@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earnings Upload Flow</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; justify-content: center; padding: 20px; background: #fff; }
+        .mermaid { max-width: 100%; }
+        h1 { text-align: center; color: #333; font-size: 1.4em; }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>3.1 Earnings Upload Flow</h1>
+        <div class="mermaid">
+sequenceDiagram
+    participant ExtSys as External System
+    participant Uploader as Admin (Uploader)
+    participant RMS as Payout System (RMS)
+    participant Approvers as Admin (Approvers 1..N)
+
+    ExtSys->>Uploader: Export earnings CSV
+    Uploader->>RMS: Upload earnings CSV
+    RMS->>RMS: Validate CSV (format, columns, data types)
+
+    alt Validation errors
+        RMS-->>Uploader: Show valid/invalid rows + downloadable error report
+        Uploader->>RMS: Submit valid rows only
+    else All rows valid
+        Uploader->>RMS: Submit CSV
+    end
+
+    loop Approval step 1..N (configured per workflow)
+        RMS->>Approvers: Email: earnings CSV approval step X of Y
+        alt Approved
+            Approvers->>RMS: Approve (different person each step)
+        else Rejected
+            Approvers->>RMS: Reject with reason
+            RMS-->>Uploader: Email: rejected at step X
+        end
+    end
+
+    Note over RMS: All approval steps passed
+    RMS->>RMS: Update creator balances (total earnings, available balance)
+    RMS-->>Uploader: Email: earnings CSV fully approved & applied
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'default', sequence: { mirrorActors: false } });</script>
+</body>
+</html>

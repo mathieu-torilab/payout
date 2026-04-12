@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TWOMI - Creator Payout Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-navy: #1A1A2E;
+            --color-cyan: #00D4FF;
+            --color-red: #FF3B5C;
+            --color-green: #00C48C;
+            --color-amber: #FFB800;
+            --color-bg: #F5F6FA;
+            --color-card: #FFFFFF;
+            --color-text: #1A1A2E;
+            --color-text-muted: #6B7280;
+            --color-border: #E5E7EB;
+        }
+
+        html, body {
+            font-family: 'Inter', sans-serif;
+            color: var(--color-text);
+            background-color: var(--color-bg);
+        }
+
+        body {
+            min-height: 100vh;
+        }
+
+        /* Login Page */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--color-navy) 0%, #2d2d4a 100%);
+        }
+
+        .login-card {
+            background: var(--color-card);
+            border-radius: 12px;
+            padding: 48px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 420px;
+            width: 90%;
+        }
+
+        .login-logo {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--color-cyan);
+            margin-bottom: 16px;
+        }
+
+        .login-tagline {
+            color: var(--color-text-muted);
+            font-size: 14px;
+            margin-bottom: 48px;
+        }
+
+        .login-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--color-cyan);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+        }
+
+        .login-button:hover {
+            background: #00b8d4;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
+        }
+
+        .login-note {
+            font-size: 12px;
+            color: var(--color-text-muted);
+        }
+
+        .login-note svg {
+            width: 12px;
+            height: 12px;
+            display: inline;
+            margin-right: 4px;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: none;
+            background: var(--color-navy);
+            color: white;
+            height: 60px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar.active {
+            display: flex;
+        }
+
+        .navbar-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            height: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .navbar-logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-cyan);
+            margin-right: 48px;
+        }
+
+        .navbar-nav {
+            display: flex;
+            gap: 32px;
+            flex: 1;
+        }
+
+        .navbar-nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .navbar-nav a:hover {
+            color: var(--color-cyan);
+        }
+
+        .navbar-nav a.active {
+            color: var(--color-cyan);
+            border-bottom-color: var(--color-cyan);
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-left: auto;
+        }
+
+        .notification-badge {
+            position: relative;
+        }
+
+        .notification-badge svg {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--color-red);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-cyan), var(--color-green));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .hamburger svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Main Content */
+        .main-container {
+            display: none;
+        }
+
+        .main-container.active {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin-top: 60px;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 32px 24px;
+            background: var(--color-bg);
+        }
+
+        .content-wrapper {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Dashboard */
+        .greeting {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .subtext {
+            color: var(--color-text-muted);
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        .stat-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 48px;
+        }
+
+        .stat-card {
+            background: var(--color-card);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--color-text-muted);
+            margin-bottom: 12px;
+        }
+
+        .stat-label svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-note {
+            font-size: 12px;
+            color: var(--color-text-muted);
+        }
+
+        .stat-note.success {
+            color: var(--color-green);
+        }
+
+        .stat-note.warning {
+            color: var(--color-amber);
+        }
+
+        /* Recent Payouts */
+        .recent-section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .payout-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .payout-row {
+            background: var(--color-card);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payout-row:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .payout-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .payout-dot.paid {
+            background: var(--color-green);
+        }
+
+        .payout-dot.processing {
+            background: var(--color-amber);
+        }
+
+        .payout-dot.failed {
+            background: var(--color-red);
+        }
+
+        .payout-info {
+            flex: 1;
+        }
+
+        .payout-description {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .payout-date {
+            font-size: 12px;
+            color: var(--color-text-muted);
+        }
+
+        .payout-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .payout-amount {
+            font-size: 16px;
+            font-weight: 600;
+            text-align: right;
+            min-width: 100px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge.paid {
+            background: #D1F4E6;
+            color: #065F46;
+        }
+
+        .badge.processing {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge.failed {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .view-all {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--color-cyan);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .view-all:hover {
+            gap: 12px;
+        }
+
+        /* Payout History */
+        .filter-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select, .filter-input {
+            padding: 8px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .filter-input {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .export-button {
+            background: var(--color-cyan);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .export-button:hover {
+            background: #00b8d4;
+        }
+
+        .export-button svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .table-wrapper {
+            background: var(--color-card);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: #F9FAFB;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--color-text-muted);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: #F9FAFB;
+        }
+
+        /* Payoneer Account */
+        .payoneer-section {
+            max-width: 600px;
+        }
+
+        .payoneer-card {
+            background: var(--color-card);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+        }
+
+        .payoneer-label {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .payoneer-value {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .payoneer-verified {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--color-green);
+            font-weight: 600;
+        }
+
+        .payoneer-verified svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .edit-button {
+            background: var(--color-cyan);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-button:hover {
+            background: #00b8d4;
+        }
+
+        .edit-form {
+            display: none;
+            padding: 20px;
+            background: #F9FAFB;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .edit-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn-save {
+            background: var(--color-cyan);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save:hover {
+            background: #00b8d4;
+        }
+
+        .btn-cancel {
+            background: var(--color-border);
+            color: var(--color-text);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            background: #d1d5db;
+        }
+
+        .form-note {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            margin-top: 12px;
+        }
+
+        .info-card {
+            background: #F0FAFF;
+            border-left: 4px solid var(--color-cyan);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .info-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .info-card-body {
+            font-size: 13px;
+            color: var(--color-text-muted);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .info-link {
+            color: var(--color-cyan);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .info-link:hover {
+            gap: 8px;
+        }
+
+        .info-link svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Notifications */
+        .notifications-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .mark-all-read {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mark-all-read:hover:not(:disabled) {
+            color: var(--color-cyan);
+        }
+
+        .mark-all-read:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .notification-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .notification-card {
+            background: var(--color-card);
+            border-left: 4px solid var(--color-border);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .notification-card.unread {
+            background: #F0FAFF;
+            border-left-color: var(--color-cyan);
+        }
+
+        .notification-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-card.paid {
+            border-left-color: var(--color-green);
+        }
+
+        .notification-card.paid.unread {
+            background: #F0FAF7;
+            border-left-color: var(--color-green);
+        }
+
+        .notification-card.processing {
+            border-left-color: var(--color-amber);
+        }
+
+        .notification-card.processing.unread {
+            background: #FFFBF0;
+            border-left-color: var(--color-amber);
+        }
+
+        .notification-card.failed {
+            border-left-color: var(--color-red);
+        }
+
+        .notification-card.failed.unread {
+            background: #FEF5F5;
+            border-left-color: var(--color-red);
+        }
+
+        .notification-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: white;
+            font-weight: 600;
+        }
+
+        .notification-icon.paid {
+            background: var(--color-green);
+        }
+
+        .notification-icon.processing {
+            background: var(--color-amber);
+        }
+
+        .notification-icon.failed {
+            background: var(--color-red);
+        }
+
+        .notification-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .notification-subtitle {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            margin-bottom: 8px;
+        }
+
+        .notification-time {
+            font-size: 11px;
+            color: var(--color-text-muted);
+        }
+
+        .notification-unread-dot {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 8px;
+            height: 8px;
+            background: var(--color-cyan);
+            border-radius: 50%;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stat-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar-nav {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background: var(--color-navy);
+                padding: 0;
+                gap: 0;
+            }
+
+            .navbar-nav.mobile-open {
+                display: flex;
+            }
+
+            .navbar-nav a {
+                padding: 16px 24px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                border-bottom-color: transparent;
+                margin-bottom: 0;
+            }
+
+            .navbar-nav a.active {
+                background: rgba(0, 212, 255, 0.1);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .hamburger {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-left: auto;
+            }
+
+            .navbar-right {
+                position: absolute;
+                right: 24px;
+                top: 50%;
+                transform: translateY(-50%);
+                margin-left: 0;
+                z-index: 101;
+            }
+
+            .login-card {
+                padding: 32px 24px;
+            }
+
+            .filter-row {
+                flex-direction: column;
+            }
+
+            .filter-input {
+                min-width: unset;
+            }
+
+            .payout-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .payout-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .content-area {
+                padding: 24px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-card">
+            <div class="login-logo">TWOMI</div>
+            <div class="login-tagline">Track your creator payouts</div>
+            <button class="login-button" onclick="handleLogin()">
+                <span>Continue with Twomi</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+            <div class="login-note">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                Secure login via your Twomi account
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="main-container" id="mainContainer">
+        <!-- Navbar -->
+        <nav class="navbar" id="navbar">
+            <div class="navbar-container">
+                <div class="navbar-logo">TWOMI</div>
+                <nav class="navbar-nav" id="navMenu">
+                    <a href="#" onclick="navigateTo('dashboard')" class="nav-link active">Dashboard</a>
+                    <a href="#" onclick="navigateTo('history')" class="nav-link">Payout History</a>
+                    <a href="#" onclick="navigateTo('payoneer')" class="nav-link">Payoneer Account</a>
+                </nav>
+                <div class="navbar-right">
+                    <div class="notification-badge" onclick="navigateTo('notifications')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <div class="notification-dot" id="notificationBadge">2</div>
+                    </div>
+                    <div class="user-avatar">TY</div>
+                </div>
+                <button class="hamburger" onclick="toggleMobileMenu()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <div class="content-wrapper">
+
+                <!-- Dashboard Page -->
+                <div class="page active" id="dashboardPage">
+                    <div class="greeting">Welcome back, Tanaka Yuki 👋</div>
+                    <div class="subtext">Here's your payout summary for April 2026</div>
+
+                    <div class="stat-cards">
+                        <div class="stat-card">
+                            <div class="stat-label">
+                                <span>💴</span>
+                                Total Earnings
+                            </div>
+                            <div class="stat-value">¥2,450,000</div>
+                            <div class="stat-note success">+¥120,000 this month</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">
+                                <span>💰</span>
+                                Available Balance
+                            </div>
+                            <div class="stat-value">¥350,000</div>
+                            <div class="stat-note">Ready for payout</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">
+                                <span>⏳</span>
+                                Processing
+                            </div>
+                            <div class="stat-value">¥150,000</div>
+                            <div class="stat-note warning">2 payouts in progress</div>
+                        </div>
+                    </div>
+
+                    <div class="recent-section-title">Recent Payouts</div>
+                    <div class="payout-list">
+                        <div class="payout-row">
+                            <div class="payout-dot paid"></div>
+                            <div class="payout-info">
+                                <div class="payout-description">Avatar sales payout</div>
+                                <div class="payout-date">Apr 5 2026</div>
+                            </div>
+                            <div class="payout-right">
+                                <div class="payout-amount">¥120,000</div>
+                                <span class="badge paid">Paid</span>
+                            </div>
+                        </div>
+                        <div class="payout-row">
+                            <div class="payout-dot paid"></div>
+                            <div class="payout-info">
+                                <div class="payout-description">Creator earnings — March 2026</div>
+                                <div class="payout-date">Mar 28 2026</div>
+                            </div>
+                            <div class="payout-right">
+                                <div class="payout-amount">¥45,000</div>
+                                <span class="badge paid">Paid</span>
+                            </div>
+                        </div>
+                        <div class="payout-row">
+                            <div class="payout-dot processing"></div>
+                            <div class="payout-info">
+                                <div class="payout-description">Avatar sales payout</div>
+                                <div class="payout-date">Mar 15 2026</div>
+                            </div>
+                            <div class="payout-right">
+                                <div class="payout-amount">¥78,000</div>
+                                <span class="badge processing">Processing</span>
+                            </div>
+                        </div>
+                        <div class="payout-row">
+                            <div class="payout-dot paid"></div>
+                            <div class="payout-info">
+                                <div class="payout-description">Creator earnings — February 2026</div>
+                                <div class="payout-date">Feb 28 2026</div>
+                            </div>
+                            <div class="payout-right">
+                                <div class="payout-amount">¥33,000</div>
+                                <span class="badge paid">Paid</span>
+                            </div>
+                        </div>
+                        <div class="payout-row">
+                            <div class="payout-dot failed"></div>
+                            <div class="payout-info">
+                                <div class="payout-description">Creator earnings — January 2026</div>
+                                <div class="payout-date">Jan 31 2026</div>
+                            </div>
+                            <div class="payout-right">
+                                <div class="payout-amount">¥30,000</div>
+                                <span class="badge failed">Failed</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a class="view-all" onclick="navigateTo('history')">
+                        View all payouts
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- Payout History Page -->
+                <div class="page" id="historyPage">
+                    <div class="greeting">Payout History</div>
+
+                    <div class="filter-row">
+                        <select class="filter-select" id="statusFilter" onchange="filterTable()">
+                            <option value="">Status: All</option>
+                            <option value="paid">Paid</option>
+                            <option value="processing">Processing</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                        <input type="date" class="filter-input" id="fromDate" onchange="filterTable()" placeholder="From date">
+                        <input type="date" class="filter-input" id="toDate" onchange="filterTable()" placeholder="To date">
+                        <button class="export-button" onclick="exportCSV()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                            Export CSV
+                        </button>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table id="payoutTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Currency</th>
+                                    <th>Status</th>
+                                    <th>Payoneer Ref</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <tr>
+                                    <td>Apr 5 2026</td>
+                                    <td>Avatar sales payout</td>
+                                    <td>120,000</td>
+                                    <td>JPY</td>
+                                    <td><span class="badge paid">Paid</span></td>
+                                    <td>PYN-884521</td>
+                                </tr>
+                                <tr>
+                                    <td>Mar 28 2026</td>
+                                    <td>Creator earnings — March 2026</td>
+                                    <td>45,000</td>
+                                    <td>JPY</td>
+                                    <td><span class="badge paid">Paid</span></td>
+                                    <td>PYN-773410</td>
+                                </tr>
+                                <tr>
+                                    <td>Mar 15 2026</td>
+                                    <td>Avatar sales payout</td>
+                                    <td>78,000</td>
+                                    <td>JPY</td>
+                                    <td><span class="badge processing">Processing</span></td>
+                                    <td>—</td>
+                                </tr>
+                                <tr>
+                                    <td>Feb 28 2026</td>
+                                    <td>Creator earnings — February 2026</td>
+                                    <td>33,000</td>
+                                    <td>JPY</td>
+                                    <td><span class="badge paid">Paid</span></td>
+                                    <td>PYN-762198</td>
+                                </tr>
+                                <tr>
+                                    <td>Jan 31 2026</td>
+                                    <td>Creator earnings — January 2026</td>
+                                    <td>30,000</td>
+                                    <td>JPY</td>
+                                    <td><span class="badge failed">Failed</span></td>
+                                    <td>—</td>
+                                </tr>
+                                <tr>
+                                    <td>Jan 15 2026</td>
+                                    <td>Bonus payout</td>
+                                    <td>50,000</td>
+                                    <td>JPY</td>
+                                    <td><span class="badge paid">Paid</span></td>
+                                    <td>PYN-751289</td>
+                                </tr>
+                                <tr>
+                                    <td>Dec 31 2025</td>
+                                    <td>Creator earnings — December 2025</td>
+                                    <td>89,000</td>
+                                    <td>JPY</td>
+                                    <td><span class="badge paid">Paid</span></td>
+                                    <td>PYN-740156</td>
+                                </tr>
+                                <tr>
+                                    <td>Dec 15 2025</td>
+                                    <td>Avatar sales payout</td>
+                                    <td>210,000</td>
+                                    <td>JPY</td>
+                                    <td><span class="badge paid">Paid</span></td>
+                                    <td>PYN-739024</td>
+                                </tr>
+                                <tr>
+                                    <td>Nov 30 2025</td>
+                                    <td>Creator earnings — November 2025</td>
+                                    <td>67,000</td>
+                                    <td>JPY</td>
+                                    <td><span class="badge processing">Processing</span></td>
+                                    <td>—</td>
+                                </tr>
+                                <tr>
+                                    <td>Nov 15 2025</td>
+                                    <td>Avatar sales payout</td>
+                                    <td>95,000</td>
+                                    <td>JPY</td>
+                                    <td><span class="badge paid">Paid</span></td>
+                                    <td>PYN-717892</td>
+                                </tr>
+                                <tr>
+                                    <td>Oct 31 2025</td>
+                                    <td>Creator earnings — October 2025</td>
+                                    <td>42,000</td>
+                                    <td>JPY</td>
+                                    <td><span class="badge paid">Paid</span></td>
+                                    <td>PYN-706759</td>
+                                </tr>
+                                <tr>
+                                    <td>Oct 15 2025</td>
+                                    <td>Bonus payout</td>
+                                    <td>15,000</td>
+                                    <td>JPY</td>
+                                    <td><span class="badge failed">Failed</span></td>
+                                    <td>—</td>
+                                </tr>
+                                <tr>
+                                    <td>Sep 30 2025</td>
+                                    <td>Creator earnings — September 2025</td>
+                                    <td>56,000</td>
+                                    <td>JPY</td>
+                                    <td><span class="badge paid">Paid</span></td>
+                                    <td>PYN-695626</td>
+                                </tr>
+                                <tr>
+                                    <td>Sep 15 2025</td>
+                                    <td>Avatar sales payout</td>
+                                    <td>132,000</td>
+                                    <td>JPY</td>
+                                    <td><span class="badge paid">Paid</span></td>
+                                    <td>PYN-684493</td>
+                                </tr>
+                                <tr>
+                                    <td>Aug 31 2025</td>
+                                    <td>Creator earnings — August 2025</td>
+                                    <td>71,000</td>
+                                    <td>JPY</td>
+                                    <td><span class="badge paid">Paid</span></td>
+                                    <td>PYN-673360</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Payoneer Account Page -->
+                <div class="page" id="payoneerPage">
+                    <div class="greeting">Payoneer Account</div>
+
+                    <div class="payoneer-section">
+                        <div class="payoneer-card">
+                            <div class="payoneer-label">Payoneer Email</div>
+                            <div class="payoneer-value">
+                                <span id="payoneerEmail">tanaka.y@payoneer.com</span>
+                                <span class="payoneer-verified">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Verified
+                                </span>
+                            </div>
+                            <button class="edit-button" onclick="toggleEditForm()">Edit</button>
+
+                            <div class="edit-form" id="editForm">
+                                <div class="form-group">
+                                    <label class="form-label">Payoneer Email</label>
+                                    <input type="email" class="form-input" id="emailInput" value="tanaka.y@payoneer.com">
+                                </div>
+                                <div class="form-actions">
+                                    <button class="btn-save" onclick="savePayoneerEmail()">Save Changes</button>
+                                    <button class="btn-cancel" onclick="cancelEdit()">Cancel</button>
+                                </div>
+                                <div class="form-note">Changing your Payoneer email will apply to future payouts only. Contact support if you need help.</div>
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="info-card-title">About Payoneer</div>
+                            <div class="info-card-body">
+                                Payoneer is the payment platform used to send your creator earnings. Ensure your Payoneer email matches your verified Payoneer account to receive payments without issues.
+                            </div>
+                            <a href="#" class="info-link" onclick="event.preventDefault()">
+                                Visit Payoneer Support
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications Page -->
+                <div class="page" id="notificationsPage">
+                    <div class="notifications-header">
+                        <div class="greeting">Notifications</div>
+                        <button class="mark-all-read" id="markAllReadBtn" onclick="markAllAsRead()">Mark all as read</button>
+                    </div>
+
+                    <div class="notification-list" id="notificationList">
+                        <div class="notification-card unread paid" onclick="markNotificationRead(this)">
+                            <div class="notification-icon paid">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-title">Payout completed — ¥120,000</div>
+                                <div class="notification-subtitle">Ref: PYN-884521</div>
+                                <div class="notification-time">2 hours ago</div>
+                            </div>
+                            <div class="notification-unread-dot"></div>
+                        </div>
+
+                        <div class="notification-card unread processing" onclick="markNotificationRead(this)">
+                            <div class="notification-icon processing">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                    <path d="M12 2v6m6.364 1.636l-4.243 4.243m4.243 6.364h-6m-6.364 -1.636l-4.243 -4.243m-4.243 -6.364h6"></path>
+                                </svg>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-title">Payout processing — ¥78,000</div>
+                                <div class="notification-subtitle">Expected within 5 business days</div>
+                                <div class="notification-time">1 day ago</div>
+                            </div>
+                            <div class="notification-unread-dot"></div>
+                        </div>
+
+                        <div class="notification-card read failed" onclick="markNotificationRead(this)">
+                            <div class="notification-icon failed">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                </svg>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-title">Payout failed — ¥30,000</div>
+                                <div class="notification-subtitle">Reason: PAYEE_NOT_FOUND. Please verify your Payoneer email.</div>
+                                <div class="notification-time">3 days ago</div>
+                            </div>
+                        </div>
+
+                        <div class="notification-card read paid" onclick="markNotificationRead(this)">
+                            <div class="notification-icon paid">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-title">Payout completed — ¥45,000</div>
+                                <div class="notification-subtitle">Ref: PYN-773410</div>
+                                <div class="notification-time">4 days ago</div>
+                            </div>
+                        </div>
+
+                        <div class="notification-card read paid" onclick="markNotificationRead(this)">
+                            <div class="notification-icon paid">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-title">Payout completed — ¥33,000</div>
+                                <div class="notification-subtitle">Ref: PYN-762198</div>
+                                <div class="notification-time">Apr 1 2026</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let isLoggedIn = false;
+        let unreadCount = 2;
+        const allPayouts = [
+            { date: '2026-04-05', description: 'Avatar sales payout', amount: 120000, currency: 'JPY', status: 'paid', ref: 'PYN-884521' },
+            { date: '2026-03-28', description: 'Creator earnings — March 2026', amount: 45000, currency: 'JPY', status: 'paid', ref: 'PYN-773410' },
+            { date: '2026-03-15', description: 'Avatar sales payout', amount: 78000, currency: 'JPY', status: 'processing', ref: '' },
+            { date: '2026-02-28', description: 'Creator earnings — February 2026', amount: 33000, currency: 'JPY', status: 'paid', ref: 'PYN-762198' },
+            { date: '2026-01-31', description: 'Creator earnings — January 2026', amount: 30000, currency: 'JPY', status: 'failed', ref: '' },
+            { date: '2026-01-15', description: 'Bonus payout', amount: 50000, currency: 'JPY', status: 'paid', ref: 'PYN-751289' },
+            { date: '2025-12-31', description: 'Creator earnings — December 2025', amount: 89000, currency: 'JPY', status: 'paid', ref: 'PYN-740156' },
+            { date: '2025-12-15', description: 'Avatar sales payout', amount: 210000, currency: 'JPY', status: 'paid', ref: 'PYN-739024' },
+            { date: '2025-11-30', description: 'Creator earnings — November 2025', amount: 67000, currency: 'JPY', status: 'processing', ref: '' },
+            { date: '2025-11-15', description: 'Avatar sales payout', amount: 95000, currency: 'JPY', status: 'paid', ref: 'PYN-717892' },
+            { date: '2025-10-31', description: 'Creator earnings — October 2025', amount: 42000, currency: 'JPY', status: 'paid', ref: 'PYN-706759' },
+            { date: '2025-10-15', description: 'Bonus payout', amount: 15000, currency: 'JPY', status: 'failed', ref: '' },
+            { date: '2025-09-30', description: 'Creator earnings — September 2025', amount: 56000, currency: 'JPY', status: 'paid', ref: 'PYN-695626' },
+            { date: '2025-09-15', description: 'Avatar sales payout', amount: 132000, currency: 'JPY', status: 'paid', ref: 'PYN-684493' },
+            { date: '2025-08-31', description: 'Creator earnings — August 2025', amount: 71000, currency: 'JPY', status: 'paid', ref: 'PYN-673360' }
+        ];
+
+        function handleLogin() {
+            isLoggedIn = true;
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('mainContainer').classList.add('active');
+            document.getElementById('navbar').classList.add('active');
+            navigateTo('dashboard');
+            lucide.createIcons();
+        }
+
+        function navigateTo(page) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+            // Show target page
+            const targetPage = document.getElementById(page + 'Page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            const navMap = {
+                'dashboard': 0,
+                'history': 1,
+                'payoneer': 2
+            };
+            if (navMap[page] !== undefined) {
+                document.querySelectorAll('.nav-link')[navMap[page]].classList.add('active');
+            }
+
+            // Close mobile menu
+            document.getElementById('navMenu').classList.remove('mobile-open');
+
+            // Reinitialize icons
+            lucide.createIcons();
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('navMenu').classList.toggle('mobile-open');
+        }
+
+        function toggleEditForm() {
+            document.getElementById('editForm').classList.toggle('active');
+        }
+
+        function cancelEdit() {
+            document.getElementById('editForm').classList.remove('active');
+            document.getElementById('emailInput').value = document.getElementById('payoneerEmail').textContent;
+        }
+
+        function savePayoneerEmail() {
+            const newEmail = document.getElementById('emailInput').value;
+            if (newEmail && newEmail.includes('@')) {
+                document.getElementById('payoneerEmail').textContent = newEmail;
+                document.getElementById('editForm').classList.remove('active');
+            }
+        }
+
+        function filterTable() {
+            const status = document.getElementById('statusFilter').value;
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+
+            document.querySelectorAll('#tableBody tr').forEach(row => {
+                const rowStatus = row.querySelector('.badge').textContent.toLowerCase().trim();
+                const rowDate = row.cells[0].textContent;
+
+                let match = true;
+
+                if (status && rowStatus !== status) {
+                    match = false;
+                }
+
+                if (fromDate && rowDate < fromDate) {
+                    match = false;
+                }
+
+                if (toDate && rowDate > toDate) {
+                    match = false;
+                }
+
+                row.style.display = match ? '' : 'none';
+            });
+        }
+
+        function exportCSV() {
+            const rows = Array.from(document.querySelectorAll('#tableBody tr'))
+                .filter(row => row.style.display !== 'none')
+                .map(row => {
+                    return Array.from(row.cells)
+                        .map((cell, idx) => {
+                            if (idx === 4) {
+                                return cell.textContent.trim();
+                            }
+                            return '"' + cell.textContent.trim() + '"';
+                        })
+                        .join(',');
+                });
+
+            const header = ['Date', 'Description', 'Amount', 'Currency', 'Status', 'Payoneer Ref'].map(h => '"' + h + '"').join(',');
+            const csv = header + '\n' + rows.join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'payout-history.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function markNotificationRead(element) {
+            if (element.classList.contains('unread')) {
+                element.classList.remove('unread');
+                const dot = element.querySelector('.notification-unread-dot');
+                if (dot) dot.remove();
+                unreadCount--;
+                updateNotificationBadge();
+            }
+        }
+
+        function markAllAsRead() {
+            document.querySelectorAll('.notification-card.unread').forEach(card => {
+                card.classList.remove('unread');
+                const dot = card.querySelector('.notification-unread-dot');
+                if (dot) dot.remove();
+            });
+            unreadCount = 0;
+            updateNotificationBadge();
+        }
+
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notificationBadge');
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNotificationBadge();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

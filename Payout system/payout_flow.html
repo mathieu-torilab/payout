@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payout Flow</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; justify-content: center; padding: 20px; background: #fff; }
+        .mermaid { max-width: 100%; }
+        h1 { text-align: center; color: #333; font-size: 1.4em; }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>3.2 Payout Flow</h1>
+        <div class="mermaid">
+sequenceDiagram
+    participant ExtSys as External System
+    participant Uploader as Admin (Uploader)
+    participant RMS as Payout System (RMS)
+    participant CSVApprovers as CSV Approvers 1..N
+    participant PayCreator as Payout Creator
+    participant PayApprovers as Payout Approvers 1..N
+    participant PES as Payout Execution Service
+    participant Payoneer as Payoneer
+    participant Creator as Creator (Receiver)
+
+    rect rgb(235, 245, 255)
+        Note over ExtSys, CSVApprovers: Phase 1 — CSV Upload & Approval
+        ExtSys->>Uploader: Export payout CSV
+        Uploader->>RMS: Upload payout CSV
+        RMS->>RMS: Validate CSV (format, emails, amounts, duplicates)
+        RMS->>RMS: Cross-validate payoneer_email vs creator registration
+
+        alt Validation errors
+            RMS-->>Uploader: Show valid/invalid rows + error report
+            Uploader->>RMS: Submit valid rows only
+        else All valid
+            Uploader->>RMS: Submit CSV
+        end
+
+        loop CSV Approval step 1..N (configured)
+            RMS->>CSVApprovers: Email: CSV approval step X of Y
+            alt Approved
+                CSVApprovers->>RMS: Approve (different person each step)
+            else Rejected
+                CSVApprovers->>RMS: Reject with reason
+                RMS-->>Uploader: Email: rejected at step X
+            end
+        end
+
+        Note over RMS: Approved rows enter payout pool
+    end
+
+    rect rgb(255, 248, 230)
+        Note over PayCreator, PayApprovers: Phase 2 — Payout Request & Approval
+        PayCreator->>RMS: Select rows from approved payout pool
+        PayCreator->>RMS: Create payout request
+
+        loop Payout Approval step 1..N (configured)
+            RMS->>PayApprovers: Email: payout approval step X of Y
+            alt Approved
+                PayApprovers->>RMS: Approve (different person each step)
+            else Rejected
+                PayApprovers->>RMS: Reject with reason
+                RMS-->>PayCreator: Email: rejected at step X
+            end
+        end
+
+        alt Execute immediately
+            Note over RMS: All steps passed → execute now
+        else Scheduled
+            Note over RMS: All steps passed → wait until scheduled date/time
+        end
+    end
+
+    rect rgb(235, 255, 235)
+        Note over RMS, Payoneer: Phase 3 — Payout Execution
+        RMS->>PES: Send payout list (request_id, amount, payoneer_email)
+        PES->>PES: Idempotency check (duplicate request_id)
+        PES->>Payoneer: POST payout API
+
+        alt Sync success
+            Payoneer-->>PES: Response (completed)
+            PES-->>RMS: Return success (completed, payout_id)
+            RMS-->>Creator: Email: payout completed
+        else Async processing
+            Payoneer-->>PES: Response (pending)
+            Payoneer-->>PES: Webhook (completed / failed)
+            PES->>PES: Verify HMAC signature
+            alt Success
+                PES-->>RMS: Notify success
+                RMS-->>Creator: Email: payout completed
+            else Failed
+                PES-->>RMS: Notify failure (error_code)
+                RMS-->>Creator: Email: payout failed
+            end
+        end
+
+        opt Webhook not received
+            PES->>Payoneer: GET payout status (polling fallback)
+            Payoneer-->>PES: Return status
+            PES-->>RMS: Update result
+        end
+    end
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'default', sequence: { mirrorActors: false } });</script>
+</body>
+</html>

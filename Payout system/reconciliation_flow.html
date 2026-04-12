@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reconciliation Flow</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; justify-content: center; padding: 20px; background: #fff; }
+        .mermaid { max-width: 100%; }
+        h1 { text-align: center; color: #333; font-size: 1.4em; }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>3.3 Reconciliation Flow</h1>
+        <div class="mermaid">
+sequenceDiagram
+    participant Admin as Admin
+    participant RMS as Payout System (RMS)
+    participant PES as Payout Execution Service
+    participant Payoneer as Payoneer
+
+    Admin->>RMS: Trigger reconciliation
+    RMS->>PES: Request latest payout statuses
+    PES->>Payoneer: GET payout statuses (batch)
+    Payoneer-->>PES: Return statuses
+    PES-->>RMS: Return results
+
+    RMS->>RMS: Compare RMS records vs Payoneer results
+
+    alt Mismatches found
+        RMS-->>Admin: Display mismatches (table with discrepancies)
+        Admin->>RMS: Review and resolve (manual override if needed)
+        RMS->>RMS: Log resolution in audit trail
+    else All matched
+        RMS-->>Admin: Reconciliation complete, no discrepancies
+    end
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'default', sequence: { mirrorActors: false } });</script>
+</body>
+</html>

@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TWOMI Payout Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --color-navy: #1A1A2E; --color-cyan: #00D4FF; --color-red: #FF3B5C;
+            --color-green: #00C48C; --color-amber: #FFB800; --color-bg: #F5F6FA;
+            --color-card: #FFFFFF; --color-text: #1A1A2E; --color-text-muted: #6B7280;
+            --color-border: #E5E7EB;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--color-bg); color: var(--color-text); overflow: hidden; }
+        .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, var(--color-navy) 0%, #0D0D1F 100%); }
+        .login-card { background: var(--color-card); border-radius: 12px; padding: 48px; text-align: center; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .login-card h1 { font-size: 48px; color: var(--color-cyan); margin-bottom: 8px; font-weight: 700; letter-spacing: -2px; }
+        .login-card .subtitle { color: var(--color-text-muted); font-size: 14px; margin-bottom: 32px; }
+        .google-signin-btn { width: 100%; padding: 12px 16px; background: var(--color-card); border: 1px solid var(--color-border); border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--color-navy); display: flex; align-items: center; justify-content: center; gap: 12px; transition: all 0.2s; margin-bottom: 16px; }
+        .google-signin-btn:hover { border-color: var(--color-navy); box-shadow: 0 4px 12px rgba(26, 26, 46, 0.1); }
+        .google-icon { width: 20px; height: 20px; background: linear-gradient(135deg, #4285F4 0%, #EA4335 100%); border-radius: 3px; }
+        .login-note { font-size: 12px; color: var(--color-text-muted); }
+        .app-layout { display: flex; height: 100vh; width: 100%; }
+        .sidebar { width: 240px; background: var(--color-navy); color: white; padding: 24px 0; overflow-y: auto; flex-shrink: 0; position: fixed; left: 0; top: 0; height: 100vh; }
+        .sidebar-brand { padding: 0 24px 32px; font-size: 24px; font-weight: 700; color: var(--color-cyan); letter-spacing: -1px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav li { padding: 12px 24px; cursor: pointer; transition: background 0.2s; color: rgba(255, 255, 255, 0.7); font-size: 14px; font-weight: 500; }
+        .sidebar-nav li:hover { background: rgba(0, 212, 255, 0.1); color: white; }
+        .sidebar-nav li.active { background: rgba(0, 212, 255, 0.2); color: var(--color-cyan); border-left: 3px solid var(--color-cyan); padding-left: 21px; }
+        .sidebar-divider { height: 1px; background: rgba(255, 255, 255, 0.1); margin: 16px 0; }
+        .header { position: fixed; top: 0; left: 240px; right: 0; height: 60px; background: var(--color-navy); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000; }
+        .header-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; }
+        .header-right { display: flex; align-items: center; gap: 24px; }
+        .notification-bell { cursor: pointer; transition: transform 0.2s; }
+        .notification-bell:hover { transform: scale(1.1); }
+        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--color-cyan); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--color-navy); cursor: pointer; }
+        .main-content { margin-left: 240px; margin-top: 60px; flex: 1; overflow-y: auto; background: var(--color-bg); padding: 24px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+        .stat-card { background: var(--color-card); padding: 24px; border-radius: 8px; border: 1px solid var(--color-border); }
+        .stat-label { font-size: 12px; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 12px; }
+        .stat-value { font-size: 28px; font-weight: 700; color: var(--color-text); margin-bottom: 8px; }
+        .stat-card.amber .stat-value { color: var(--color-amber); }
+        .stat-card.red .stat-value { color: var(--color-red); }
+        .stat-card.green .stat-value { color: var(--color-green); }
+        .stat-detail { font-size: 12px; color: var(--color-text-muted); }
+        .activity-section h2 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+        .activity-feed { background: var(--color-card); border-radius: 8px; border: 1px solid var(--color-border); overflow: hidden; }
+        .activity-item { padding: 16px 24px; border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: flex-start; }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-content { flex: 1; }
+        .activity-title { font-weight: 500; color: var(--color-text); margin-bottom: 4px; font-size: 14px; }
+        .activity-detail { font-size: 12px; color: var(--color-text-muted); }
+        .activity-time { font-size: 12px; color: var(--color-text-muted); white-space: nowrap; margin-left: 16px; }
+        table { width: 100%; border-collapse: collapse; background: var(--color-card); border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; }
+        thead { background: #FAFBFC; border-bottom: 1px solid var(--color-border); }
+        th { padding: 12px 16px; text-align: left; font-weight: 600; font-size: 12px; color: var(--color-text-muted); text-transform: uppercase; }
+        td { padding: 16px; border-bottom: 1px solid var(--color-border); font-size: 14px; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #FAFBFC; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+        .badge-pending { background: rgba(255, 184, 0, 0.1); color: var(--color-amber); }
+        .badge-approved { background: rgba(0, 196, 140, 0.1); color: var(--color-green); }
+        .badge-rejected { background: rgba(255, 59, 92, 0.1); color: var(--color-red); }
+        .badge-completed { background: rgba(0, 196, 140, 0.1); color: var(--color-green); }
+        .badge-scheduled { background: rgba(0, 212, 255, 0.1); color: var(--color-cyan); }
+        .badge-failed { background: rgba(255, 59, 92, 0.1); color: var(--color-red); }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 14px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: var(--color-cyan); color: var(--color-navy); }
+        .btn-primary:hover { background: #00B8D4; box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3); }
+        .btn-secondary { background: white; color: var(--color-navy); border: 1px solid var(--color-border); }
+        .btn-secondary:hover { background: #FAFBFC; border-color: var(--color-navy); }
+        .btn-danger { background: rgba(255, 59, 92, 0.1); color: var(--color-red); }
+        .btn-danger:hover { background: rgba(255, 59, 92, 0.2); }
+        .btn-success { background: rgba(0, 196, 140, 0.1); color: var(--color-green); }
+        .btn-success:hover { background: rgba(0, 196, 140, 0.2); }
+        .btn-small { padding: 6px 12px; font-size: 12px; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: var(--color-card); border-radius: 12px; padding: 32px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); position: relative; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .modal-title { font-size: 18px; font-weight: 700; }
+        .modal-close { cursor: pointer; color: var(--color-text-muted); transition: color 0.2s; background: none; border: none; padding: 0; font-size: 16px; }
+        .modal-close:hover { color: var(--color-text); }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-weight: 500; margin-bottom: 8px; font-size: 14px; }
+        .form-input, .form-select { width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 14px; transition: border-color 0.2s; }
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--color-cyan); }
+        .checkbox-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+        .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .checkbox-label input { cursor: pointer; }
+        .modal-footer { display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; }
+        .drag-drop-zone { border: 2px dashed var(--color-border); border-radius: 8px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
+        .drag-drop-zone:hover { border-color: var(--color-cyan); background: rgba(0, 212, 255, 0.05); }
+        .drag-drop-zone.active { border-color: var(--color-cyan); background: rgba(0, 212, 255, 0.1); }
+        .drag-drop-icon { font-size: 32px; margin-bottom: 12px; }
+        .drag-drop-text { font-size: 14px; font-weight: 500; color: var(--color-text); margin-bottom: 4px; }
+        .drag-drop-hint { font-size: 12px; color: var(--color-text-muted); }
+        .info-banner { background: rgba(0, 212, 255, 0.1); border-left: 3px solid var(--color-cyan); padding: 12px 16px; border-radius: 4px; margin-bottom: 16px; font-size: 13px; color: var(--color-text); }
+        .stepper { display: flex; align-items: center; gap: 0; margin: 24px 0; }
+        .step { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; }
+        .step-circle { width: 40px; height: 40px; border-radius: 50%; background: var(--color-border); color: var(--color-text-muted); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; margin-bottom: 8px; position: relative; z-index: 1; }
+        .step.active .step-circle { background: var(--color-cyan); color: var(--color-navy); }
+        .step.completed .step-circle { background: var(--color-green); color: white; }
+        .step-label { font-size: 12px; color: var(--color-text-muted); text-align: center; max-width: 80px; }
+        .step.active .step-label { color: var(--color-cyan); font-weight: 600; }
+        .step.completed .step-label { color: var(--color-green); font-weight: 600; }
+        .step-connector { flex: 1; height: 2px; background: var(--color-border); margin-top: -48px; z-index: 0; }
+        .step.completed ~ .step-connector { background: var(--color-green); }
+        .step:last-child .step-connector { display: none; }
+        .action-bar { position: fixed; bottom: 0; left: 240px; right: 0; background: white; border-top: 1px solid var(--color-border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; z-index: 500; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05); }
+        .action-bar.hidden { display: none; }
+        .action-bar-info { font-size: 14px; color: var(--color-text); }
+        .action-bar-total { font-weight: 600; color: var(--color-cyan); }
+        .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--color-border); margin-bottom: 24px; }
+        .tab { padding: 12px 16px; cursor: pointer; border-bottom: 2px solid transparent; color: var(--color-text-muted); font-weight: 500; transition: all 0.2s; }
+        .tab:hover { color: var(--color-text); }
+        .tab.active { color: var(--color-cyan); border-bottom-color: var(--color-cyan); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .section-title { font-size: 18px; font-weight: 700; color: var(--color-text); }
+        .detail-header { background: var(--color-card); padding: 24px; border-radius: 8px; border: 1px solid var(--color-border); margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start; }
+        .detail-header-info h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+        .detail-header-info p { font-size: 13px; color: var(--color-text-muted); margin-bottom: 2px; }
+        .number-input-group { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+        .number-btn { width: 32px; height: 32px; border: 1px solid var(--color-border); background: white; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .number-btn:hover { border-color: var(--color-cyan); color: var(--color-cyan); }
+        .number-input { width: 60px; text-align: center; border: 1px solid var(--color-border); padding: 8px; border-radius: 4px; font-weight: 600; font-size: 14px; }
+        .config-card { background: var(--color-card); border: 1px solid var(--color-border); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+        .config-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+        .config-card p { font-size: 13px; color: var(--color-text-muted); margin-bottom: 16px; }
+        .config-flow { display: flex; align-items: center; gap: 12px; padding: 16px; background: #FAFBFC; border-radius: 6px; margin-top: 16px; font-size: 12px; color: var(--color-text-muted); font-weight: 500; flex-wrap: wrap; }
+        .flow-arrow { color: var(--color-cyan); }
+        .toggle-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .toggle-switch { position: relative; width: 44px; height: 24px; background: var(--color-border); border-radius: 12px; transition: background 0.2s; cursor: pointer; border: none; }
+        .toggle-switch.on { background: var(--color-green); }
+        .toggle-switch::after { content: ''; position: absolute; width: 20px; height: 20px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: left 0.2s; }
+        .toggle-switch.on::after { left: 22px; }
+        .segmented-control { display: flex; gap: 0; border: 1px solid var(--color-border); border-radius: 6px; overflow: hidden; background: white; }
+        .segment { flex: 1; padding: 8px 16px; border: none; background: white; cursor: pointer; font-weight: 500; font-size: 14px; color: var(--color-text-muted); transition: all 0.2s; border-right: 1px solid var(--color-border); }
+        .segment:last-child { border-right: none; }
+        .segment.active { background: var(--color-cyan); color: var(--color-navy); }
+        .filter-bar { background: var(--color-card); padding: 16px 24px; border-radius: 8px; border: 1px solid var(--color-border); margin-bottom: 24px; display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+        .filter-group { display: flex; flex-direction: column; gap: 6px; }
+        .filter-label { font-size: 12px; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; }
+        .filter-input { width: 150px; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 6px; font-size: 14px; }
+        .eye-toggle { cursor: pointer; color: var(--color-text-muted); transition: color 0.2s; background: none; border: none; padding: 0; }
+        .eye-toggle:hover { color: var(--color-text); }
+        .masked-input { font-family: monospace; letter-spacing: 2px; }
+        .summary-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .summary-card { background: var(--color-card); padding: 24px; border-radius: 8px; border: 1px solid var(--color-border); text-align: center; }
+        .summary-value { font-size: 32px; font-weight: 700; color: var(--color-cyan); margin-bottom: 8px; }
+        .summary-label { font-size: 13px; color: var(--color-text-muted); }
+        .permissions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+        .permission-badge { background: rgba(0, 212, 255, 0.1); color: var(--color-cyan); padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 500; text-align: center; }
+        .status-active { color: var(--color-green); font-weight: 600; }
+        .status-inactive { color: var(--color-text-muted); font-weight: 600; }
+        .btn-large { padding: 16px 32px; font-size: 16px; margin: 0 auto; }
+        .error-report-link { display: inline-flex; align-items: center; gap: 8px; color: var(--color-cyan); cursor: pointer; font-weight: 500; margin-bottom: 24px; }
+        .error-report-link:hover { text-decoration: underline; }
+        .key-value { display: grid; grid-template-columns: 180px 1fr; gap: 16px; margin-bottom: 12px; align-items: center; }
+        .key { font-weight: 500; font-size: 14px; color: var(--color-text-muted); }
+        .value { font-weight: 600; font-size: 14px; color: var(--color-text); }
+        .back-link { color: var(--color-cyan); cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 4px; text-decoration: none; font-size: 14px; margin-bottom: 24px; }
+        .back-link:hover { text-decoration: underline; }
+        .resolve-options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+        .resolve-option { padding: 12px 16px; border: 1px solid var(--color-border); border-radius: 6px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+        .resolve-option input { cursor: pointer; }
+        .resolve-option:hover { border-color: var(--color-cyan); background: rgba(0, 212, 255, 0.05); }
+        .confirmation-text { font-size: 14px; color: var(--color-text-muted); margin-bottom: 24px; }
+        .centered-action { text-align: center; padding: 48px 24px; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        @media (max-width: 1400px) { .stat-cards { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { .sidebar { width: 0; padding: 0; } .header, .main-content, .action-bar { margin-left: 0; left: 0; } .stat-cards { grid-template-columns: 1fr; } .modal-content { width: 90%; } }
+    </style>
+</head>
+<body>
+    <div id="login-page" class="login-container">
+        <div class="login-card">
+            <h1>TWOMI</h1>
+            <p class="subtitle">Payout Admin</p>
+            <button class="google-signin-btn" onclick="loginUser()">
+                <div class="google-icon"></div>
+                Sign in with Google
+            </button>
+            <p class="login-note">Access restricted to @torilab.ai accounts</p>
+        </div>
+    </div>
+
+    <div id="app-layout" class="app-layout" style="display: none;">
+        <div class="sidebar">
+            <div class="sidebar-brand">TWOMI</div>
+            <ul class="sidebar-nav">
+                <li class="nav-item active" onclick="navigateTo('dashboard', this)">Dashboard</li>
+                <li class="nav-item" onclick="navigateTo('earnings-csv', this)">Earnings CSV</li>
+                <li class="nav-item" onclick="navigateTo('payout-execution', this)">Payout Execution</li>
+                <li class="nav-item" onclick="navigateTo('monitoring', this)">Monitoring</li>
+                <li class="nav-item" onclick="navigateTo('reconciliation', this)">Reconciliation</li>
+                <div class="sidebar-divider"></div>
+                <li class="nav-item" onclick="navigateTo('user-management', this)">User Management</li>
+                <li class="nav-item" onclick="navigateTo('flow-config', this)">Flow Config</li>
+                <li class="nav-item" onclick="navigateTo('audit-log', this)">Audit Log</li>
+                <li class="nav-item" onclick="navigateTo('settings', this)">Settings</li>
+            </ul>
+        </div>
+
+        <div class="header">
+            <div style="width: 60px;"></div>
+            <div class="header-title" id="header-title">Dashboard</div>
+            <div class="header-right">
+                <div class="notification-bell">
+                    <i data-lucide="bell" style="color: white; width: 20px; height: 20px;"></i>
+                </div>
+                <div class="user-avatar">SK</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div id="page-dashboard" class="page active">
+                <div class="stat-cards">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Paid This Month</div>
+                        <div class="stat-value">¥12,450,000</div>
+                        <div class="stat-detail">+2.5% from last month</div>
+                    </div>
+                    <div class="stat-card amber">
+                        <div class="stat-label">Pending Approvals</div>
+                        <div class="stat-value">3</div>
+                        <div class="stat-detail">Awaiting review</div>
+                    </div>
+                    <div class="stat-card red">
+                        <div class="stat-label">Failed Payouts</div>
+                        <div class="stat-value">1</div>
+                        <div class="stat-detail">Requires action</div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-label">Active Creators</div>
+                        <div class="stat-value">248</div>
+                        <div class="stat-detail">This month</div>
+                    </div>
+                </div>
+
+                <div class="activity-section">
+                    <h2>Recent Activity</h2>
+                    <div class="activity-feed">
+                        <div class="activity-item">
+                            <div class="activity-content">
+                                <div class="activity-title">CSV uploaded: <strong>earnings_2026_04.csv</strong> — 156 rows</div>
+                                <div class="activity-detail">by yamamoto.k</div>
+                            </div>
+                            <div class="activity-time">2h ago</div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-content">
+                                <div class="activity-title">CSV approved: <strong>earnings_2026_04.csv</strong> — Step 2 of 2</div>
+                                <div class="activity-detail">by sato.m</div>
+                            </div>
+                            <div class="activity-time">3h ago</div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-content">
+                                <div class="activity-title">Payout request <strong>PR-0041</strong> created — 24 rows, ¥3,240,000</div>
+                                <div class="activity-detail">by tanaka.y</div>
+                            </div>
+                            <div class="activity-time">5h ago</div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-content">
+                                <div class="activity-title">Payout <strong>PR-0040</strong> completed — ¥2,340,000</div>
+                                <div class="activity-detail">Request processed</div>
+                            </div>
+                            <div class="activity-time">Yesterday</div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-content">
+                                <div class="activity-title">CSV rejected: <strong>invalid amount in row 12</strong></div>
+                                <div class="activity-detail">Requires resubmission</div>
+                            </div>
+                            <div class="activity-time">Yesterday</div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-content">
+                                <div class="activity-title">Payout <strong>PR-0039</strong> scheduled for <strong>Apr 15 2026</strong></div>
+                                <div class="activity-detail">Awaiting execution</div>
+                            </div>
+                            <div class="activity-time">2 days ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Earnings CSV Page -->
+            <div id="page-earnings-csv" class="page">
+                <div id="earnings-list-view">
+                    <div class="section-header">
+                        <h1 class="section-title">Earnings CSV</h1>
+                        <button class="btn btn-primary" onclick="openUploadModal()">
+                            <i data-lucide="upload" style="width: 16px; height: 16px;"></i>
+                            Upload CSV
+                        </button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>File Name</th><th>Uploaded By</th><th>Date</th><th>Valid Rows</th><th>Status</th><th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>earnings_2026_04.csv</td><td>yamamoto.k@torilab.ai</td><td>Apr 11 2026</td><td>152/156</td>
+                                <td><span class="badge badge-pending">Pending — Step 1 of 2</span></td>
+                                <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(0)">View</button></td>
+                            </tr>
+                            <tr>
+                                <td>earnings_2026_03.csv</td><td>suzuki.h@torilab.ai</td><td>Mar 28 2026</td><td>200/200</td>
+                                <td><span class="badge badge-approved">Approved</span></td>
+                                <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(1)">View</button></td>
+                            </tr>
+                            <tr>
+                                <td>earnings_2026_02.csv</td><td>yamamoto.k@torilab.ai</td><td>Feb 29 2026</td><td>198/200</td>
+                                <td><span class="badge badge-approved">Approved</span></td>
+                                <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(2)">View</button></td>
+                            </tr>
+                            <tr>
+                                <td>earnings_2026_01.csv</td><td>suzuki.h@torilab.ai</td><td>Jan 31 2026</td><td>145/145</td>
+                                <td><span class="badge badge-rejected">Rejected</span></td>
+                                <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(3)">View</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="earnings-detail-view" style="display: none;">
+                    <a class="back-link" onclick="backToEarningsList()">
+                        <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                        Back to Earnings CSV
+                    </a>
+                    <div class="detail-header">
+                        <div class="detail-header-info">
+                            <h2 id="earnings-detail-name">earnings_2026_04.csv</h2>
+                            <p id="earnings-detail-uploader">Uploaded by yamamoto.k@torilab.ai</p>
+                            <p id="earnings-detail-date">Apr 11 2026</p>
+                        </div>
+                        <div><span id="earnings-detail-badge" class="badge badge-pending">Pending — Step 1 of 2</span></div>
+                    </div>
+                    <div class="stepper">
+                        <div class="step completed">
+                            <div class="step-circle"><i data-lucide="check" style="width: 18px; height: 18px;"></i></div>
+                            <div class="step-label">Upload</div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step active">
+                            <div class="step-circle">1</div>
+                            <div class="step-label">Step 1</div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step">
+                            <div class="step-circle">2</div>
+                            <div class="step-label">Step 2</div>
+                        </div>
+                    </div>
+                    <div class="config-card">
+                        <h3>Upload Summary</h3>
+                        <div class="key-value"><div class="key">Total Rows</div><div class="value">156</div></div>
+                        <div class="key-value"><div class="key">Valid Rows</div><div class="value">152</div></div>
+                        <div class="key-value"><div class="key">Invalid Rows</div><div class="value">4</div></div>
+                    </div>
+                    <a class="error-report-link" onclick="downloadErrorReport()">
+                        <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                        Download Error Report
+                    </a>
+                    <div class="tabs">
+                        <div class="tab active" onclick="switchEarningsTab('valid', this)">Valid Rows</div>
+                        <div class="tab" onclick="switchEarningsTab('invalid', this)">Invalid Rows</div>
+                    </div>
+                    <div id="earnings-valid-tab" class="tab-content active">
+                        <table>
+                            <thead><tr><th>Twomi User ID</th><th>Event Type</th><th>Amount</th><th>Currency</th><th>Period</th></tr></thead>
+                            <tbody>
+                                <tr><td>TW-10042</td><td>Subscription</td><td>¥45,000</td><td>JPY</td><td>Apr 2026</td></tr>
+                                <tr><td>TW-10087</td><td>Collaboration</td><td>¥120,000</td><td>JPY</td><td>Apr 2026</td></tr>
+                                <tr><td>TW-10134</td><td>Subscription</td><td>¥78,000</td><td>JPY</td><td>Apr 2026</td></tr>
+                                <tr><td>TW-10201</td><td>Event Bonus</td><td>¥33,000</td><td>JPY</td><td>Apr 2026</td></tr>
+                                <tr><td>TW-10256</td><td>Subscription</td><td>¥210,000</td><td>JPY</td><td>Apr 2026</td></tr>
+                                <tr><td>TW-10312</td><td>Collaboration</td><td>¥67,500</td><td>JPY</td><td>Apr 2026</td></tr>
+                                <tr><td>TW-10389</td><td>Subscription</td><td>¥155,000</td><td>JPY</td><td>Apr 2026</td></tr>
+                                <tr><td>TW-10421</td><td>Event Bonus</td><td>¥89,000</td><td>JPY</td><td>Apr 2026</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="earnings-invalid-tab" class="tab-content">
+                        <table>
+                            <thead><tr><th>Row #</th><th>Field</th><th>Error</th></tr></thead>
+                            <tbody>
+                                <tr><td>12</td><td>amount</td><td>Invalid amount format (missing decimal)</td></tr>
+                                <tr><td>47</td><td>currency</td><td>Unsupported currency code XYZ</td></tr>
+                                <tr><td>89</td><td>twomi_user_id</td><td>User ID does not exist</td></tr>
+                                <tr><td>156</td><td>event_type</td><td>Invalid event type</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top: 32px; display: flex; gap: 12px; justify-content: flex-end;">
+                        <button class="btn btn-danger"><i data-lucide="x" style="width: 16px; height: 16px;"></i>Reject</button>
+                        <button class="btn btn-success"><i data-lucide="check" style="width: 16px; height: 16px;"></i>Approve — Step 1 of 2</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payout Execution Page -->
+            <div id="page-payout-execution" class="page">
+                <h1 class="section-title" style="margin-bottom: 24px;">Payout Execution</h1>
+                <div class="tabs">
+                    <div class="tab active" onclick="switchPayoutTab('pool', this)">Payout Pool</div>
+                    <div class="tab" onclick="switchPayoutTab('requests', this)">Payout Requests</div>
+                </div>
+                <div id="payout-pool-tab" class="tab-content active">
+                    <div class="info-banner">
+                        <i data-lucide="info" style="width: 14px; height: 14px; display: inline; margin-right: 8px;"></i>
+                        Rows auto-populated from approved earnings CSVs. Select rows to create a payout request.
+                    </div>
+                    <table>
+                        <thead><tr><th><input type="checkbox" onchange="toggleAllPoolRows(this)"></th><th>Creator</th><th>Twomi ID</th><th>Payoneer Email</th><th>Amount</th><th>Currency</th><th>Source CSV</th><th>Added</th></tr></thead>
+                        <tbody id="pool-table-body">
+                            <tr><td><input type="checkbox" class="pool-row-checkbox" data-amount="45000"></td><td>Tanaka Yuki</td><td>TW-10042</td><td>tanaka.y@payoneer.com</td><td>¥45,000</td><td>JPY</td><td>earnings_2026_03.csv</td><td>Apr 10 2026</td></tr>
+                            <tr><td><input type="checkbox" class="pool-row-checkbox" data-amount="120000"></td><td>Suzuki Hana</td><td>TW-10087</td><td>suzuki.h@payoneer.com</td><td>¥120,000</td><td>JPY</td><td>earnings_2026_03.csv</td><td>Apr 10 2026</td></tr>
+                            <tr><td><input type="checkbox" class="pool-row-checkbox" data-amount="78000"></td><td>Yamamoto Kenji</td><td>TW-10134</td><td>yamamoto.k@payoneer.com</td><td>¥78,000</td><td>JPY</td><td>earnings_2026_03.csv</td><td>Apr 10 2026</td></tr>
+                            <tr><td><input type="checkbox" class="pool-row-checkbox" data-amount="33000"></td><td>Sato Mika</td><td>TW-10201</td><td>sato.m@payoneer.com</td><td>¥33,000</td><td>JPY</td><td>earnings_2026_03.csv</td><td>Apr 10 2026</td></tr>
+                            <tr><td><input type="checkbox" class="pool-row-checkbox" data-amount="210000"></td><td>Watanabe Ryo</td><td>TW-10256</td><td>watanabe.r@payoneer.com</td><td>¥210,000</td><td>JPY</td><td>earnings_2026_03.csv</td><td>Apr 10 2026</td></tr>
+                            <tr><td><input type="checkbox" class="pool-row-checkbox" data-amount="67500"></td><td>Ito Sakura</td><td>TW-10312</td><td>ito.s@payoneer.com</td><td>¥67,500</td><td>JPY</td><td>earnings_2026_02.csv</td><td>Mar 20 2026</td></tr>
+                            <tr><td><input type="checkbox" class="pool-row-checkbox" data-amount="155000"></td><td>Nakamura Daiki</td><td>TW-10389</td><td>nakamura.d@payoneer.com</td><td>¥155,000</td><td>JPY</td><td>earnings_2026_02.csv</td><td>Mar 20 2026</td></tr>
+                            <tr><td><input type="checkbox" class="pool-row-checkbox" data-amount="89000"></td><td>Hayashi Yuna</td><td>TW-10421</td><td>hayashi.y@payoneer.com</td><td>¥89,000</td><td>JPY</td><td>earnings_2026_02.csv</td><td>Mar 20 2026</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="payout-requests-tab" class="tab-content">
+                    <table>
+                        <thead><tr><th>Request ID</th><th>Created By</th><th>Date</th><th>Rows</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            <tr><td>PR-0041</td><td>tanaka.y</td><td>Apr 11 2026</td><td>24</td><td>¥3,240,000</td><td><span class="badge badge-pending">Pending (Step 1 of 2)</span></td><td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(0)">View</button></td></tr>
+                            <tr><td>PR-0040</td><td>tanaka.y</td><td>Apr 5 2026</td><td>18</td><td>¥2,340,000</td><td><span class="badge badge-completed">Completed</span></td><td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(1)">View</button></td></tr>
+                            <tr><td>PR-0039</td><td>tanaka.y</td><td>Mar 28 2026</td><td>30</td><td>¥4,100,000</td><td><span class="badge badge-scheduled">Scheduled Apr 15</span></td><td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(2)">View</button></td></tr>
+                            <tr><td>PR-0038</td><td>suzuki.h</td><td>Mar 15 2026</td><td>12</td><td>¥1,560,000</td><td><span class="badge badge-failed">Failed</span></td><td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(3)">View</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="payout-request-detail" style="display: none;">
+                    <a class="back-link" onclick="backToPayoutRequests()"><i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>Back to Payout Requests</a>
+                    <div class="detail-header">
+                        <div class="detail-header-info">
+                            <h2 id="payout-request-id">PR-0041</h2>
+                            <p id="payout-request-creator">Created by tanaka.y</p>
+                            <p id="payout-request-date">Apr 11 2026</p>
+                        </div>
+                        <div><span id="payout-request-badge" class="badge badge-pending">Pending (Step 1 of 2)</span></div>
+                    </div>
+                    <div class="stepper">
+                        <div class="step completed"><div class="step-circle"><i data-lucide="check" style="width: 18px; height: 18px;"></i></div><div class="step-label">Created</div></div>
+                        <div class="step-connector"></div>
+                        <div class="step active"><div class="step-circle">1</div><div class="step-label">Step 1</div></div>
+                        <div class="step-connector"></div>
+                        <div class="step"><div class="step-circle">2</div><div class="step-label">Step 2</div></div>
+                    </div>
+                    <table style="margin-bottom: 24px;"><thead><tr><th>Creator</th><th>Twomi ID</th><th>Payoneer Email</th><th>Amount</th><th>Currency</th></tr></thead><tbody>
+                        <tr><td>Tanaka Yuki</td><td>TW-10042</td><td>tanaka.y@payoneer.com</td><td>¥45,000</td><td>JPY</td></tr>
+                        <tr><td>Suzuki Hana</td><td>TW-10087</td><td>suzuki.h@payoneer.com</td><td>¥120,000</td><td>JPY</td></tr>
+                        <tr><td>Yamamoto Kenji</td><td>TW-10134</td><td>yamamoto.k@payoneer.com</td><td>¥78,000</td><td>JPY</td></tr>
+                        <tr><td>Sato Mika</td><td>TW-10201</td><td>sato.m@payoneer.com</td><td>¥33,000</td><td>JPY</td></tr>
+                        <tr><td>Watanabe Ryo</td><td>TW-10256</td><td>watanabe.r@payoneer.com</td><td>¥210,000</td><td>JPY</td></tr>
+                    </tbody></table>
+                    <div class="config-card"><h3>Total</h3><div class="stat-value" style="color: var(--color-cyan);">¥3,240,000</div></div>
+                    <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                        <button class="btn btn-danger"><i data-lucide="x" style="width: 16px; height: 16px;"></i>Reject</button>
+                        <button class="btn btn-success"><i data-lucide="check" style="width: 16px; height: 16px;"></i>Approve — Step 1 of 2</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monitoring Page -->
+            <div id="page-monitoring" class="page">
+                <div class="section-header">
+                    <h1 class="section-title">Monitoring</h1>
+                    <button class="btn btn-primary"><i data-lucide="download" style="width: 16px; height: 16px;"></i>Export</button>
+                </div>
+                <div class="filter-bar">
+                    <div class="filter-group"><label class="filter-label">Status</label><select class="filter-input"><option>All</option><option>Pending</option><option>Completed</option><option>Failed</option></select></div>
+                    <div class="filter-group"><label class="filter-label">Currency</label><select class="filter-input"><option>All</option><option>JPY</option><option>USD</option><option>EUR</option></select></div>
+                    <div class="filter-group"><label class="filter-label">Date From</label><input type="date" class="filter-input"></div>
+                    <div class="filter-group"><label class="filter-label">Date To</label><input type="date" class="filter-input"></div>
+                    <div class="filter-group"><label class="filter-label">Search Email</label><input type="text" class="filter-input" placeholder="creator@example.com"></div>
+                    <button class="btn btn-primary">Filter</button>
+                </div>
+                <table>
+                    <thead><tr><th>Request ID</th><th>Creator</th><th>Email</th><th>Payoneer Email</th><th>Amount</th><th>Currency</th><th>Status</th><th>Submitted</th><th>Completed</th><th>Error</th></tr></thead>
+                    <tbody>
+                        <tr><td>PR-0041</td><td>Tanaka Yuki</td><td>tanaka.y@torilab.ai</td><td>tanaka.y@payoneer.com</td><td>¥3,240,000</td><td>JPY</td><td><span class="badge badge-pending">Pending</span></td><td>Apr 11 10:30</td><td>—</td><td>—</td></tr>
+                        <tr><td>PR-0040</td><td>Tanaka Yuki</td><td>tanaka.y@torilab.ai</td><td>tanaka.y@payoneer.com</td><td>¥2,340,000</td><td>JPY</td><td><span class="badge badge-completed">Completed</span></td><td>Apr 5 14:15</td><td>Apr 6 09:42</td><td>—</td></tr>
+                        <tr><td>PR-0039</td><td>Tanaka Yuki</td><td>tanaka.y@torilab.ai</td><td>tanaka.y@payoneer.com</td><td>¥4,100,000</td><td>JPY</td><td><span class="badge badge-scheduled">Scheduled</span></td><td>Mar 28 11:00</td><td>—</td><td>—</td></tr>
+                        <tr><td>PR-0038</td><td>Suzuki Hana</td><td>suzuki.h@torilab.ai</td><td>suzuki.h@payoneer.com</td><td>¥1,560,000</td><td>JPY</td><td><span class="badge badge-failed">Failed</span></td><td>Mar 15 09:20</td><td>—</td><td>Account verification failed</td></tr>
+                        <tr><td>PR-0037</td><td>Yamamoto Kenji</td><td>yamamoto.k@torilab.ai</td><td>yamamoto.k@payoneer.com</td><td>¥890,000</td><td>JPY</td><td><span class="badge badge-completed">Completed</span></td><td>Mar 10 15:45</td><td>Mar 11 08:30</td><td>—</td></tr>
+                        <tr><td>PR-0036</td><td>Sato Mika</td><td>sato.m@torilab.ai</td><td>sato.m@payoneer.com</td><td>¥2,150,000</td><td>JPY</td><td><span class="badge badge-completed">Completed</span></td><td>Mar 5 12:00</td><td>Mar 6 10:15</td><td>—</td></tr>
+                        <tr><td>PR-0035</td><td>Watanabe Ryo</td><td>watanabe.r@torilab.ai</td><td>watanabe.r@payoneer.com</td><td>¥3,560,000</td><td>JPY</td><td><span class="badge badge-completed">Completed</span></td><td>Feb 28 13:30</td><td>Mar 1 09:00</td><td>—</td></tr>
+                        <tr><td>PR-0034</td><td>Ito Sakura</td><td>ito.s@torilab.ai</td><td>ito.s@payoneer.com</td><td>¥1,230,000</td><td>JPY</td><td><span class="badge badge-completed">Completed</span></td><td>Feb 25 10:20</td><td>Feb 26 11:45</td><td>—</td></tr>
+                        <tr><td>PR-0033</td><td>Nakamura Daiki</td><td>nakamura.d@torilab.ai</td><td>nakamura.d@payoneer.com</td><td>¥2,890,000</td><td>JPY</td><td><span class="badge badge-failed">Failed</span></td><td>Feb 20 14:00</td><td>—</td><td>Invalid IBAN format</td></tr>
+                        <tr><td>PR-0032</td><td>Hayashi Yuna</td><td>hayashi.y@torilab.ai</td><td>hayashi.y@payoneer.com</td><td>¥1,670,000</td><td>JPY</td><td><span class="badge badge-completed">Completed</span></td><td>Feb 18 09:15</td><td>Feb 19 10:30</td><td>—</td></tr>
+                        <tr><td>PR-0031</td><td>Tanaka Yuki</td><td>tanaka.y@torilab.ai</td><td>tanaka.y@payoneer.com</td><td>¥2,100,000</td><td>JPY</td><td><span class="badge badge-completed">Completed</span></td><td>Feb 15 11:45</td><td>Feb 16 09:20</td><td>—</td></tr>
+                        <tr><td>PR-0030</td><td>Suzuki Hana</td><td>suzuki.h@torilab.ai</td><td>suzuki.h@payoneer.com</td><td>¥3,420,000</td><td>JPY</td><td><span class="badge badge-completed">Completed</span></td><td>Feb 12 13:30</td><td>Feb 13 10:45</td><td>—</td></tr>
+                        <tr><td>PR-0029</td><td>Yamamoto Kenji</td><td>yamamoto.k@torilab.ai</td><td>yamamoto.k@payoneer.com</td><td>¥1,890,000</td><td>JPY</td><td><span class="badge badge-completed">Completed</span></td><td>Feb 10 10:00</td><td>Feb 11 09:15</td><td>—</td></tr>
+                        <tr><td>PR-0028</td><td>Sato Mika</td><td>sato.m@torilab.ai</td><td>sato.m@payoneer.com</td><td>¥2,340,000</td><td>JPY</td><td><span class="badge badge-completed">Completed</span></td><td>Feb 8 15:20</td><td>Feb 9 10:30</td><td>—</td></tr>
+                        <tr><td>PR-0027</td><td>Watanabe Ryo</td><td>watanabe.r@torilab.ai</td><td>watanabe.r@payoneer.com</td><td>¥3,100,000</td><td>JPY</td><td><span class="badge badge-completed">Completed</span></td><td>Feb 5 12:45</td><td>Feb 6 11:00</td><td>—</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Reconciliation Page -->
+            <div id="page-reconciliation" class="page">
+                <h1 class="section-title" style="margin-bottom: 32px;">Reconciliation</h1>
+                <div id="reconciliation-initial" class="centered-action">
+                    <div style="font-size: 48px; color: var(--color-cyan); margin-bottom: 16px;">
+                        <i data-lucide="check-circle" style="width: 48px; height: 48px;"></i>
+                    </div>
+                    <h2 style="font-size: 18px; margin-bottom: 8px;">No Reconciliation Running</h2>
+                    <p style="color: var(--color-text-muted); margin-bottom: 32px; font-size: 14px;">Click the button below to start a new reconciliation check</p>
+                    <button class="btn btn-primary btn-large" onclick="startReconciliation()">
+                        <i data-lucide="play" style="width: 16px; height: 16px;"></i>
+                        Run Reconciliation
+                    </button>
+                </div>
+                <div id="reconciliation-results" style="display: none;">
+                    <div class="summary-cards">
+                        <div class="summary-card"><div class="summary-value">248</div><div class="summary-label">Checked</div></div>
+                        <div class="summary-card"><div class="summary-value">245</div><div class="summary-label">Matched</div></div>
+                        <div class="summary-card"><div class="summary-value">3</div><div class="summary-label">Mismatched</div></div>
+                    </div>
+                    <table>
+                        <thead><tr><th>Request ID</th><th>Creator Email</th><th>RMS Status</th><th>Payoneer Status</th><th>Result</th><th>Action</th></tr></thead>
+                        <tbody>
+                            <tr><td>PR-0041</td><td>tanaka.y@torilab.ai</td><td><span class="badge badge-completed">Completed</span></td><td><span class="badge badge-pending">Processing</span></td><td><span class="badge badge-rejected">Mismatch</span></td><td><button class="btn btn-small btn-primary" onclick="openResolveModal(0)">Resolve</button></td></tr>
+                            <tr><td>PR-0040</td><td>tanaka.y@torilab.ai</td><td><span class="badge badge-completed">Completed</span></td><td><span class="badge badge-completed">Completed</span></td><td><span class="badge badge-approved">Match</span></td><td>—</td></tr>
+                            <tr><td>PR-0039</td><td>tanaka.y@torilab.ai</td><td><span class="badge badge-scheduled">Scheduled</span></td><td><span class="badge badge-pending">Queued</span></td><td><span class="badge badge-approved">Match</span></td><td>—</td></tr>
+                            <tr><td>PR-0038</td><td>suzuki.h@torilab.ai</td><td><span class="badge badge-failed">Failed</span></td><td><span class="badge badge-pending">Pending</span></td><td><span class="badge badge-rejected">Mismatch</span></td><td><button class="btn btn-small btn-primary" onclick="openResolveModal(1)">Resolve</button></td></tr>
+                            <tr><td>PR-0037</td><td>yamamoto.k@torilab.ai</td><td><span class="badge badge-completed">Completed</span></td><td><span class="badge badge-completed">Completed</span></td><td><span class="badge badge-approved">Match</span></td><td>—</td></tr>
+                            <tr><td>PR-0036</td><td>sato.m@torilab.ai</td><td><span class="badge badge-completed">Completed</span></td><td><span class="badge badge-completed">Completed</span></td><td><span class="badge badge-rejected">Mismatch</span></td><td><button class="btn btn-small btn-primary" onclick="openResolveModal(2)">Resolve</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- User Management Page -->
+            <div id="page-user-management" class="page">
+                <div class="section-header">
+                    <h1 class="section-title">User Management</h1>
+                    <button class="btn btn-primary" onclick="openInviteModal()">
+                        <i data-lucide="user-plus" style="width: 16px; height: 16px;"></i>
+                        Invite User
+                    </button>
+                </div>
+                <table>
+                    <thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Permissions</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td>Tanaka Yuki</td><td>tanaka.y@torilab.ai</td><td><span class="status-active">Active</span></td>
+                            <td><div class="permissions-grid" style="grid-template-columns: 1fr 1fr;"><span class="permission-badge">Upload CSV</span><span class="permission-badge">Approve CSV</span></div></td>
+                            <td><button class="btn btn-small btn-secondary">Edit</button> <button class="btn btn-small btn-secondary">Deactivate</button></td>
+                        </tr>
+                        <tr>
+                            <td>Suzuki Hana</td><td>suzuki.h@torilab.ai</td><td><span class="status-active">Active</span></td>
+                            <td><div class="permissions-grid" style="grid-template-columns: repeat(3, 1fr);"><span class="permission-badge">Upload CSV</span><span class="permission-badge">Create Payout</span><span class="permission-badge">Approve Payout</span></div></td>
+                            <td><button class="btn btn-small btn-secondary">Edit</button> <button class="btn btn-small btn-secondary">Deactivate</button></td>
+                        </tr>
+                        <tr>
+                            <td>Yamamoto Kenji</td><td>yamamoto.k@torilab.ai</td><td><span class="status-active">Active</span></td>
+                            <td><div class="permissions-grid" style="grid-template-columns: 1fr 1fr;"><span class="permission-badge">Upload CSV</span><span class="permission-badge">Approve CSV</span></div></td>
+                            <td><button class="btn btn-small btn-secondary">Edit</button> <button class="btn btn-small btn-secondary">Deactivate</button></td>
+                        </tr>
+                        <tr>
+                            <td>Sato Mika</td><td>sato.m@torilab.ai</td><td><span class="status-active">Active</span></td>
+                            <td><span class="permission-badge" style="background: rgba(0, 196, 140, 0.2); color: var(--color-green);">Super Admin</span></td>
+                            <td><button class="btn btn-small btn-secondary">Edit</button></td>
+                        </tr>
+                        <tr>
+                            <td>Watanabe Ryo</td><td>watanabe.r@torilab.ai</td><td><span class="status-inactive">Inactive</span></td>
+                            <td><span class="permission-badge">Upload CSV</span></td>
+                            <td><button class="btn btn-small btn-secondary">Edit</button> <button class="btn btn-small btn-success">Reactivate</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Flow Config Page -->
+            <div id="page-flow-config" class="page">
+                <h1 class="section-title" style="margin-bottom: 32px;">Flow Configuration</h1>
+                <div class="config-card">
+                    <h3>CSV Approval Steps</h3>
+                    <p>Steps required before an uploaded CSV is applied and payout pool is populated.</p>
+                    <div class="number-input-group">
+                        <button class="number-btn" onclick="decrementSteps('csv', 'csv-steps')">-</button>
+                        <input type="number" class="number-input" id="csv-steps" value="2" readonly>
+                        <button class="number-btn" onclick="incrementSteps('csv', 'csv-steps')">+</button>
+                    </div>
+                    <div class="config-flow">Upload <span class="flow-arrow">→</span> Step 1 <span class="flow-arrow">→</span> Step 2 <span class="flow-arrow">→</span> <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i> Applied & Pool Updated</div>
+                </div>
+                <div class="config-card">
+                    <h3>Payout Execution Approval Steps</h3>
+                    <p>Steps required before a payout request is sent to Payoneer.</p>
+                    <div class="number-input-group">
+                        <button class="number-btn" onclick="decrementSteps('payout', 'payout-steps')">-</button>
+                        <input type="number" class="number-input" id="payout-steps" value="2" readonly>
+                        <button class="number-btn" onclick="incrementSteps('payout', 'payout-steps')">+</button>
+                    </div>
+                    <div class="config-flow">Create Request <span class="flow-arrow">→</span> Step 1 <span class="flow-arrow">→</span> Step 2 <span class="flow-arrow">→</span> <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i> Sent to Payoneer</div>
+                </div>
+                <div class="info-banner">Each step must be approved by a different person. The uploader/creator cannot approve their own submission.</div>
+                <div style="margin-top: 32px;"><button class="btn btn-primary"><i data-lucide="save" style="width: 16px; height: 16px;"></i>Save Configuration</button></div>
+            </div>
+
+            <!-- Audit Log Page -->
+            <div id="page-audit-log" class="page">
+                <div class="section-header">
+                    <h1 class="section-title">Audit Log</h1>
+                    <button class="btn btn-primary"><i data-lucide="download" style="width: 16px; height: 16px;"></i>Export</button>
+                </div>
+                <div class="filter-bar">
+                    <div class="filter-group"><label class="filter-label">Date Range</label><input type="date" class="filter-input"></div>
+                    <div class="filter-group"><label class="filter-label">Action Type</label><select class="filter-input"><option>All</option><option>Upload</option><option>Approve</option><option>Reject</option><option>Payout</option><option>User Mgmt</option><option>Config</option></select></div>
+                    <button class="btn btn-primary">Filter</button>
+                </div>
+                <table>
+                    <thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Details</th><th>Resource</th></tr></thead>
+                    <tbody>
+                        <tr><td>Apr 11 2026, 10:30:45</td><td>yamamoto.k</td><td><span class="badge badge-pending">Upload</span></td><td>CSV file uploaded successfully</td><td>earnings_2026_04.csv</td></tr>
+                        <tr><td>Apr 11 2026, 10:15:22</td><td>sato.m</td><td><span class="badge badge-approved">Approve</span></td><td>Approved CSV at step 2</td><td>earnings_2026_04.csv</td></tr>
+                        <tr><td>Apr 11 2026, 09:50:11</td><td>tanaka.y</td><td><span class="badge badge-completed">Payout</span></td><td>Created payout request from approved CSV</td><td>PR-0041</td></tr>
+                        <tr><td>Apr 10 2026, 16:45:33</td><td>suzuki.h</td><td><span class="badge badge-approved">Approve</span></td><td>Approved payout request at step 1</td><td>PR-0040</td></tr>
+                        <tr><td>Apr 10 2026, 14:20:18</td><td>yamamoto.k</td><td><span class="badge badge-rejected">Reject</span></td><td>Rejected CSV with invalid data</td><td>earnings_2026_03_v2.csv</td></tr>
+                        <tr><td>Apr 9 2026, 11:35:42</td><td>sato.m</td><td><span class="badge badge-completed">Config</span></td><td>Updated approval step configuration</td><td>Flow Config</td></tr>
+                        <tr><td>Apr 8 2026, 15:10:25</td><td>tanaka.y</td><td><span class="badge badge-pending">User Mgmt</span></td><td>Invited new user to system</td><td>watanabe.r@torilab.ai</td></tr>
+                        <tr><td>Apr 7 2026, 09:45:50</td><td>suzuki.h</td><td><span class="badge badge-completed">Payout</span></td><td>Executed payout request</td><td>PR-0040</td></tr>
+                        <tr><td>Apr 6 2026, 13:22:15</td><td>yamamoto.k</td><td><span class="badge badge-approved">Approve</span></td><td>Approved CSV at step 1</td><td>earnings_2026_03.csv</td></tr>
+                        <tr><td>Apr 5 2026, 10:55:08</td><td>sato.m</td><td><span class="badge badge-pending">Upload</span></td><td>CSV file uploaded successfully</td><td>earnings_2026_03.csv</td></tr>
+                        <tr><td>Apr 4 2026, 16:30:44</td><td>tanaka.y</td><td><span class="badge badge-pending">User Mgmt</span></td><td>Deactivated user account</td><td>old.user@torilab.ai</td></tr>
+                        <tr><td>Apr 3 2026, 11:10:32</td><td>suzuki.h</td><td><span class="badge badge-completed">Payout</span></td><td>Scheduled payout request for future execution</td><td>PR-0039</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="page-settings" class="page">
+                <h1 class="section-title" style="margin-bottom: 32px;">Settings</h1>
+                <div class="config-card">
+                    <h3>Currency Management</h3>
+                    <p style="margin-bottom: 16px;">Enable or disable supported currencies for payouts.</p>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <label class="toggle-label"><input type="checkbox" class="toggle-switch" checked onchange="toggleCheck(this)">JPY (Japanese Yen)</label>
+                        <label class="toggle-label"><input type="checkbox" class="toggle-switch" checked onchange="toggleCheck(this)">USD (US Dollar)</label>
+                        <label class="toggle-label"><input type="checkbox" class="toggle-switch" onchange="toggleCheck(this)">EUR (Euro)</label>
+                        <label class="toggle-label"><input type="checkbox" class="toggle-switch" onchange="toggleCheck(this)">SGD (Singapore Dollar)</label>
+                        <label class="toggle-label"><input type="checkbox" class="toggle-switch" onchange="toggleCheck(this)">KRW (Korean Won)</label>
+                    </div>
+                    <button class="btn btn-secondary" style="margin-top: 16px;"><i data-lucide="plus" style="width: 16px; height: 16px;"></i>Add Currency</button>
+                </div>
+                <div class="config-card">
+                    <h3>Payoneer Configuration</h3>
+                    <div class="form-group"><label class="form-label">Program ID</label><input type="text" class="form-input" value="TW-PROG-001" readonly></div>
+                    <div class="form-group"><label class="form-label">API Key</label><div style="display: flex; gap: 8px; align-items: center;"><input type="password" class="form-input masked-input" id="api-key-input" value="●●●●●●●●●●●●" readonly><button class="eye-toggle" onclick="toggleApiKeyVisibility()"><i data-lucide="eye" style="width: 18px; height: 18px;"></i></button></div></div>
+                    <div class="form-group"><label class="form-label">API Secret</label><div style="display: flex; gap: 8px; align-items: center;"><input type="password" class="form-input masked-input" id="api-secret-input" value="●●●●●●●●●●●●" readonly><button class="eye-toggle" onclick="toggleApiSecretVisibility()"><i data-lucide="eye" style="width: 18px; height: 18px;"></i></button></div></div>
+                    <div class="form-group"><label class="form-label">Environment</label><div class="segmented-control"><button class="segment active">Production</button><button class="segment">Sandbox</button></div></div>
+                    <button class="btn btn-primary"><i data-lucide="save" style="width: 16px; height: 16px;"></i>Save Changes</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar hidden" id="action-bar">
+            <div class="action-bar-info"><span id="selected-count">5</span> rows selected - Total: <span class="action-bar-total" id="selected-total">¥541,000</span></div>
+            <button class="btn btn-primary" onclick="createPayoutRequest()"><i data-lucide="plus" style="width: 16px; height: 16px;"></i>Create Payout Request</button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="upload-modal" onclick="closeUploadModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header"><div class="modal-title">Upload CSV</div><button class="modal-close" onclick="closeUploadModal()"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button></div>
+            <div class="drag-drop-zone"><div class="drag-drop-icon"><i data-lucide="upload-cloud" style="width: 32px; height: 32px;"></i></div><div class="drag-drop-text">Drop CSV here or click to browse</div><div class="drag-drop-hint">Maximum file size: 50MB</div></div>
+            <div style="margin-bottom: 16px;"><label class="form-label">Required columns</label><div style="font-size: 12px; color: var(--color-text-muted);">twomi_user_id, event_type, amount, currency, period</div></div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button><button class="btn btn-primary">Upload</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="create-payout-modal" onclick="closeCreatePayoutModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header"><div class="modal-title">Create Payout Request</div><button class="modal-close" onclick="closeCreatePayoutModal()"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button></div>
+            <div class="confirmation-text">You are about to create a new payout request with the selected rows. This will initiate the approval workflow.</div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeCreatePayoutModal()">Cancel</button><button class="btn btn-primary" onclick="confirmCreatePayoutRequest()">Create Request</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="invite-modal" onclick="closeInviteModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header"><div class="modal-title">Invite User</div><button class="modal-close" onclick="closeInviteModal()"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button></div>
+            <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-input" placeholder="user@torilab.ai"></div>
+            <div class="form-group"><label class="form-label">Permissions</label><div class="checkbox-group"><label class="checkbox-label"><input type="checkbox"> Upload CSV</label><label class="checkbox-label"><input type="checkbox"> Approve CSV</label><label class="checkbox-label"><input type="checkbox"> Create Payout Request</label><label class="checkbox-label"><input type="checkbox"> Approve Payout Execution</label></div></div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeInviteModal()">Cancel</button><button class="btn btn-primary">Send Invite</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="resolve-modal" onclick="closeResolveModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header"><div class="modal-title">Resolve Mismatch</div><button class="modal-close" onclick="closeResolveModal()"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button></div>
+            <p class="confirmation-text">There is a mismatch between RMS and Payoneer status. Select an action to resolve.</p>
+            <div class="resolve-options">
+                <label class="resolve-option"><input type="radio" name="resolve" checked><span>Mark as resolved in Payoneer</span></label>
+                <label class="resolve-option"><input type="radio" name="resolve"><span>Revert to pending in RMS</span></label>
+                <label class="resolve-option"><input type="radio" name="resolve"><span>Manual override - mark as completed</span></label>
+            </div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeResolveModal()">Cancel</button><button class="btn btn-primary">Resolve</button></div>
+        </div>
+    </div>
+
+    <script>
+        function loginUser() { document.getElementById('login-page').style.display = 'none'; document.getElementById('app-layout').style.display = 'flex'; lucide.createIcons(); }
+        function navigateTo(page, element) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+            const titles = { 'dashboard': 'Dashboard', 'earnings-csv': 'Earnings CSV', 'payout-execution': 'Payout Execution', 'monitoring': 'Monitoring', 'reconciliation': 'Reconciliation', 'user-management': 'User Management', 'flow-config': 'Flow Configuration', 'audit-log': 'Audit Log', 'settings': 'Settings' };
+            document.getElementById('header-title').textContent = titles[page] || page;
+            document.querySelectorAll('.sidebar-nav li').forEach(li => li.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (page !== 'payout-execution') document.getElementById('action-bar').classList.add('hidden');
+            lucide.createIcons();
+        }
+        function openUploadModal() { document.getElementById('upload-modal').classList.add('active'); }
+        function closeUploadModal(event) { if (event && event.target !== document.getElementById('upload-modal')) return; document.getElementById('upload-modal').classList.remove('active'); }
+        function viewEarningsDetail(index) { document.getElementById('earnings-list-view').style.display = 'none'; document.getElementById('earnings-detail-view').style.display = 'block'; lucide.createIcons(); }
+        function backToEarningsList() { document.getElementById('earnings-list-view').style.display = 'block'; document.getElementById('earnings-detail-view').style.display = 'none'; }
+        function switchEarningsTab(tab, element) { element.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); element.classList.add('active'); document.getElementById('earnings-valid-tab').classList.toggle('active', tab === 'valid'); document.getElementById('earnings-invalid-tab').classList.toggle('active', tab === 'invalid'); }
+        function downloadErrorReport() { console.log('Downloading error report'); }
+        function toggleAllPoolRows(checkbox) { document.querySelectorAll('.pool-row-checkbox').forEach(cb => cb.checked = checkbox.checked); updateActionBar(); }
+        function updateActionBar() {
+            const checkboxes = document.querySelectorAll('.pool-row-checkbox:checked');
+            const selected = Array.from(checkboxes);
+            if (selected.length > 0) {
+                const total = selected.reduce((sum, cb) => sum + parseInt(cb.dataset.amount || 0), 0);
+                document.getElementById('selected-count').textContent = selected.length;
+                document.getElementById('selected-total').textContent = '¥' + total.toLocaleString();
+                document.getElementById('action-bar').classList.remove('hidden');
+            } else {
+                document.getElementById('action-bar').classList.add('hidden');
+            }
+        }
+        function switchPayoutTab(tab, element) { element.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); element.classList.add('active'); document.getElementById('payout-pool-tab').classList.toggle('active', tab === 'pool'); document.getElementById('payout-requests-tab').classList.toggle('active', tab === 'requests'); }
+        function createPayoutRequest() { document.getElementById('create-payout-modal').classList.add('active'); }
+        function closeCreatePayoutModal(event) { if (event && event.target !== document.getElementById('create-payout-modal')) return; document.getElementById('create-payout-modal').classList.remove('active'); }
+        function confirmCreatePayoutRequest() { closeCreatePayoutModal(); document.querySelectorAll('.pool-row-checkbox').forEach(cb => cb.checked = false); updateActionBar(); }
+        function viewPayoutRequest(index) { document.getElementById('payout-pool-tab').style.display = 'none'; document.getElementById('payout-requests-tab').style.display = 'none'; document.getElementById('payout-request-detail').style.display = 'block'; lucide.createIcons(); }
+        function backToPayoutRequests() { document.getElementById('payout-pool-tab').style.display = 'block'; document.getElementById('payout-requests-tab').style.display = 'block'; document.getElementById('payout-request-detail').style.display = 'none'; }
+        function startReconciliation() { document.getElementById('reconciliation-initial').style.display = 'none'; document.getElementById('reconciliation-results').style.display = 'block'; }
+        function openResolveModal(index) { document.getElementById('resolve-modal').classList.add('active'); }
+        function closeResolveModal(event) { if (event && event.target !== document.getElementById('resolve-modal')) return; document.getElementById('resolve-modal').classList.remove('active'); }
+        function openInviteModal() { document.getElementById('invite-modal').classList.add('active'); }
+        function closeInviteModal(event) { if (event && event.target !== document.getElementById('invite-modal')) return; document.getElementById('invite-modal').classList.remove('active'); }
+        function incrementSteps(type, inputId) { const input = document.getElementById(inputId); input.value = Math.max(1, parseInt(input.value) + 1); }
+        function decrementSteps(type, inputId) { const input = document.getElementById(inputId); input.value = Math.max(1, parseInt(input.value) - 1); }
+        function toggleCheck(checkbox) { if (checkbox.classList && checkbox.classList.contains('toggle-switch')) checkbox.classList.toggle('on'); }
+        function toggleApiKeyVisibility() { const input = document.getElementById('api-key-input'); if (input.type === 'password') { input.type = 'text'; input.value = 'sk-live-abc123def456ghi789jkl012'; } else { input.type = 'password'; input.value = '●●●●●●●●●●●●'; } }
+        function toggleApiSecretVisibility() { const input = document.getElementById('api-secret-input'); if (input.type === 'password') { input.type = 'text'; input.value = 'secret-abc123def456ghi789jkl012'; } else { input.type = 'password'; input.value = '●●●●●●●●●●●●'; } }
+        window.addEventListener('load', function() {
+            lucide.createIcons();
+            document.querySelectorAll('input[type="checkbox"].toggle-switch').forEach(toggle => { toggle.checked = toggle.hasAttribute('checked'); if (toggle.checked) toggle.classList.add('on'); });
+            document.querySelectorAll('.segment').forEach((segment, index) => { if (index === 0) segment.classList.add('active'); segment.addEventListener('click', function() { this.parentElement.querySelectorAll('.segment').forEach(s => s.classList.remove('active')); this.classList.add('active'); }); });
+            const poolCheckboxes = document.querySelectorAll('.pool-row-checkbox');
+            poolCheckboxes.forEach(cb => cb.addEventListener('change', updateActionBar));
+        });
+    </script>
+</body>
+</html>
