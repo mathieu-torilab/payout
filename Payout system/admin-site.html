@@ -234,16 +234,29 @@
             <div class="sidebar-brand">TWOMI</div>
             <ul class="sidebar-nav">
                 <li class="nav-item active" onclick="navigateTo('dashboard', this)">Dashboard</li>
-                <li class="nav-item" onclick="navigateTo('earnings-csv', this)">Commissions</li>
+                <li class="nav-item nav-parent" id="commission-parent" onclick="toggleCommissionMenu(this)">
+                    Commissions <span class="nav-arrow">▾</span>
+                </li>
+                <ul class="nav-submenu" id="commission-submenu">
+                    <li class="nav-subitem" id="nav-commission-uploader" onclick="navigateTo('commission-uploader', this)">
+                        <i data-lucide="upload" style="width:14px;height:14px;"></i> Maker
+                    </li>
+                    <li class="nav-subitem" id="nav-commission-checker" onclick="navigateTo('commission-checker', this)">
+                        <i data-lucide="check-square" style="width:14px;height:14px;"></i> Checker
+                    </li>
+                </ul>
                 <li class="nav-item nav-parent" id="payout-parent" onclick="togglePayoutMenu(this)">
                     Payout <span class="nav-arrow">▾</span>
                 </li>
                 <ul class="nav-submenu" id="payout-submenu">
                     <li class="nav-subitem" id="nav-payout-pool" onclick="navigateTo('payout-pool', this)">
-                        <i data-lucide="send" style="width:14px;height:14px;"></i> New Payout
+                        <i data-lucide="file-plus" style="width:14px;height:14px;"></i> Maker
                     </li>
                     <li class="nav-subitem" id="nav-payout-requests" onclick="navigateTo('payout-requests', this)">
-                        <i data-lucide="send" style="width:14px;height:14px;"></i> Payout Requests
+                        <i data-lucide="check-square" style="width:14px;height:14px;"></i> Checker
+                    </li>
+                    <li class="nav-subitem" id="nav-payout-executer" onclick="navigateTo('payout-executer', this)">
+                        <i data-lucide="zap" style="width:14px;height:14px;"></i> Executer
                     </li>
                 </ul>
                 <li class="nav-item" onclick="navigateTo('monitoring', this)">Monitoring</li>
@@ -422,6 +435,77 @@
                     </div>
                 </div>
 
+            </div>
+
+            <!-- Commission Uploader Page -->
+            <div id="page-commission-uploader" class="page">
+                <div class="section-header" style="margin-bottom:20px;">
+                    <div>
+                        <h1 class="section-title">Commissions — Maker</h1>
+                        <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px;">Upload commission files. Files you upload will enter the approval workflow — you cannot approve your own submissions.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="openUploadModal()">
+                        <i data-lucide="upload" style="width:16px;height:16px;"></i> Upload File
+                    </button>
+                </div>
+                <div class="info-banner" style="margin-bottom:20px;">
+                    <i data-lucide="info" style="width:14px;height:14px;display:inline;margin-right:8px;"></i>
+                    As Maker, you cannot approve your own submissions. Files pending approval are awaiting review by the Checker.
+                </div>
+                <table>
+                    <thead><tr>
+                        <th>Cycle</th><th>Type</th><th>File Name</th><th>Upload Date</th><th>Valid Rows</th><th>Status</th><th>Actions</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>April 2026</strong></td>
+                            <td><span class="badge badge-pending" style="font-size:10px;">Commission</span></td>
+                            <td>commissions_2026_04.csv</td><td>Apr 11 2026, 10:30:15</td>
+                            <td>156 rows</td>
+                            <td><span class="badge badge-pending">Pending — Step 1 of 2</span></td>
+                            <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(0)">View</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>March 2026</strong></td>
+                            <td><span class="badge" style="font-size:10px;background:rgba(99,91,255,0.1);color:#6366f1;">Adjust</span></td>
+                            <td>adjust_2026_03_bonus.csv</td><td>Mar 15 2026, 14:20:00</td>
+                            <td>12 rows</td>
+                            <td><span class="badge badge-approved">Approved</span></td>
+                            <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(1)">View</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Commission Checker Page -->
+            <div id="page-commission-checker" class="page">
+                <div class="section-header" style="margin-bottom:20px;">
+                    <div>
+                        <h1 class="section-title">Commissions — Checker</h1>
+                        <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px;">Review and approve or reject commission files at your assigned approval step.</p>
+                    </div>
+                </div>
+                <div class="info-banner" style="margin-bottom:20px;background:rgba(255,184,0,0.06);border-color:rgba(255,184,0,0.3);color:var(--color-amber);">
+                    <i data-lucide="alert-triangle" style="width:14px;height:14px;display:inline;margin-right:8px;"></i>
+                    <strong>1 file</strong> is waiting for your approval.
+                </div>
+                <table>
+                    <thead><tr>
+                        <th>Cycle</th><th>Type</th><th>File Name</th><th>Uploaded By</th><th>Upload Date</th><th>Valid Rows</th><th>Step</th><th>Actions</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr style="background:rgba(255,184,0,0.03);">
+                            <td><strong>April 2026</strong></td>
+                            <td><span class="badge badge-pending" style="font-size:10px;">Commission</span></td>
+                            <td>commissions_2026_04.csv</td>
+                            <td>yamamoto.k@torilab.ai</td>
+                            <td>Apr 11 2026, 10:30:15</td>
+                            <td>156 rows</td>
+                            <td><span class="badge badge-pending" style="font-size:10px;">Step 1 of 2</span></td>
+                            <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(0)">Review</button></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
             <!-- Earnings Page -->
@@ -621,20 +705,23 @@
 
             <!-- Payout Pool Page -->
             <div id="page-payout-pool" class="page">
-                <div class="section-header" style="margin-bottom:20px;">
+                <div class="section-header" style="margin-bottom:16px;">
                     <div>
-                        <h1 class="section-title">New Payout</h1>
-                        <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px;">Create a payout request by selecting receivers from the balance list or by uploading a payout file.</p>
+                        <h1 class="section-title">Payout — Maker</h1>
+                        <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px;">Create new payout requests or view requests you have created.</p>
                     </div>
                 </div>
 
+                <!-- Maker tabs -->
                 <div class="tabs" style="margin-bottom:0;">
-                    <div class="tab active" onclick="switchNewPayoutTab('select', this)">Select Receivers</div>
-                    <div class="tab" onclick="switchNewPayoutTab('upload', this)">Upload File</div>
+                    <div class="tab active" onclick="switchMakerTab('new', this)">New Payout</div>
+                    <div class="tab" onclick="switchMakerTab('requests', this)">My Requests</div>
                 </div>
 
-                <!-- Tab 1: Select Receivers -->
-                <div id="new-payout-select-tab" class="tab-content active">
+                <!-- Tab: New Payout -->
+                <div id="maker-tab-new" class="tab-content active">
+                <!-- Receivers list -->
+                <div id="new-payout-select-tab">
                     <div class="filter-bar" style="margin-top:16px;">
                         <div class="filter-group">
                             <span class="filter-label">Name / Twomi ID</span>
@@ -645,12 +732,12 @@
                             <input class="filter-input" type="text" id="np-filter-email" placeholder="@twomi.com" style="width:160px;" onkeydown="if(event.key==='Enter') applyNewPayoutFilters()">
                         </div>
                         <div class="filter-group">
-                            <span class="filter-label">Balance</span>
-                            <select class="filter-input" id="np-filter-balance" onchange="applyNewPayoutFilters()" style="width:130px;">
-                                <option value="">All</option>
-                                <option value="positive">Has balance</option>
-                                <option value="zero">Zero balance</option>
-                            </select>
+                            <span class="filter-label">Balance From (¥)</span>
+                            <input class="filter-input" type="number" id="np-filter-bal-from" placeholder="0" min="0" style="width:110px;" onkeydown="if(event.key==='Enter') applyNewPayoutFilters()">
+                        </div>
+                        <div class="filter-group">
+                            <span class="filter-label">Balance To (¥)</span>
+                            <input class="filter-input" type="number" id="np-filter-bal-to" placeholder="∞" min="0" style="width:110px;" onkeydown="if(event.key==='Enter') applyNewPayoutFilters()">
                         </div>
                         <div class="filter-group">
                             <span class="filter-label">&nbsp;</span>
@@ -713,35 +800,73 @@
                             <div><div style="font-size:11px;color:var(--color-text-muted);text-transform:uppercase;font-weight:600;margin-bottom:4px;">Selected</div><div style="font-size:18px;font-weight:700;color:var(--color-navy);" id="np-selected-count">0 receivers</div></div>
                             <div><div style="font-size:11px;color:var(--color-text-muted);text-transform:uppercase;font-weight:600;margin-bottom:4px;">Total Amount</div><div style="font-size:18px;font-weight:700;color:var(--color-cyan);" id="np-total-amount">¥0</div></div>
                         </div>
-                        <button class="btn btn-primary" id="np-create-btn" onclick="createPayoutFromSelection()" disabled>
-                            <i data-lucide="send" style="width:16px;height:16px;"></i> Create Payout Request
-                        </button>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-secondary" id="np-upload-btn" onclick="toggleNPUploadZone()">
+                                <i data-lucide="upload" style="width:16px;height:16px;"></i> Upload File
+                            </button>
+                            <button class="btn btn-primary" id="np-create-btn" onclick="createPayoutFromSelection()" disabled>
+                                <i data-lucide="send" style="width:16px;height:16px;"></i> Create Payout Request
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Tab 2: Upload File -->
-                <div id="new-payout-upload-tab" class="tab-content">
-                    <div style="margin-top:16px;">
-                        <div class="drag-drop-zone" style="margin-bottom:16px;">
-                            <div class="drag-drop-icon"><i data-lucide="upload-cloud" style="width:32px;height:32px;color:var(--color-cyan);"></i></div>
-                            <div class="drag-drop-text">Drop payout file here or click to browse</div>
+                    <!-- Upload zone (collapsed by default) -->
+                    <div id="np-upload-zone" style="display:none;border:1px solid var(--color-border);border-radius:8px;padding:20px;margin-top:12px;background:var(--color-bg);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                            <div style="font-size:13px;font-weight:600;color:var(--color-navy);">Upload Payout File</div>
+                            <button onclick="toggleNPUploadZone()" style="background:none;border:none;cursor:pointer;color:var(--color-text-muted);font-size:18px;">×</button>
+                        </div>
+                        <div class="drag-drop-zone" style="margin-bottom:12px;">
+                            <div class="drag-drop-icon"><i data-lucide="upload-cloud" style="width:28px;height:28px;color:var(--color-cyan);"></i></div>
+                            <div class="drag-drop-text">Drop payout CSV here or click to browse</div>
                             <div class="drag-drop-hint">.csv · Max 50MB</div>
                         </div>
-                        <div style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:6px;padding:12px 16px;margin-bottom:16px;">
-                            <div style="font-size:12px;font-weight:700;color:var(--color-navy);margin-bottom:6px;">Required columns</div>
-                            <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                                <span style="background:white;border:1px solid var(--color-border);border-radius:4px;padding:3px 8px;font-size:11px;font-family:monospace;">Twomi User ID</span>
-                                <span style="background:white;border:1px solid var(--color-border);border-radius:4px;padding:3px 8px;font-size:11px;font-family:monospace;">Receiver Email</span>
-                                <span style="background:white;border:1px solid var(--color-border);border-radius:4px;padding:3px 8px;font-size:11px;font-family:monospace;">Amount</span>
-                                <span style="background:white;border:1px solid var(--color-border);border-radius:4px;padding:3px 8px;font-size:11px;font-family:monospace;">Currency</span>
-                            </div>
-                            <div style="font-size:11px;color:var(--color-text-muted);margin-top:8px;">Amount must be ≤ receiver's current balance. Rows exceeding the balance will fail validation.</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">
+                            <span style="background:white;border:1px solid var(--color-border);border-radius:4px;padding:2px 7px;font-size:11px;font-family:monospace;">Twomi User ID</span>
+                            <span style="background:white;border:1px solid var(--color-border);border-radius:4px;padding:2px 7px;font-size:11px;font-family:monospace;">Receiver Email</span>
+                            <span style="background:white;border:1px solid var(--color-border);border-radius:4px;padding:2px 7px;font-size:11px;font-family:monospace;">Amount</span>
+                            <span style="background:white;border:1px solid var(--color-border);border-radius:4px;padding:2px 7px;font-size:11px;font-family:monospace;">Currency</span>
                         </div>
+                        <div style="font-size:11px;color:var(--color-text-muted);margin-bottom:12px;">Amount must be ≤ each receiver's current balance.</div>
                         <div style="display:flex;justify-content:flex-end;">
-                            <button class="btn btn-primary"><i data-lucide="upload" style="width:16px;height:16px;"></i> Upload &amp; Create Request</button>
+                            <button class="btn btn-primary btn-small" onclick="toggleNPUploadZone()"><i data-lucide="upload" style="width:14px;height:14px;"></i> Upload &amp; Create Request</button>
                         </div>
                     </div>
                 </div>
+                </div><!-- /maker-tab-new -->
+
+                <!-- Tab: My Requests -->
+                <div id="maker-tab-requests" class="tab-content">
+                    <div class="info-banner" style="margin:16px 0 16px;">
+                        <i data-lucide="info" style="width:14px;height:14px;display:inline;margin-right:8px;"></i>
+                        Payout requests you have created. Pending approval by Checker.
+                    </div>
+                    <table>
+                        <thead><tr>
+                            <th>Request ID</th><th>Cycle</th><th>Date</th><th>Receivers</th><th>Total Amount</th><th>Status</th><th>Actions</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>PR-0043</strong></td><td>April 2026</td><td>Apr 13 2026, 09:00:00</td>
+                                <td>5</td><td>¥76,394</td>
+                                <td><span class="badge badge-scheduled">In Progress</span></td>
+                                <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(5)">View</button></td>
+                            </tr>
+                            <tr>
+                                <td><strong>PR-0041</strong></td><td>April 2026</td><td>Apr 11 2026, 10:00:00</td>
+                                <td>7</td><td>¥150,725</td>
+                                <td><span class="badge badge-pending">Pending — Step 1 of 2</span></td>
+                                <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(0)">View</button></td>
+                            </tr>
+                            <tr>
+                                <td><strong>PR-0039</strong></td><td>March 2026</td><td>Mar 28 2026, 11:00:00</td>
+                                <td>30</td><td>¥4,100,000</td>
+                                <td><span class="badge badge-scheduled">Scheduled Apr 15</span></td>
+                                <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(2)">View</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div><!-- /maker-tab-requests -->
             </div>
             <!-- Payout Requests Page -->
             <div id="page-payout-requests" class="page">
@@ -1674,6 +1799,62 @@
                 </div>
             </div>
 
+            <!-- Payout Executer Page -->
+            <div id="page-payout-executer" class="page">
+                <div class="section-header" style="margin-bottom:20px;">
+                    <div>
+                        <h1 class="section-title">Payout — Executer</h1>
+                        <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px;">Execute or schedule approved payout requests for payment submission.</p>
+                    </div>
+                </div>
+
+                <!-- Global payout off warning -->
+                <div id="executer-payout-off-banner" style="display:none;padding:12px 16px;background:rgba(255,59,92,0.06);border:1px solid rgba(255,59,92,0.25);border-radius:6px;margin-bottom:20px;font-size:13px;color:var(--color-red);">
+                    <strong>⚠ Global payout execution is OFF.</strong> No requests can be executed until it is turned back ON in Flow Config.
+                </div>
+
+                <div class="info-banner" style="margin-bottom:20px;background:rgba(0,196,140,0.06);border-color:rgba(0,196,140,0.3);color:var(--color-green);">
+                    <i data-lucide="check-circle" style="width:14px;height:14px;display:inline;margin-right:8px;"></i>
+                    <strong>2 requests</strong> are ready to execute or schedule.
+                </div>
+
+                <table>
+                    <thead><tr>
+                        <th>Request ID</th><th>Cycle</th><th>Created By</th><th>Date Approved</th>
+                        <th>Receivers</th><th>Total Amount</th><th>Status</th><th>Actions</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>PR-0041</strong></td><td>April 2026</td>
+                            <td>Tanaka Yuki · tanaka.y@torilab.ai</td>
+                            <td>Apr 12 2026, 16:00:00</td>
+                            <td>7</td><td>¥150,725</td>
+                            <td><span class="badge badge-approved" style="font-size:10px;">Ready to Execute</span></td>
+                            <td>
+                                <button class="btn btn-small btn-primary" onclick="viewPayoutRequest(0)">
+                                    <i data-lucide="send" style="width:12px;height:12px;"></i> Execute
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>PR-0042</strong></td><td>April 2026</td>
+                            <td>Suzuki Hana · suzuki.h@torilab.ai</td>
+                            <td>Apr 12 2026, 17:00:00</td>
+                            <td>3</td><td>¥58,872</td>
+                            <td><span class="badge badge-scheduled" style="font-size:10px;">Scheduled — May 1 2026, 09:00:00</span></td>
+                            <td>
+                                <button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(4)">
+                                    <i data-lucide="pencil" style="width:12px;height:12px;"></i> Modify
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination" style="margin-top:12px;">
+                    <span class="pagination-info">Showing 1–2 of 2 requests</span>
+                </div>
+            </div>
+
             <!-- Flow Config Page -->
             <div id="page-flow-config" class="page">
                 <div class="section-header" style="margin-bottom:24px;">
@@ -1704,18 +1885,42 @@
                     <span>Configuration saved. <strong id="flow-config-inprogress-count">2 requests</strong> currently in progress will continue under their original step configuration.</span>
                 </div>
 
-                <!-- Minimum Payout Threshold -->
+                <!-- Global Payout Flag -->
+                <div class="config-card" style="margin-bottom:20px;border:1px solid rgba(0,212,255,0.25);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <h3 style="margin-bottom:4px;">Global Payout Execution</h3>
+                            <p style="font-size:13px;color:var(--color-text-muted);">When OFF, all payout execution and scheduling is blocked system-wide regardless of request status.</p>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span id="global-payout-label" style="font-size:13px;font-weight:600;color:var(--color-green);">ON</span>
+                            <button id="global-payout-toggle" class="toggle-switch on" onclick="toggleGlobalPayout(this)" style="cursor:pointer;"></button>
+                        </div>
+                    </div>
+                    <div id="global-payout-warning" style="display:none;margin-top:12px;padding:8px 12px;background:rgba(255,59,92,0.06);border:1px solid rgba(255,59,92,0.25);border-radius:6px;font-size:12px;color:var(--color-red);">
+                        ⚠ Payout execution is currently <strong>OFF</strong>. No requests can be executed or scheduled until this is turned back ON.
+                    </div>
+                </div>
+
+                <!-- Payout Limits -->
                 <div class="config-card" style="margin-bottom:20px;">
-                    <h3 style="margin-bottom:6px;">Minimum Payout Threshold</h3>
-                    <p style="font-size:13px;color:var(--color-text-muted);margin-bottom:16px;">Receivers with an outstanding balance below this amount are flagged in the Payout Pool. Admin can still include them with a confirmation.</p>
-                    <div style="display:flex;align-items:center;gap:12px;">
+                    <h3 style="margin-bottom:6px;">Payout Limits</h3>
+                    <p style="font-size:13px;color:var(--color-text-muted);margin-bottom:16px;">Set the minimum and maximum payout amount per receiver per request. These are used as default filters in New Payout.</p>
+                    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
                         <select class="form-select" style="width:80px;" id="threshold-currency">
                             <option value="JPY" selected>JPY</option>
                             <option value="USD">USD</option>
                             <option value="EUR">EUR</option>
                         </select>
-                        <input type="number" class="form-input" id="threshold-amount" value="1000" min="0" style="width:140px;" placeholder="e.g. 1000">
-                        <span style="font-size:13px;color:var(--color-text-muted);">— rows below this will show a warning</span>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:13px;color:var(--color-text-muted);">Min</span>
+                            <input type="number" class="form-input" id="threshold-amount" value="1000" min="0" style="width:130px;" placeholder="e.g. 1000">
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:13px;color:var(--color-text-muted);">Max</span>
+                            <input type="number" class="form-input" id="payout-max-amount" value="500000" min="0" style="width:130px;" placeholder="e.g. 500000">
+                        </div>
+                        <span style="font-size:12px;color:var(--color-text-muted);">per receiver per request</span>
                     </div>
                 </div>
 
@@ -1870,7 +2075,7 @@
                     <table>
                         <thead><tr>
                             <th>Receiver</th><th>Twomi ID</th><th>Receiver Email</th>
-                            <th>Payment Method</th><th>Total Paid</th><th>Last Paid</th><th>Unpaid</th><th>Actions</th>
+                            <th>Payment Method</th><th>Total Paid</th><th>Last Paid</th><th>Unpaid</th><th>Payout</th><th>Actions</th>
                         </tr></thead>
                         <tbody id="receivers-table-body">
                             <tr data-payment="linked" data-search="tanaka yuki TW-10042 tanaka.y@twomi.com">
@@ -1881,6 +2086,12 @@
                                 </td>
                                 <td style="font-weight:600;">¥516,820</td><td style="font-size:12px;color:var(--color-text-muted);">Apr 13 2026</td>
                                 <td style="color:var(--color-amber);font-weight:600;">¥8,504</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
+                                        <button class="toggle-switch on" onclick="toggleReceiverPayout(this, 'tanaka')" style="cursor:pointer;flex-shrink:0;"></button>
+                                        <span style="font-size:11px;color:var(--color-green);font-weight:600;">On</span>
+                                    </div>
+                                </td>
                                 <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('tanaka')">View</button></td>
                             </tr>
                             <tr data-payment="linked" data-search="suzuki hana TW-10087 suzuki.h@twomi.com">
@@ -1891,6 +2102,12 @@
                                 </td>
                                 <td style="font-weight:600;">¥1,234,560</td><td style="font-size:12px;color:var(--color-text-muted);">Apr 13 2026</td>
                                 <td style="color:var(--color-text-muted);">¥0</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
+                                        <button class="toggle-switch on" onclick="toggleReceiverPayout(this, 'suzuki')" style="cursor:pointer;flex-shrink:0;"></button>
+                                        <span style="font-size:11px;color:var(--color-green);font-weight:600;">On</span>
+                                    </div>
+                                </td>
                                 <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('suzuki')">View</button></td>
                             </tr>
                             <tr data-payment="linked" data-search="yamamoto kenji TW-10134 yamamoto.k@twomi.com">
@@ -1901,6 +2118,12 @@
                                 </td>
                                 <td style="font-weight:600;">¥892,450</td><td style="font-size:12px;color:var(--color-text-muted);">Apr 13 2026</td>
                                 <td style="color:var(--color-text-muted);">¥0</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
+                                        <button class="toggle-switch on" onclick="toggleReceiverPayout(this, 'yamamoto')" style="cursor:pointer;flex-shrink:0;"></button>
+                                        <span style="font-size:11px;color:var(--color-green);font-weight:600;">On</span>
+                                    </div>
+                                </td>
                                 <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('yamamoto')">View</button></td>
                             </tr>
                             <tr data-payment="not-linked" data-search="nakamura daiki TW-10389 nakamura.d@twomi.com">
@@ -1908,6 +2131,12 @@
                                 <td><span class="badge" style="font-size:10px;background:rgba(255,184,0,0.1);color:var(--color-amber);">⚠ Not Linked</span></td>
                                 <td style="font-weight:600;">¥29,295</td><td style="font-size:12px;color:var(--color-text-muted);">Feb 16 2026</td>
                                 <td style="color:var(--color-red);font-weight:600;">¥29,295</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
+                                        <button class="toggle-switch" onclick="toggleReceiverPayout(this, 'nakamura')" style="cursor:pointer;flex-shrink:0;"></button>
+                                        <span style="font-size:11px;color:var(--color-red);font-weight:600;">Off</span>
+                                    </div>
+                                </td>
                                 <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('nakamura')">View</button></td>
                             </tr>
                             <tr data-payment="linked" data-search="hayashi yuna TW-10421 hayashi.y@twomi.com">
@@ -1918,6 +2147,12 @@
                                 </td>
                                 <td style="font-weight:600;">¥456,230</td><td style="font-size:12px;color:var(--color-text-muted);">Mar 30 2026</td>
                                 <td style="color:var(--color-red);font-weight:600;">¥16,820</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
+                                        <button class="toggle-switch on" onclick="toggleReceiverPayout(this, 'hayashi')" style="cursor:pointer;flex-shrink:0;"></button>
+                                        <span style="font-size:11px;color:var(--color-green);font-weight:600;">On</span>
+                                    </div>
+                                </td>
                                 <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('hayashi')">View</button></td>
                             </tr>
                         </tbody>
@@ -2426,6 +2661,55 @@
         </div>
     </div>
 
+    <!-- New Payout Request modal -->
+    <div class="modal-overlay" id="new-payout-modal" onclick="closeNewPayoutModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width:480px;">
+            <div class="modal-header">
+                <div class="modal-title">Create Payout Request</div>
+                <button class="modal-close" onclick="closeNewPayoutModal()"><i data-lucide="x" style="width:20px;height:20px;"></i></button>
+            </div>
+
+            <!-- Summary -->
+            <div style="background:var(--color-bg);border-radius:8px;padding:14px 16px;margin-bottom:20px;">
+                <div class="key-value" style="margin-bottom:6px;"><div class="key">Receivers</div><div class="value" id="npm-receivers" style="font-weight:600;">—</div></div>
+                <div class="key-value"><div class="key">Total Amount</div><div class="value" id="npm-total" style="font-weight:700;color:var(--color-cyan);">—</div></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Cycle <span style="color:var(--color-red)">*</span></label>
+                <div style="display:flex;gap:8px;">
+                    <select class="form-select" id="npm-cycle-year" style="flex:1;">
+                        <option value="">Year</option>
+                        <option value="2026" selected>2026</option>
+                        <option value="2025">2025</option>
+                    </select>
+                    <select class="form-select" id="npm-cycle-month" style="flex:1.4;">
+                        <option value="">Month</option>
+                        <option value="01">January</option><option value="02">February</option>
+                        <option value="03">March</option><option value="04" selected>April</option>
+                        <option value="05">May</option><option value="06">June</option>
+                        <option value="07">July</option><option value="08">August</option>
+                        <option value="09">September</option><option value="10">October</option>
+                        <option value="11">November</option><option value="12">December</option>
+                    </select>
+                </div>
+                <div style="font-size:11px;color:var(--color-text-muted);margin-top:5px;">The cycle this payout corresponds to — used for tracking and reconciliation.</div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Description</label>
+                <textarea id="npm-description" class="form-input" rows="3" placeholder="Optional — describe the purpose of this payout request (e.g. April 2026 monthly commission payout)" style="resize:vertical;font-family:inherit;"></textarea>
+            </div>
+
+            <div class="modal-footer" style="margin-top:20px;">
+                <button class="btn btn-secondary" onclick="closeNewPayoutModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmNewPayoutRequest()">
+                    <i data-lucide="send" style="width:16px;height:16px;"></i>Create Request
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Mark as Resolved modal -->
     <div class="modal-overlay" id="resolve-pr-modal" onclick="closeResolvePRModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()" style="max-width:500px;">
@@ -2651,16 +2935,24 @@
             const isOpen  = submenu.classList.toggle('open');
             parentEl.classList.toggle('open', isOpen);
         }
+        function toggleCommissionMenu(parentEl) {
+            const submenu = document.getElementById('commission-submenu');
+            const isOpen  = submenu.classList.toggle('open');
+            parentEl.classList.toggle('open', isOpen);
+        }
 
         function navigateTo(page, element) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             const pageEl = document.getElementById('page-' + page);
             if (pageEl) pageEl.classList.add('active');
             const titles = {
-                'dashboard':        'Dashboard',
-                'earnings-csv':     'Commissions',
-                'payout-pool':      'New Payout',
-                'payout-requests':  'Payout Requests',
+                'dashboard':             'Dashboard',
+                'earnings-csv':          'Commissions',
+                'commission-uploader':   'Commissions — Maker',
+                'commission-checker':    'Commissions — Checker',
+                'payout-pool':           'Payout — Maker',
+                'payout-requests':       'Payout — Checker',
+                'payout-executer':       'Payout — Executer',
                 'monitoring':       'Monitoring',
                 'reconciliation':   'Reconciliation',
                 'user-management':  'User Management',
@@ -2679,17 +2971,28 @@
             document.querySelectorAll('.sidebar-nav li, .nav-subitem').forEach(el => el.classList.remove('active'));
 
             // Mark active — handle subitems separately
-            if (page === 'payout-pool' || page === 'payout-requests') {
+            const payoutPages      = ['payout-pool','payout-requests','payout-executer'];
+            const commissionPages  = ['commission-uploader','commission-checker'];
+            const umPages          = ['permission-groups','users'];
+
+            if (payoutPages.includes(page)) {
                 document.getElementById('payout-submenu').classList.add('open');
                 document.getElementById('payout-parent').classList.add('open');
                 const subEl = document.getElementById('nav-' + page);
                 if (subEl) subEl.classList.add('active');
-                document.getElementById('um-submenu').classList.remove('open');
-                document.getElementById('um-parent').classList.remove('open');
+            } else if (commissionPages.includes(page)) {
+                document.getElementById('commission-submenu').classList.add('open');
+                document.getElementById('commission-parent').classList.add('open');
+                const subEl = document.getElementById('nav-' + page);
+                if (subEl) subEl.classList.add('active');
+                document.getElementById('payout-submenu').classList.remove('open');
+                document.getElementById('payout-parent').classList.remove('open');
             } else {
                 if (element) element.classList.add('active');
                 document.getElementById('payout-submenu').classList.remove('open');
                 document.getElementById('payout-parent').classList.remove('open');
+                document.getElementById('commission-submenu').classList.remove('open');
+                document.getElementById('commission-parent').classList.remove('open');
             }
 
             document.getElementById('action-bar').classList.add('hidden');
@@ -3004,8 +3307,15 @@
             }).join('');
         }
 
+        let earningsDetailOrigin = 'earnings-csv';
+
         function viewEarningsDetail(index) {
             const d = earningsData[index];
+            // Navigate to earnings-csv page (which houses the detail view)
+            const currentPage = document.querySelector('.page.active');
+            earningsDetailOrigin = currentPage ? currentPage.id.replace('page-', '') : 'earnings-csv';
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-earnings-csv').classList.add('active');
             document.getElementById('earnings-list-view').style.display = 'none';
             document.getElementById('earnings-detail-view').style.display = 'block';
 
@@ -3065,7 +3375,17 @@
             document.getElementById('upload-file-zone').style.display        = 'block';
             document.getElementById('upload-validation-error').style.display = 'none';
         }
-        function backToEarningsList() { document.getElementById('earnings-list-view').style.display = 'block'; document.getElementById('earnings-detail-view').style.display = 'none'; }
+        function backToEarningsList() {
+            document.getElementById('earnings-detail-view').style.display = 'none';
+            document.getElementById('earnings-list-view').style.display = 'block';
+            // Navigate back to origin page
+            const origin = typeof earningsDetailOrigin !== 'undefined' ? earningsDetailOrigin : 'earnings-csv';
+            if (origin !== 'earnings-csv') {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                const originPage = document.getElementById('page-' + origin);
+                if (originPage) originPage.classList.add('active');
+            }
+        }
         function switchEarningsTab(tab, element) { element.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); element.classList.add('active'); document.getElementById('earnings-valid-tab').classList.toggle('active', tab === 'valid'); document.getElementById('earnings-invalid-tab').classList.toggle('active', tab === 'invalid'); }
         function downloadErrorReport() { console.log('Downloading error report'); }
         function toggleAllPoolRows(checkbox) { document.querySelectorAll('.pool-row-checkbox').forEach(cb => cb.checked = checkbox.checked); updateActionBar(); }
@@ -3118,27 +3438,82 @@
         }
         // ── Payout Pool filters ───────────────────────────────────
         // ── New Payout page ───────────────────────────────────────
-        function switchNewPayoutTab(tab, el) {
+        function switchMakerTab(tab, el) {
             document.querySelectorAll('#page-payout-pool .tabs .tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
-            document.getElementById('new-payout-select-tab').classList.toggle('active', tab === 'select');
-            document.getElementById('new-payout-upload-tab').classList.toggle('active', tab === 'upload');
+            document.getElementById('maker-tab-new').classList.toggle('active', tab === 'new');
+            document.getElementById('maker-tab-requests').classList.toggle('active', tab === 'requests');
+        }
+
+                function switchNewPayoutTab(tab, el) { /* no-op */ }
+
+        function toggleNPUploadZone() {
+            const zone = document.getElementById('np-upload-zone');
+            zone.style.display = zone.style.display === 'none' ? 'block' : 'none';
+            if (zone.style.display === 'block') lucide.createIcons();
+        }
+
+        // ── Global Payout Flag ────────────────────────────────────
+        let globalPayoutOn = true;
+        function toggleGlobalPayout(btn) {
+            globalPayoutOn = !globalPayoutOn;
+            btn.classList.toggle('on', globalPayoutOn);
+            const label = document.getElementById('global-payout-label');
+            label.textContent = globalPayoutOn ? 'ON' : 'OFF';
+            label.style.color = globalPayoutOn ? 'var(--color-green)' : 'var(--color-red)';
+            document.getElementById('global-payout-warning').style.display = globalPayoutOn ? 'none' : 'block';
+            // Block execute button in PR detail if off
+            const execPanel = document.getElementById('pr-execute-panel');
+            if (execPanel) {
+                const execBtn = execPanel.querySelector('.btn-primary');
+                if (execBtn) { execBtn.disabled = !globalPayoutOn; execBtn.title = globalPayoutOn ? '' : 'Global payout execution is OFF'; }
+            }
+        }
+
+        // ── Per-receiver Payout Flag ──────────────────────────────
+        function toggleReceiverPayout(btn, receiverKey) {
+            const isOn = !btn.classList.contains('on');
+            btn.classList.toggle('on', isOn);
+            const label = btn.nextElementSibling;
+            if (label) { label.textContent = isOn ? 'On' : 'Off'; label.style.color = isOn ? 'var(--color-green)' : 'var(--color-red)'; }
+            // Reflect in New Payout table
+            const npRows = Array.from(document.querySelectorAll('#np-table-body tr'));
+            const npRow = npRows.find(r => r.dataset.search && r.dataset.search.toLowerCase().includes(receiverKey.toLowerCase()));
+            if (npRow) {
+                const cb = npRow.querySelector('.np-row-check');
+                if (!isOn && cb) { cb.checked = false; cb.disabled = true; onNPRowCheck(cb); }
+                if (isOn  && cb) { cb.disabled = false; }
+                npRow.style.opacity = isOn ? '1' : '0.5';
+            }
+        }
+
+        // Sync min/max limits as placeholder hints in New Payout filters
+        function applyPayoutLimitsToFilters() {
+            const min = document.getElementById('threshold-amount')?.value;
+            const max = document.getElementById('payout-max-amount')?.value;
+            const fromEl = document.getElementById('np-filter-bal-from');
+            const toEl   = document.getElementById('np-filter-bal-to');
+            if (fromEl && min) { fromEl.value = min; }
+            if (toEl   && max) { toEl.value   = max; }
+            applyNewPayoutFilters();
         }
         function applyNewPayoutFilters() {
             const name    = document.getElementById('np-filter-name').value.toLowerCase();
             const email   = document.getElementById('np-filter-email').value.toLowerCase();
-            const balance = document.getElementById('np-filter-balance').value;
+            const balFrom = document.getElementById('np-filter-bal-from').value;
+            const balTo   = document.getElementById('np-filter-bal-to').value;
             const rows    = Array.from(document.querySelectorAll('#np-table-body tr'));
             rows.forEach(row => {
                 const bal = parseInt(row.querySelector('.np-amount')?.dataset.balance || '0');
                 const match = (!name    || row.dataset.search.includes(name))
                            && (!email   || row.dataset.search.includes(email))
-                           && (!balance || (balance === 'positive' && bal > 0) || (balance === 'zero' && bal === 0));
+                           && (!balFrom || bal >= parseInt(balFrom))
+                           && (!balTo   || bal <= parseInt(balTo));
                 row.style.display = match ? '' : 'none';
             });
         }
         function resetNewPayoutFilters() {
-            ['np-filter-name','np-filter-email','np-filter-balance'].forEach(id => document.getElementById(id).value = '');
+            ['np-filter-name','np-filter-email','np-filter-bal-from','np-filter-bal-to'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
             applyNewPayoutFilters();
         }
         function toggleAllNewPayout(masterCb) {
@@ -3165,7 +3540,23 @@
             const checks = Array.from(document.querySelectorAll('.np-row-check:checked'));
             if (!checks.length) return;
             const total = checks.reduce((s, cb) => s + parseInt(cb.closest('tr').querySelector('.np-amount')?.value || '0'), 0);
-            alert('Payout request created for ' + checks.length + ' receiver(s) \u00b7 \u00a5' + total.toLocaleString() + '\nRequest will enter the approval workflow.');
+            document.getElementById('npm-receivers').textContent = checks.length + ' receiver' + (checks.length !== 1 ? 's' : '');
+            document.getElementById('npm-total').textContent     = '\u00a5' + total.toLocaleString();
+            document.getElementById('new-payout-modal').classList.add('active');
+            lucide.createIcons();
+        }
+        function closeNewPayoutModal(event) {
+            if (event && event.target !== document.getElementById('new-payout-modal')) return;
+            document.getElementById('new-payout-modal').classList.remove('active');
+        }
+        function confirmNewPayoutRequest() {
+            const year  = document.getElementById('npm-cycle-year').value;
+            const month = document.getElementById('npm-cycle-month').value;
+            if (!year || !month) { alert('Please select a cycle.'); return; }
+            document.getElementById('new-payout-modal').classList.remove('active');
+            const receivers = document.getElementById('npm-receivers').textContent;
+            const total     = document.getElementById('npm-total').textContent;
+            alert('Payout request created\n' + receivers + ' \u00b7 ' + total + '\nCycle: ' + month + '/' + year + '\nEntering approval workflow.');
             navigateTo('payout-requests', document.getElementById('nav-payout-requests'));
         }
 
@@ -3947,9 +4338,15 @@
             alert(`${resolvingCreatorId} marked as Resolved. Recorded with proof image and note. Audit log updated.`);
         }
 
+        let prDetailOrigin = 'payout-requests';
+
         function viewPayoutRequest(index) {
             currentPRIndex = index;
             const d = payoutRequestData[index];
+            const currentPage = document.querySelector('.page.active');
+            prDetailOrigin = currentPage ? currentPage.id.replace('page-', '') : 'payout-requests';
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-payout-requests').classList.add('active');
             document.getElementById('pr-list-section').style.display       = 'none';
             document.getElementById('payout-request-detail').style.display = 'block';
 
@@ -4004,6 +4401,13 @@
             document.getElementById('payout-request-detail').style.display = 'none';
             document.getElementById('pr-list-section').style.display       = 'block';
             currentPRIndex = null;
+            const origin = typeof prDetailOrigin !== 'undefined' ? prDetailOrigin : 'payout-requests';
+            if (origin !== 'payout-requests') {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                const originPage = document.getElementById('page-' + origin);
+                if (originPage) originPage.classList.add('active');
+                document.getElementById('pr-list-section').style.display = 'none';
+            }
             lucide.createIcons();
         }
 
