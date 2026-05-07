@@ -448,7 +448,7 @@
                         <div style="padding:12px 16px;background:rgba(255,59,92,0.06);border:1px solid rgba(255,59,92,0.25);border-radius:6px;">
                             <div style="font-size:12px;color:var(--color-red);font-weight:600;margin-bottom:4px;">PAYONEER FAILED</div>
                             <div style="font-size:13px;color:var(--color-text);font-weight:500;">PR-0038 · 2 receivers failed</div>
-                            <div style="font-size:11px;color:var(--color-text-muted);margin-top:2px;">Return to Pool or Mark Resolved</div>
+                            <div style="font-size:11px;color:var(--color-text-muted);margin-top:2px;">Cancel Transaction or Mark Resolved</div>
                         </div>
                     </div>
                 </div>
@@ -521,7 +521,7 @@
                         <th>Record ID</th><th>Cycle</th><th>Type</th><th>File Name</th><th>Upload Date</th><th>Valid Rows</th><th>Status</th><th>Actions</th>
                     </tr></thead>
                     <tbody id="maker-commission-tbody">
-                        <tr data-id="cm-0005" data-year="2026" data-month="05" data-status="created" style="background:rgba(107,114,128,0.03);">
+                        <tr data-id="cm-0005" data-year="2026" data-month="05" data-status="created" data-created-by="yamamoto.k@torilab.ai" style="background:rgba(107,114,128,0.03);">
                             <td><strong>CM-0005</strong></td>
                             <td><strong>May 2026</strong></td>
                             <td><span class="badge badge-pending" style="font-size:10px;">Commission</span></td>
@@ -530,7 +530,7 @@
                             <td><span class="badge badge-created" style="font-size:10px;">Created</span></td>
                             <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(4)">View</button></td>
                         </tr>
-                        <tr data-id="cm-0004" data-year="2026" data-month="04" data-status="pending">
+                        <tr data-id="cm-0004" data-year="2026" data-month="04" data-status="pending" data-created-by="yamamoto.k@torilab.ai">
                             <td><strong>CM-0004</strong></td>
                             <td><strong>April 2026</strong></td>
                             <td><span class="badge badge-pending" style="font-size:10px;">Commission</span></td>
@@ -539,7 +539,7 @@
                             <td><span class="badge badge-pending">Pending — Step 1 of 2</span></td>
                             <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(0)">View</button></td>
                         </tr>
-                        <tr data-id="adj-0001" data-year="2026" data-month="03" data-status="approved">
+                        <tr data-id="adj-0001" data-year="2026" data-month="03" data-status="approved" data-created-by="yamamoto.k@torilab.ai">
                             <td><strong>ADJ-0001</strong></td>
                             <td><strong>March 2026</strong></td>
                             <td><span class="badge" style="font-size:10px;background:rgba(99,91,255,0.1);color:#6366f1;">Adjust</span></td>
@@ -617,7 +617,7 @@
                         <th>Record ID</th><th>Cycle</th><th>Type</th><th>File Name</th><th>Submitted By</th><th>Submitted Date</th><th>Valid Rows</th><th>Step</th><th>Actions</th>
                     </tr></thead>
                     <tbody id="checker-commission-tbody">
-                        <tr data-id="cm-0004" style="background:rgba(255,184,0,0.03);">
+                        <tr data-id="cm-0004" data-status="pending" data-pending-step-group="finance-team" style="background:rgba(255,184,0,0.03);">
                             <td><strong>CM-0004</strong></td>
                             <td><strong>April 2026</strong></td>
                             <td><span class="badge badge-pending" style="font-size:10px;">Commission</span></td>
@@ -627,6 +627,17 @@
                             <td>156 rows</td>
                             <td><span class="badge badge-pending" style="font-size:10px;">Step 1 of 2</span></td>
                             <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(0)">Review</button></td>
+                        </tr>
+                        <tr data-id="cm-0003" data-status="approved" data-checker-action="yamamoto.k@torilab.ai">
+                            <td><strong>CM-0003</strong></td>
+                            <td><strong>March 2026</strong></td>
+                            <td><span class="badge badge-pending" style="font-size:10px;">Commission</span></td>
+                            <td>commissions_2026_03.csv</td>
+                            <td>suzuki.h@torilab.ai</td>
+                            <td>Mar 28 2026, 09:15:00</td>
+                            <td>200 rows</td>
+                            <td><span class="badge badge-approved" style="font-size:10px;">Approved</span></td>
+                            <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(1)">View</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -813,6 +824,7 @@
                             <h3>Summary</h3>
                             <div class="key-value"><div class="key">Cycle</div><div class="value" id="earnings-detail-cycle">April 2026</div></div>
                             <div class="key-value"><div class="key">Total Rows</div><div class="value" id="earnings-detail-total-rows">156</div></div>
+                            <div class="key-value" style="align-items:flex-start;"><div class="key">Description</div><div class="value" id="earnings-detail-description" style="white-space:pre-wrap;line-height:1.5;">—</div></div>
                         </div>
 
                         <!-- Data table -->
@@ -893,17 +905,18 @@
                     <table style="margin-top:4px;">
                         <thead><tr>
                             <th style="width:40px;"><input type="checkbox" id="np-check-all" onchange="toggleAllNewPayout(this)" style="accent-color:var(--color-cyan);"></th>
-                            <th>Receiver</th><th>Twomi ID</th><th>Receiver Email</th><th>Payment Method</th>
+                            <th>Receiver</th><th>Twomi ID</th><th>Receiver Email</th><th>Payment Method</th><th>Payment Account</th>
                             <th style="text-align:right;">Total Balance</th>
                             <th style="text-align:right;">Locked</th>
                             <th style="text-align:right;">Available</th>
-                            <th style="min-width:190px;">Amount to Pay</th>
+                            <th style="min-width:160px;">Amount to Pay</th>
                         </tr></thead>
                         <tbody id="np-table-body">
                             <tr data-available="8504" data-search="tanaka yuki TW-10042 tanaka.y@twomi.com">
                                 <td><input type="checkbox" class="np-row-check" onchange="onNPRowCheck(this)" style="accent-color:var(--color-cyan);"></td>
                                 <td><strong>Tanaka Yuki</strong></td><td>TW-10042</td><td>tanaka.y@twomi.com</td>
                                 <td><span class="badge badge-approved" style="font-size:10px;">Payoneer</span></td>
+                                <td style="font-size:12px;color:var(--color-text-muted);">tanaka.y@payoneer.com</td>
                                 <td style="text-align:right;color:var(--color-text-muted);">¥38,504</td>
                                 <td style="text-align:right;color:var(--color-text-muted);">¥30,000</td>
                                 <td style="text-align:right;font-weight:600;color:var(--color-amber);">¥8,504</td>
@@ -916,6 +929,7 @@
                                 <td><input type="checkbox" class="np-row-check" onchange="onNPRowCheck(this)" style="accent-color:var(--color-cyan);"></td>
                                 <td><strong>Suzuki Hana</strong></td><td>TW-10087</td><td>suzuki.h@twomi.com</td>
                                 <td><span class="badge" style="font-size:10px;background:rgba(99,91,255,0.1);color:#6366f1;">Stripe</span></td>
+                                <td style="font-size:12px;color:var(--color-text-muted);">suzuki.h@stripe.com</td>
                                 <td style="text-align:right;color:var(--color-text-muted);">¥22,680</td>
                                 <td style="text-align:right;color:var(--color-text-muted);">¥22,680</td>
                                 <td style="text-align:right;font-weight:600;color:var(--color-text-muted);">¥0</td>
@@ -928,6 +942,7 @@
                                 <td><input type="checkbox" class="np-row-check" onchange="onNPRowCheck(this)" style="accent-color:var(--color-cyan);"></td>
                                 <td><strong>Yamamoto Kenji</strong></td><td>TW-10134</td><td>yamamoto.k@twomi.com</td>
                                 <td><span class="badge badge-approved" style="font-size:10px;">Payoneer</span></td>
+                                <td style="font-size:12px;color:var(--color-text-muted);">yamamoto.k@payoneer.com</td>
                                 <td style="text-align:right;color:var(--color-text-muted);">¥14,742</td>
                                 <td style="text-align:right;color:var(--color-text-muted);">¥14,742</td>
                                 <td style="text-align:right;font-weight:600;color:var(--color-text-muted);">¥0</td>
@@ -940,6 +955,7 @@
                                 <td><input type="checkbox" class="np-row-check" onchange="onNPRowCheck(this)" style="accent-color:var(--color-cyan);"></td>
                                 <td><strong>Nakamura Daiki</strong></td><td>TW-10389</td><td>nakamura.d@twomi.com</td>
                                 <td><span class="badge" style="font-size:10px;background:rgba(255,184,0,0.1);color:var(--color-amber);">⚠ Not Linked</span></td>
+                                <td style="font-size:12px;color:var(--color-amber);font-style:italic;">No account linked</td>
                                 <td style="text-align:right;color:var(--color-text-muted);">¥39,295</td>
                                 <td style="text-align:right;color:var(--color-text-muted);">¥10,000</td>
                                 <td style="text-align:right;font-weight:600;color:var(--color-red);">¥29,295</td>
@@ -952,6 +968,7 @@
                                 <td><input type="checkbox" class="np-row-check" onchange="onNPRowCheck(this)" style="accent-color:var(--color-cyan);"></td>
                                 <td><strong>Hayashi Yuna</strong></td><td>TW-10421</td><td>hayashi.y@twomi.com</td>
                                 <td><span class="badge badge-approved" style="font-size:10px;">Payoneer</span></td>
+                                <td style="font-size:12px;color:var(--color-text-muted);">hayashi.y@payoneer.com</td>
                                 <td style="text-align:right;color:var(--color-text-muted);">¥26,820</td>
                                 <td style="text-align:right;color:var(--color-text-muted);">¥10,000</td>
                                 <td style="text-align:right;font-weight:600;color:var(--color-red);">¥16,820</td>
@@ -1048,25 +1065,25 @@
                             <th>Request ID</th><th>Cycle</th><th>Date</th><th>Receivers</th><th>Total Amount</th><th>Status</th><th>Actions</th>
                         </tr></thead>
                         <tbody id="maker-pr-tbody">
-                            <tr data-id="pr-0044" data-year="2026" data-month="05" data-status="created" data-date="2026-05-06" style="background:rgba(107,114,128,0.03);">
+                            <tr data-id="pr-0044" data-year="2026" data-month="05" data-status="created" data-date="2026-05-06" data-created-by="yamamoto.k@torilab.ai" style="background:rgba(107,114,128,0.03);">
                                 <td><strong>PR-0044</strong></td><td>May 2026</td><td>May 6 2026, 10:00:00</td>
                                 <td>5</td><td>¥54,001</td>
                                 <td><span class="badge badge-created" style="font-size:11px;">Created</span></td>
                                 <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(5)">View</button></td>
                             </tr>
-                            <tr data-id="pr-0043" data-year="2026" data-month="04" data-status="executed" data-date="2026-04-13">
+                            <tr data-id="pr-0043" data-year="2026" data-month="04" data-status="executed" data-date="2026-04-13" data-created-by="yamamoto.k@torilab.ai">
                                 <td><strong>PR-0043</strong></td><td>April 2026</td><td>Apr 13 2026, 09:00:00</td>
                                 <td>5</td><td>¥76,394</td>
                                 <td><span class="badge badge-executed">Executed</span></td>
                                 <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(6)">View</button></td>
                             </tr>
-                            <tr data-id="pr-0041" data-year="2026" data-month="04" data-status="pending" data-date="2026-04-11">
+                            <tr data-id="pr-0041" data-year="2026" data-month="04" data-status="pending" data-date="2026-04-11" data-created-by="tanaka.y@torilab.ai">
                                 <td><strong>PR-0041</strong></td><td>April 2026</td><td>Apr 11 2026, 10:00:00</td>
                                 <td>7</td><td>¥150,725</td>
                                 <td><span class="badge badge-pending">Pending — Step 1 of 2</span></td>
                                 <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(0)">View</button></td>
                             </tr>
-                            <tr data-id="pr-0039" data-year="2026" data-month="03" data-status="scheduled" data-date="2026-03-28">
+                            <tr data-id="pr-0039" data-year="2026" data-month="03" data-status="scheduled" data-date="2026-03-28" data-created-by="tanaka.y@torilab.ai">
                                 <td><strong>PR-0039</strong></td><td>March 2026</td><td>Mar 28 2026, 11:00:00</td>
                                 <td>30</td><td>¥4,100,000</td>
                                 <td><span class="badge badge-scheduled">Scheduled — May 15 2026, 09:00:00</span></td>
@@ -1151,7 +1168,7 @@
                                 <th>Receivers</th><th>Total Amount</th><th>Status</th><th>Next Action</th><th>Actions</th>
                             </tr></thead>
                             <tbody id="pr-flat-body">
-                                <tr data-id="pr-0043" data-year="2026" data-month="04" data-status="executed" data-receiver="yamamoto.k@torilab.ai">
+                                <tr data-id="pr-0043" data-year="2026" data-month="04" data-status="executed" data-receiver="yamamoto.k@torilab.ai" data-checker-action="suzuki.h@torilab.ai">
                                     <td><strong>PR-0043</strong></td><td>April 2026</td>
                                     <td>Yamamoto Kenji · yamamoto.k@torilab.ai</td><td>Apr 13 2026</td>
                                     <td>5</td><td>¥76,394</td>
@@ -1159,7 +1176,7 @@
                                     <td style="font-size:12px;color:var(--color-text-muted);">Awaiting Payoneer</td>
                                     <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(6)">View</button></td>
                                 </tr>
-                                <tr data-id="pr-0041" data-year="2026" data-month="04" data-status="pending" data-receiver="tanaka.y@torilab.ai">
+                                <tr data-id="pr-0041" data-year="2026" data-month="04" data-status="pending" data-receiver="tanaka.y@torilab.ai" data-pending-step-group="finance-team">
                                     <td><strong>PR-0041</strong></td><td>April 2026</td>
                                     <td>Tanaka Yuki · tanaka.y@torilab.ai</td><td>Apr 11 2026</td>
                                     <td>7</td><td>¥150,725</td>
@@ -1167,7 +1184,7 @@
                                     <td><span class="permission-badge" style="font-size:11px;">Finance Team</span></td>
                                     <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(0)">View</button></td>
                                 </tr>
-                                <tr data-id="pr-0042" data-year="2026" data-month="04" data-status="scheduled" data-receiver="suzuki.h@torilab.ai">
+                                <tr data-id="pr-0042" data-year="2026" data-month="04" data-status="scheduled" data-receiver="suzuki.h@torilab.ai" data-checker-action="yamamoto.k@torilab.ai">
                                     <td><strong>PR-0042</strong></td><td>April 2026</td>
                                     <td>Suzuki Hana · suzuki.h@torilab.ai</td><td>Apr 12 2026</td>
                                     <td>3</td><td>¥58,872</td>
@@ -1175,7 +1192,7 @@
                                     <td style="font-size:12px;color:var(--color-text-muted);">Scheduled — May 1 2026, 09:00:00</td>
                                     <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(4)">View</button></td>
                                 </tr>
-                                <tr data-id="pr-0040" data-year="2026" data-month="04" data-status="ready" data-receiver="tanaka.y@torilab.ai">
+                                <tr data-id="pr-0040" data-year="2026" data-month="04" data-status="ready" data-receiver="tanaka.y@torilab.ai" data-checker-action="yamamoto.k@torilab.ai">
                                     <td><strong>PR-0040</strong></td><td>April 2026</td>
                                     <td>Tanaka Yuki · tanaka.y@torilab.ai</td><td>Apr 5 2026</td>
                                     <td>3</td><td>¥375,000</td>
@@ -1183,7 +1200,7 @@
                                     <td style="color:var(--color-text-muted);">Awaiting Executer</td>
                                     <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(1)">View</button></td>
                                 </tr>
-                                <tr data-id="pr-0039" data-year="2026" data-month="03" data-status="scheduled" data-receiver="tanaka.y@torilab.ai">
+                                <tr data-id="pr-0039" data-year="2026" data-month="03" data-status="scheduled" data-receiver="tanaka.y@torilab.ai" data-checker-action="yamamoto.k@torilab.ai">
                                     <td><strong>PR-0039</strong></td><td>March 2026</td>
                                     <td>Tanaka Yuki · tanaka.y@torilab.ai</td><td>Mar 28 2026</td>
                                     <td>30</td><td>¥4,100,000</td>
@@ -1191,7 +1208,7 @@
                                     <td style="font-size:12px;color:var(--color-text-muted);">Scheduled — May 15 2026, 09:00:00</td>
                                     <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(2)">View</button></td>
                                 </tr>
-                                <tr data-id="pr-0038" data-year="2026" data-month="02" data-status="failed" data-receiver="suzuki.h@torilab.ai">
+                                <tr data-id="pr-0038" data-year="2026" data-month="02" data-status="failed" data-receiver="suzuki.h@torilab.ai" data-checker-action="yamamoto.k@torilab.ai">
                                     <td><strong>PR-0038</strong></td><td>February 2026</td>
                                     <td>Suzuki Hana · suzuki.h@torilab.ai</td><td>Feb 15 2026</td>
                                     <td>4</td><td>¥92,374</td>
@@ -1231,6 +1248,7 @@
                         <h3>Summary</h3>
                         <div class="key-value"><div class="key">Rows</div><div class="value" id="pr-detail-rows">24 receivers</div></div>
                         <div class="key-value"><div class="key">Total Amount</div><div class="value" style="color:var(--color-cyan);font-weight:700;" id="pr-detail-total">¥3,240,000</div></div>
+                        <div class="key-value" style="align-items:flex-start;"><div class="key">Description</div><div class="value" id="pr-detail-description" style="white-space:pre-wrap;line-height:1.5;">—</div></div>
                     </div>
 
                     <!-- Payoneer error banner (shown only for failed requests) -->
@@ -1343,7 +1361,7 @@
                         <select class="filter-input" id="mon-filter-status" onchange="applyMonFilters()" style="width:140px;">
                             <option value="">All</option>
                             <option value="in-progress">In Progress</option>
-                            <option value="sent">Sent</option>
+                            <option value="paid">Paid</option>
                             <option value="failed">Failed</option>
                             <option value="resolved">Resolved</option>
                         </select>
@@ -1406,29 +1424,29 @@
                             <td style="font-size:12px;">Apr 13 2026, 14:00:00</td>
                         </tr>
                         <!-- PR-0040: April 2026, Sent -->
-                        <tr data-year="2026" data-month="04" data-status="sent" data-email="tanaka.y@twomi.com" data-tx="PAY-2026-040001" data-date="2026-04-06">
+                        <tr data-year="2026" data-month="04" data-status="paid" data-email="tanaka.y@twomi.com" data-tx="PAY-2026-040001" data-date="2026-04-06">
                             <td>April 2026</td><td>PR-0040</td><td>Tanaka Yuki</td><td>TW-10042</td>
                             <td>tanaka.y@twomi.com</td><td>tanaka.y@payoneer.com</td>
                             <td style="font-family:monospace;font-size:11px;">PAY-2026-040001</td>
                             <td>¥45,000</td><td>JPY</td>
-                            <td><span class="badge badge-approved" style="font-size:10px;">✓ Sent</span></td>
+                            <td><span class="badge badge-approved" style="font-size:10px;">✓ Paid</span></td>
                             <td style="font-size:12px;">Apr 6 2026, 09:42:00</td>
                         </tr>
-                        <tr data-year="2026" data-month="04" data-status="sent" data-email="suzuki.h@twomi.com" data-tx="PAY-2026-040002" data-date="2026-04-06">
+                        <tr data-year="2026" data-month="04" data-status="paid" data-email="suzuki.h@twomi.com" data-tx="PAY-2026-040002" data-date="2026-04-06">
                             <td>April 2026</td><td>PR-0040</td><td>Suzuki Hana</td><td>TW-10087</td>
                             <td>suzuki.h@twomi.com</td><td>suzuki.h@payoneer.com</td>
                             <td style="font-family:monospace;font-size:11px;">PAY-2026-040002</td>
                             <td>¥120,000</td><td>JPY</td>
-                            <td><span class="badge badge-approved" style="font-size:10px;">✓ Sent</span></td>
+                            <td><span class="badge badge-approved" style="font-size:10px;">✓ Paid</span></td>
                             <td style="font-size:12px;">Apr 6 2026, 09:42:00</td>
                         </tr>
                         <!-- PR-0038: Feb 2026, mixed -->
-                        <tr data-year="2026" data-month="02" data-status="sent" data-email="tanaka.y@twomi.com" data-tx="PAY-2026-038001" data-date="2026-02-16">
+                        <tr data-year="2026" data-month="02" data-status="paid" data-email="tanaka.y@twomi.com" data-tx="PAY-2026-038001" data-date="2026-02-16">
                             <td>February 2026</td><td>PR-0038</td><td>Tanaka Yuki</td><td>TW-10042</td>
                             <td>tanaka.y@twomi.com</td><td>tanaka.y@payoneer.com</td>
                             <td style="font-family:monospace;font-size:11px;">PAY-2026-038001</td>
                             <td>¥8,504</td><td>JPY</td>
-                            <td><span class="badge badge-approved" style="font-size:10px;">✓ Sent</span></td>
+                            <td><span class="badge badge-approved" style="font-size:10px;">✓ Paid</span></td>
                             <td style="font-size:12px;">Feb 16 2026, 15:00:00</td>
                         </tr>
                         <tr data-year="2026" data-month="02" data-status="resolved" data-email="nakamura.d@twomi.com" data-tx="PAY-2026-038003" data-date="2026-02-16">
@@ -1651,7 +1669,7 @@
                                 <td>PR-0040</td><td>Tanaka Yuki</td><td>tanaka.y@payoneer.com</td>
                                 <td style="font-size:11px;color:var(--color-text-muted);font-family:monospace;">PAY-2026-040001</td>
                                 <td>¥45,000</td><td>¥45,000</td>
-                                <td><span class="badge badge-approved" style="font-size:10px;">Sent</span></td>
+                                <td><span class="badge badge-approved" style="font-size:10px;">Paid</span></td>
                                 <td><span class="badge badge-approved" style="font-size:10px;">Completed</span></td>
                                 <td><span class="badge badge-approved" style="font-size:11px;">Match</span></td>
                             </tr>
@@ -1659,7 +1677,7 @@
                                 <td>PR-0040</td><td>Suzuki Hana</td><td>suzuki.h@payoneer.com</td>
                                 <td style="font-size:11px;color:var(--color-text-muted);font-family:monospace;">PAY-2026-040002</td>
                                 <td>¥120,000</td><td>¥120,000</td>
-                                <td><span class="badge badge-approved" style="font-size:10px;">Sent</span></td>
+                                <td><span class="badge badge-approved" style="font-size:10px;">Paid</span></td>
                                 <td><span class="badge badge-approved" style="font-size:10px;">Completed</span></td>
                                 <td><span class="badge badge-approved" style="font-size:11px;">Match</span></td>
                             </tr>
@@ -1686,7 +1704,7 @@
                                 <td style="font-size:11px;color:var(--color-red);font-family:monospace;">PAY-2026-039003</td>
                                 <td>¥210,000</td>
                                 <td style="color:var(--color-red);font-weight:600;">¥21,000</td>
-                                <td><span class="badge badge-approved" style="font-size:10px;">Sent</span></td>
+                                <td><span class="badge badge-approved" style="font-size:10px;">Paid</span></td>
                                 <td><span class="badge badge-approved" style="font-size:10px;">Completed</span></td>
                                 <td><span class="badge badge-failed" style="font-size:11px;">Amount Mismatch</span></td>
                             </tr>
@@ -2106,7 +2124,7 @@
                     </tr></thead>
                     <tbody id="executer-pr-tbody">
                         <tr data-id="pr-0040" data-year="2026" data-month="04" data-status="ready"
-                            data-submitted-by="tanaka.y@torilab.ai" data-submitted-date="2026-04-05" data-approved-date="2026-04-06">
+                            data-submitted-by="tanaka.y@torilab.ai" data-submitted-date="2026-04-05" data-approved-date="2026-04-06" data-executed-by="">
                             <td><strong>PR-0040</strong></td><td>April 2026</td>
                             <td>Tanaka Yuki · tanaka.y@torilab.ai</td>
                             <td>Apr 5 2026, 14:15:00</td>
@@ -2120,7 +2138,7 @@
                             </td>
                         </tr>
                         <tr data-id="pr-0042" data-year="2026" data-month="04" data-status="scheduled"
-                            data-submitted-by="suzuki.h@torilab.ai" data-submitted-date="2026-04-12" data-approved-date="2026-04-12">
+                            data-submitted-by="suzuki.h@torilab.ai" data-submitted-date="2026-04-12" data-approved-date="2026-04-12" data-executed-by="yamamoto.k@torilab.ai">
                             <td><strong>PR-0042</strong></td><td>April 2026</td>
                             <td>Suzuki Hana · suzuki.h@torilab.ai</td>
                             <td>Apr 12 2026, 09:00:00</td>
@@ -2133,7 +2151,8 @@
                                 </button>
                             </td>
                         </tr>
-                        <tr data-id="pr-0043" data-year="2026" data-month="04" data-status="executed" data-submitted-by="yamamoto.k@torilab.ai" data-submitted-date="2026-04-13" data-approved-date="2026-04-13">
+                        <tr data-id="pr-0043" data-year="2026" data-month="04" data-status="executed"
+                            data-submitted-by="yamamoto.k@torilab.ai" data-submitted-date="2026-04-13" data-approved-date="2026-04-13" data-executed-by="yamamoto.k@torilab.ai">
                             <td><strong>PR-0043</strong></td><td>April 2026</td>
                             <td>Yamamoto Kenji · yamamoto.k@torilab.ai</td>
                             <td>Apr 13 2026, 09:00:00</td>
@@ -2142,6 +2161,34 @@
                             <td><span class="badge badge-executed" style="font-size:10px;">Executed</span></td>
                             <td>
                                 <button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(6)">
+                                    <i data-lucide="eye" style="width:12px;height:12px;"></i> View
+                                </button>
+                            </td>
+                        </tr>
+                        <tr data-id="pr-0039" data-year="2026" data-month="03" data-status="scheduled"
+                            data-submitted-by="tanaka.y@torilab.ai" data-submitted-date="2026-03-28" data-approved-date="2026-03-29" data-executed-by="tanaka.y@torilab.ai">
+                            <td><strong>PR-0039</strong></td><td>March 2026</td>
+                            <td>Tanaka Yuki · tanaka.y@torilab.ai</td>
+                            <td>Mar 28 2026, 11:00:00</td>
+                            <td>Mar 29 2026, 15:30:00</td>
+                            <td>30</td><td>¥4,100,000</td>
+                            <td><span class="badge badge-scheduled" style="font-size:10px;">Scheduled — May 15 2026, 09:00:00</span></td>
+                            <td>
+                                <button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(2)">
+                                    <i data-lucide="eye" style="width:12px;height:12px;"></i> View
+                                </button>
+                            </td>
+                        </tr>
+                        <tr data-id="pr-0038" data-year="2026" data-month="02" data-status="failed"
+                            data-submitted-by="suzuki.h@torilab.ai" data-submitted-date="2026-02-15" data-approved-date="2026-02-16" data-executed-by="suzuki.h@torilab.ai">
+                            <td><strong>PR-0038</strong></td><td>February 2026</td>
+                            <td>Suzuki Hana · suzuki.h@torilab.ai</td>
+                            <td>Feb 15 2026, 09:20:00</td>
+                            <td>Feb 16 2026, 14:45:00</td>
+                            <td>4</td><td>¥92,374</td>
+                            <td><span class="badge badge-failed" style="font-size:10px;">Payment Failed</span></td>
+                            <td>
+                                <button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(3)">
                                     <i data-lucide="eye" style="width:12px;height:12px;"></i> View
                                 </button>
                             </td>
@@ -2496,7 +2543,7 @@
                             <option value="reject-request">Reject Request</option>
                             <option value="execute">Execute / Schedule</option>
                             <option value="mark-resolved">Mark Resolved</option>
-                            <option value="return-pool">Return to Pool</option>
+                            <option value="cancel-transaction">Cancel Transaction</option>
                             <option value="reconciliation">Reconciliation</option>
                             <option value="user-mgmt">User Management</option>
                             <option value="config">Flow Config</option>
@@ -2531,7 +2578,7 @@
                         <tr data-type="upload"><td>Apr 11 2026, 10:30:00</td><td>yamamoto.k@torilab.ai</td><td><span class="badge badge-pending" style="font-size:10px;">Upload</span></td><td>Uploaded payout list for April 2026 — 156 rows, all valid</td><td>April 2026</td></tr>
                         <tr data-type="create-request"><td>Apr 11 2026, 10:00:00</td><td>tanaka.y@torilab.ai</td><td><span class="badge badge-pending" style="font-size:10px;">Create Request</span></td><td>Created payout request from April 2026 pool — 7 receivers · ¥150,725</td><td>PR-0041</td></tr>
                         <tr data-type="approve-request"><td>Apr 6 2026, 14:00:00</td><td>yamamoto.k@torilab.ai</td><td><span class="badge badge-approved" style="font-size:10px;">Approve Request</span></td><td>Approved PR-0040 at Step 2 of 2 — final approval</td><td>PR-0040</td></tr>
-                        <tr data-type="return-pool"><td>Apr 5 2026, 11:00:00</td><td>suzuki.h@torilab.ai</td><td><span class="badge badge-failed" style="font-size:10px;">Return to Pool</span></td><td>Returned TW-10421 Hayashi Yuna to pool — Transfer limit exceeded</td><td>PR-0038</td></tr>
+                        <tr data-type="cancel-transaction"><td>Apr 5 2026, 11:00:00</td><td>suzuki.h@torilab.ai</td><td><span class="badge badge-failed" style="font-size:10px;">Cancel Transaction</span></td><td>Returned TW-10421 Hayashi Yuna to pool — Transfer limit exceeded</td><td>PR-0038</td></tr>
                         <tr data-type="reconciliation"><td>Apr 4 2026, 10:45:00</td><td>suzuki.h@torilab.ai</td><td><span class="badge badge-scheduled" style="font-size:10px;">Reconciliation</span></td><td>Ran reconciliation for April 2026 — 12 checked, 8 matched, 4 mismatched</td><td>April 2026</td></tr>
                         <tr data-type="reject-request"><td>Apr 2 2026, 15:20:00</td><td>yamamoto.k@torilab.ai</td><td><span class="badge badge-rejected" style="font-size:10px;">Reject Request</span></td><td>Rejected PR-0038 at Step 2 — Receiver account verification failed for TW-10312</td><td>PR-0038</td></tr>
                         <tr data-type="user-mgmt"><td>Apr 1 2026, 09:00:00</td><td>sato.m@torilab.ai</td><td><span class="badge badge-pending" style="font-size:10px;">User Mgmt</span></td><td>Invited Watanabe Ryo — assigned to Uploader group</td><td>watanabe.r@torilab.ai</td></tr>
@@ -2588,7 +2635,7 @@
                         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 14px;border:2px solid var(--color-cyan);border-radius:6px;background:rgba(0,212,255,0.04);flex:1;" id="type-commission-label">
                             <input type="radio" name="upload-type" value="commission" checked onchange="onUploadTypeChange(this)" style="accent-color:var(--color-cyan);">
                             <div>
-                                <div style="font-size:13px;font-weight:600;color:var(--color-navy);">Twomi Commission</div>
+                                <div style="font-size:13px;font-weight:600;color:var(--color-navy);">Commission</div>
                                 <div style="font-size:11px;color:var(--color-text-muted);">Standard monthly commission — one file per cycle</div>
                             </div>
                         </label>
@@ -2625,6 +2672,11 @@
                             <option value="12">December</option>
                         </select>
                     </div>
+                </div>
+
+                <div class="form-group" style="margin-top:12px;margin-bottom:0;">
+                    <label class="form-label">Description <span style="color:var(--color-red)">*</span></label>
+                    <textarea id="upload-description" class="form-input" rows="3" placeholder="Describe the purpose of this upload (e.g. April 2026 monthly commission — 156 creators)" style="resize:vertical;font-family:inherit;" oninput="checkUploadReady()"></textarea>
                 </div>
 
                 <!-- Cycle status feedback -->
@@ -2745,8 +2797,13 @@
                         </select>
                     </div>
                 </div>
-                <div id="pu-cycle-warning" style="display:none;padding:10px 14px;border-radius:6px;font-size:13px;"></div>
-                <div id="pu-cycle-ok" style="display:none;padding:10px 14px;border-radius:6px;font-size:13px;background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.3);color:var(--color-green);">
+                <div class="form-group" style="margin-top:12px;margin-bottom:0;">
+                    <label class="form-label">Description <span style="color:var(--color-red)">*</span></label>
+                    <textarea id="pu-description" class="form-input" rows="3" placeholder="Describe the purpose of this payout (e.g. April 2026 monthly payout — 7 receivers)" style="resize:vertical;font-family:inherit;" oninput="puCheckUploadReady()"></textarea>
+                </div>
+
+                <div id="pu-cycle-warning" style="display:none;padding:10px 14px;border-radius:6px;font-size:13px;margin-top:12px;"></div>
+                <div id="pu-cycle-ok" style="display:none;padding:10px 14px;border-radius:6px;font-size:13px;margin-top:12px;background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.3);color:var(--color-green);">
                     ✓ <strong id="pu-cycle-ok-label"></strong> — No existing payout request. Ready to proceed.
                 </div>
                 <div class="modal-footer" style="margin-top:24px;">
@@ -3337,6 +3394,75 @@
             parentEl.classList.toggle('open', isOpen);
         }
 
+        // ── Current user (prototype — hardcoded) ─────────────────
+        const currentUser = {
+            name:  'Yamamoto Kenji',
+            email: 'yamamoto.k@torilab.ai',
+            group: 'finance-manager'   // Step 2 approver & Executer group by default Flow Config
+        };
+
+        // ── Role-based row filter ─────────────────────────────────
+        //
+        // Commission — Maker   : createdBy == currentUser
+        //                        Visible: created | pending | approved | rejected
+        //
+        // Commission — Checker : status == pending AND pendingStepGroup == myGroup
+        //                        OR checkerAction includes myEmail
+        //                        Visible: pending | approved | rejected
+        //
+        // Payout — Maker       : createdBy == currentUser
+        //                        Visible: created | pending | ready | scheduled |
+        //                                 executed | completed | failed | rejected
+        //
+        // Payout — Checker     : status == pending AND pendingStepGroup == myGroup
+        //                        OR checkerAction includes myEmail
+        //                        Exclude: failed (Executer's responsibility)
+        //                        Visible: pending | ready | scheduled | executed |
+        //                                 completed | failed | rejected
+        //
+        // Payout — Executer    : status == ready
+        //                        OR status == failed (all executers handle failed)
+        //                        OR executedBy == myEmail (scheduled/executed history)
+        //                        Visible: ready | scheduled | executed | completed | failed
+
+        function applyRoleFilter(page) {
+            if (page === 'commission-uploader') {
+                document.querySelectorAll('#maker-commission-tbody tr').forEach(row => {
+                    row.style.display = row.dataset.createdBy === currentUser.email ? '' : 'none';
+                });
+
+            } else if (page === 'commission-checker') {
+                document.querySelectorAll('#checker-commission-tbody tr').forEach(row => {
+                    const pendingForMe = row.dataset.status === 'pending'
+                                      && row.dataset.pendingStepGroup === currentUser.group;
+                    const myAction     = (row.dataset.checkerAction || '').includes(currentUser.email);
+                    row.style.display  = pendingForMe || myAction ? '' : 'none';
+                });
+
+            } else if (page === 'payout-pool') {
+                document.querySelectorAll('#maker-pr-tbody tr').forEach(row => {
+                    row.style.display = row.dataset.createdBy === currentUser.email ? '' : 'none';
+                });
+
+            } else if (page === 'payout-requests') {
+                document.querySelectorAll('#pr-flat-body tr').forEach(row => {
+                    if (row.dataset.status === 'failed') { row.style.display = 'none'; return; }
+                    const pendingForMe = row.dataset.status === 'pending'
+                                      && row.dataset.pendingStepGroup === currentUser.group;
+                    const myAction     = (row.dataset.checkerAction || '').includes(currentUser.email);
+                    row.style.display  = pendingForMe || myAction ? '' : 'none';
+                });
+
+            } else if (page === 'payout-executer') {
+                document.querySelectorAll('#executer-pr-tbody tr').forEach(row => {
+                    const isReady    = row.dataset.status === 'ready';
+                    const isFailed   = row.dataset.status === 'failed';
+                    const isMyAction = row.dataset.executedBy === currentUser.email;
+                    row.style.display = isReady || isFailed || isMyAction ? '' : 'none';
+                });
+            }
+        }
+
         function navigateTo(page, element) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             const pageEl = document.getElementById('page-' + page);
@@ -3406,6 +3532,9 @@
                 if (eList)   eList.style.display   = 'block';
                 if (eDetail) eDetail.style.display = 'none';
             }
+
+            // Apply role-based row filter
+            applyRoleFilter(page);
 
             lucide.createIcons();
         }
@@ -3547,8 +3676,9 @@
             warning.style.display = 'none';
             okBox.style.display   = 'none';
             nextBtn.disabled      = true;
+            window._uploadCycleValid = false;
 
-            if (!year || !month) return;
+            if (!year || !month) { checkUploadReady(); return; }
 
             const key    = `${year}-${month}`;
             const label  = `${monthNames[month]} ${year}`;
@@ -3557,21 +3687,18 @@
             // Adjust type: always allowed (additive), even if cycle is Approved
             if (type === 'adjust') {
                 okBox.style.display = 'block';
-                document.getElementById('cycle-ok-label').textContent = label;
-                okBox.querySelector?.('span') || null;
-                // Override ok message for adjust
                 const okEl = document.getElementById('cycle-ok');
                 okEl.innerHTML = `✓ <strong id="cycle-ok-label">${label}</strong> — Adjust file will be added on top of existing records.`;
-                nextBtn.disabled = false;
-                return;
+                window._uploadCycleValid = true;
+                checkUploadReady(); return;
             }
 
             // Commission type: original rules
             if (!status) {
                 okBox.style.display = 'block';
                 document.getElementById('cycle-ok-label').textContent = label;
-                nextBtn.disabled = false;
-                return;
+                window._uploadCycleValid = true;
+                checkUploadReady(); return;
             }
             if (status === 'rejected') {
                 warning.style.display    = 'block';
@@ -3579,8 +3706,8 @@
                 warning.style.border     = '1px solid rgba(255,184,0,0.3)';
                 warning.style.color      = 'var(--color-amber)';
                 warning.innerHTML        = `<strong>⚠ ${label} was previously rejected.</strong> You may upload a corrected file.`;
-                nextBtn.disabled         = false;
-                return;
+                window._uploadCycleValid = true;
+                checkUploadReady(); return;
             }
             if (status === 'pending') {
                 warning.style.display    = 'block';
@@ -3588,7 +3715,6 @@
                 warning.style.border     = '1px solid rgba(255,59,92,0.3)';
                 warning.style.color      = 'var(--color-red)';
                 warning.innerHTML        = `<strong>✕ ${label} commission is pending approval.</strong> Wait for it to complete, or upload an Adjust file instead.`;
-                nextBtn.disabled         = true;
                 return;
             }
             if (status === 'approved') {
@@ -3597,8 +3723,13 @@
                 warning.style.border     = '1px solid rgba(255,59,92,0.3)';
                 warning.style.color      = 'var(--color-red)';
                 warning.innerHTML        = `<strong>✕ ${label} commission already approved.</strong> To add more amounts, use the Adjust type instead.`;
-                nextBtn.disabled         = true;
             }
+        }
+
+        function checkUploadReady() {
+            const desc    = (document.getElementById('upload-description')?.value || '').trim();
+            const nextBtn = document.getElementById('upload-next-btn');
+            if (nextBtn) nextBtn.disabled = !(window._uploadCycleValid && desc.length > 0);
         }
 
         function goToUploadStep2() {
@@ -3643,6 +3774,7 @@
                 id: 'CM-0004',
                 name: 'earnings_2026_04.csv', cycle: 'April 2026', uploader: 'Yamamoto Kenji · yamamoto.k@torilab.ai',
                 date: 'Apr 11 2026', status: 'pending', badge: 'badge-pending', badgeText: 'Pending — Step 1 of 2', rows: '156',
+                description: 'April 2026 monthly commission — 156 creators. Includes Q2 performance bonus for top 10 earners.',
                 approvals: [
                     { label: 'Upload',      name: 'Yamamoto Kenji', email: 'yamamoto.k@torilab.ai', date: 'Apr 11 2026, 10:30:00', status: 'done' },
                     { label: 'Step 1 of 2', name: null,             email: null,                    date: null,                 status: 'pending' },
@@ -3653,6 +3785,7 @@
                 id: 'CM-0003',
                 name: 'earnings_2026_03.csv', cycle: 'March 2026', uploader: 'Suzuki Hana · suzuki.h@torilab.ai',
                 date: 'Mar 28 2026', status: 'approved', badge: 'badge-approved', badgeText: 'Approved', rows: '200',
+                description: 'March 2026 monthly commission — 200 creators.',
                 approvals: [
                     { label: 'Upload',      name: 'Suzuki Hana',    email: 'suzuki.h@torilab.ai',   date: 'Mar 28 2026, 09:15:00', status: 'done' },
                     { label: 'Step 1 of 2', name: 'Tanaka Yuki',    email: 'tanaka.y@torilab.ai',   date: 'Mar 29 2026, 14:30:00', status: 'approved' },
@@ -3663,6 +3796,7 @@
                 id: 'CM-0002',
                 name: 'earnings_2026_02.csv', cycle: 'February 2026', uploader: 'Yamamoto Kenji · yamamoto.k@torilab.ai',
                 date: 'Feb 29 2026', status: 'approved', badge: 'badge-approved', badgeText: 'Approved', rows: '198',
+                description: 'February 2026 monthly commission — 198 creators.',
                 approvals: [
                     { label: 'Upload',      name: 'Yamamoto Kenji', email: 'yamamoto.k@torilab.ai', date: 'Feb 29 2026, 13:00:00', status: 'done' },
                     { label: 'Step 1 of 2', name: 'Suzuki Hana',    email: 'suzuki.h@torilab.ai',   date: 'Mar 1 2026, 10:20:00',  status: 'approved' },
@@ -3673,6 +3807,7 @@
                 id: 'CM-0001',
                 name: 'earnings_2026_01.csv', cycle: 'January 2026', uploader: 'Suzuki Hana · suzuki.h@torilab.ai',
                 date: 'Jan 31 2026', status: 'rejected', badge: 'badge-rejected', badgeText: 'Rejected by Approver', rows: '145',
+                description: 'January 2026 monthly commission — 145 creators.',
                 approvals: [
                     { label: 'Upload',      name: 'Suzuki Hana',    email: 'suzuki.h@torilab.ai',   date: 'Jan 31 2026, 13:00:00', status: 'done' },
                     { label: 'Step 1 of 2', name: 'Tanaka Yuki',    email: 'tanaka.y@torilab.ai',   date: 'Feb 1 2026, 10:00:00',  status: 'approved' },
@@ -3683,6 +3818,7 @@
             { id: 'CM-0005',
               name: 'commissions_2026_05.csv', cycle: 'May 2026', uploader: 'Yamamoto Kenji · yamamoto.k@torilab.ai',
                 date: 'May 6 2026', status: 'created', badge: 'badge-created', badgeText: 'Created — awaiting submission', rows: '148',
+                description: 'May 2026 monthly commission — 148 creators.',
                 approvals: [
                     { label:'Created',     name:'Yamamoto Kenji', email:'yamamoto.k@torilab.ai', date:'May 6 2026, 09:15:00', status:'done'    },
                     { label:'Step 1 of 2', name:null,             email:null,                    date:null,                   status:'waiting' },
@@ -3760,9 +3896,10 @@
             document.getElementById('earnings-list-view').style.display = 'none';
             document.getElementById('earnings-detail-view').style.display = 'block';
 
-            document.getElementById('earnings-detail-name').textContent     = d.name;
-            document.getElementById('earnings-detail-uploader').textContent = 'Uploaded by ' + d.uploader;
-            document.getElementById('earnings-detail-date').textContent     = d.date;
+            document.getElementById('earnings-detail-name').textContent        = d.name;
+            document.getElementById('earnings-detail-uploader').textContent   = 'Uploaded by ' + d.uploader;
+            document.getElementById('earnings-detail-date').textContent        = d.date;
+            document.getElementById('earnings-detail-description').textContent = d.description || '—';
             const badge = document.getElementById('earnings-detail-badge');
             badge.className   = 'badge ' + d.badge;
             badge.textContent = d.badgeText;
@@ -4044,21 +4181,26 @@
             const warn = document.getElementById('pu-cycle-warning');
             const ok   = document.getElementById('pu-cycle-ok');
             warn.style.display = 'none'; ok.style.display = 'none';
-            document.getElementById('pu-next-btn').disabled = true;
-            if (!y || !m) return;
+            window._puCycleValid = false;
+            if (!y || !m) { puCheckUploadReady(); return; }
             const label = monthNameByIndex(parseInt(m)) + ' ' + y;
-            // Check if a payout request already exists for this cycle in Maker's list
             const existingRows = Array.from(document.querySelectorAll('#maker-pr-tbody tr'));
             const exists = existingRows.some(r => r.dataset.year === y && r.dataset.month === m && ['created','pending','ready','scheduled','executed'].includes(r.dataset.status));
             if (exists) {
-                warn.style.cssText = 'display:block;padding:10px 14px;border-radius:6px;font-size:13px;background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.3);color:var(--color-amber);';
+                warn.style.cssText = 'display:block;padding:10px 14px;border-radius:6px;font-size:13px;margin-top:12px;background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.3);color:var(--color-amber);';
                 warn.innerHTML = `⚠ A payout request for <strong>${label}</strong> already exists and is active. You may still upload a new one if the cycle allows multiple requests.`;
-                document.getElementById('pu-next-btn').disabled = false;
             } else {
                 document.getElementById('pu-cycle-ok-label').textContent = label;
                 ok.style.display = 'block';
-                document.getElementById('pu-next-btn').disabled = false;
             }
+            window._puCycleValid = true;
+            puCheckUploadReady();
+        }
+
+        function puCheckUploadReady() {
+            const desc    = (document.getElementById('pu-description')?.value || '').trim();
+            const nextBtn = document.getElementById('pu-next-btn');
+            if (nextBtn) nextBtn.disabled = !(window._puCycleValid && desc.length > 0);
         }
         function puGoToStep2() {
             const y = document.getElementById('pu-cycle-year').value;
@@ -4197,42 +4339,38 @@
         function onNPRowCheck(cb) {
             const row   = cb.closest('tr');
             const input = row.querySelector('.np-amount');
-            const avail = parseInt(row.dataset.available || '0');
-            if (input) {
-                const isChecked = cb.checked && avail > 0;
-                input.disabled = !isChecked;
-                // Reset value to available when first checking
-                if (isChecked) { input.value = avail; input.style.borderColor = ''; }
+            const warn  = row.querySelector('.np-amount-warn');
+            // Input stays disabled always — amount = available (read-only)
+            if (input) input.disabled = true;
+            if (!cb.checked) {
                 // Clear warning when unchecking
-                const warn = row.querySelector('.np-amount-warn');
-                if (!isChecked && warn) { warn.style.display = 'none'; warn.textContent = ''; input.style.borderColor = ''; }
-                if (isChecked) validateNPAmount(input);
+                if (warn)  { warn.style.display = 'none'; warn.textContent = ''; }
+                if (input) input.style.borderColor = '';
+            } else {
+                // Validate available amount against min/max on check
+                if (input) validateNPAmount(input);
             }
             updateNPSummary();
         }
         function validateNPAmount(input) {
-            const val    = parseFloat(input.value);
+            // Amount to Pay is always = Available balance (read-only)
             const avail  = parseInt(input.dataset.available || '0');
             const minAmt = parseInt(document.getElementById('min-payout-amount')?.value || '1000');
             const maxAmt = parseInt(document.getElementById('max-payout-amount')?.value || '500000');
             const warn   = input.closest('td')?.querySelector('.np-amount-warn');
             let msg = '';
-            if (isNaN(val) || val < 1) {
-                msg = 'Amount must be at least \u00a51.';
-            } else if (val > avail) {
-                msg = `Cannot exceed available balance (\u00a5${avail.toLocaleString()}).`;
-            } else if (val > maxAmt) {
-                msg = `\u26a0 Exceeds max payout per receiver (\u00a5${maxAmt.toLocaleString()}). Reduce the amount or contact Super Admin.`;
-            } else if (val < minAmt) {
-                msg = `\u26a0 Below min payout amount (\u00a5${minAmt.toLocaleString()}). Increase the amount or skip this receiver.`;
+            if (avail > maxAmt) {
+                msg = `\u26a0 Exceeds max payout per receiver (\u00a5${maxAmt.toLocaleString()}).`;
+            } else if (avail < minAmt) {
+                msg = `\u26a0 Below min payout amount (\u00a5${minAmt.toLocaleString()}).`;
             }
             if (warn) { warn.textContent = msg; warn.style.display = msg ? 'block' : 'none'; }
-            input.style.borderColor = msg ? 'var(--color-red)' : '';
+            input.style.outline = msg ? '2px solid var(--color-amber)' : '';
             updateNPSummary();
         }
         function updateNPSummary() {
             const checks    = Array.from(document.querySelectorAll('.np-row-check:checked'));
-            const total     = checks.reduce((s, cb) => s + (parseFloat(cb.closest('tr').querySelector('.np-amount')?.value) || 0), 0);
+            const total     = checks.reduce((s, cb) => s + parseInt(cb.closest('tr').dataset.available || '0'), 0);
             const hasErrors = Array.from(document.querySelectorAll('#np-table-body .np-amount-warn'))
                                    .some(w => w.style.display !== 'none' && w.textContent);
             document.getElementById('np-selected-count').textContent = checks.length + ' receiver' + (checks.length !== 1 ? 's' : '');
@@ -4331,7 +4469,7 @@
                 ]
             },
             'partial': {
-                title: 'February 2026', meta: '8 receivers total · 6 Sent · 2 remaining · Added Feb 12 2026, 13:00:08',
+                title: 'February 2026', meta: '8 receivers total · 6 Paid · 2 remaining · Added Feb 12 2026, 13:00:08',
                 badge: '<span class="badge badge-pending">Open</span>', status: 'partial',
                 paid: [
                     { name:'Tanaka Yuki',    id:'TW-10042', paymentAccount:'tanaka.y@payoneer.com',   amount:8504,  request:'PR-0040' },
@@ -4347,7 +4485,7 @@
                 ]
             },
             'partial-jan': {
-                title: 'January 2026', meta: '8 receivers total · 7 Sent · 1 Failed · Added Jan 31 2026, 13:00:55',
+                title: 'January 2026', meta: '8 receivers total · 7 Paid · 1 Failed · Added Jan 31 2026, 13:00:55',
                 badge: '<span class="badge badge-pending">Open</span>', status: 'partial',
                 paid: [
                     { name:'Tanaka Yuki',    id:'TW-10042', paymentAccount:'tanaka.y@payoneer.com',   amount:8504,  request:'PR-0039' },
@@ -4363,7 +4501,7 @@
                 ]
             },
             'completed': {
-                title: 'December 2025', meta: '6 receivers · ¥380,000 total · All Sent via PR-0035 · Added Dec 28 2025, 11:20:33',
+                title: 'December 2025', meta: '6 receivers · ¥380,000 total · All Paid via PR-0035 · Added Dec 28 2025, 11:20:33',
                 badge: '<span class="badge badge-approved">Closed</span>', status: 'completed',
                 paid: [
                     { name:'Tanaka Yuki',    id:'TW-10042', paymentAccount:'tanaka.y@payoneer.com',   amount:63000, request:'PR-0035' },
@@ -4555,7 +4693,7 @@
                         <td>${c.name}</td><td>${c.id}</td>
                         <td style="font-size:12px;color:var(--color-text-muted);">${c.paymentAccount||'—'}</td>
                         <td>¥${c.amount.toLocaleString()}</td><td>JPY</td>
-                        <td><span class="badge badge-approved" style="font-size:10px;">Sent</span></td>
+                        <td><span class="badge badge-approved" style="font-size:10px;">Paid</span></td>
                         <td style="font-size:12px;color:var(--color-green);">${c.request}</td>
                     </tr>`).join('');
                 const avail = data.available.map(c => `
@@ -4588,14 +4726,14 @@
                         <td>${c.name}</td><td>${c.id}</td>
                         <td style="font-size:12px;color:var(--color-text-muted);">${c.paymentAccount||'—'}</td>
                         <td>¥${c.amount.toLocaleString()}</td><td>JPY</td>
-                        <td><span class="badge badge-approved" style="font-size:10px;">Sent</span></td>
+                        <td><span class="badge badge-approved" style="font-size:10px;">Paid</span></td>
                         <td style="font-size:12px;color:var(--color-green);">${c.request}</td>
                     </tr>`).join('');
                 return `
                     ${poolDetailSearchBar()}
                     <div class="info-banner" style="margin-bottom:16px;background:rgba(0,196,140,0.06);border-color:rgba(0,196,140,0.3);color:var(--color-green);">
                         <i data-lucide="check-circle" style="width:14px;height:14px;display:inline;margin-right:8px;"></i>
-                        All receivers are Sent or Resolved. This cycle is Closed.
+                        All receivers are Paid or Resolved. This cycle is Closed.
                     </div>
                     <table><thead><tr>${poolTableHeader(false)}</tr></thead>
                     <tbody>${rows}</tbody></table>`;
@@ -4873,6 +5011,7 @@
             { id: 'PR-0041', receiver: 'Tanaka Yuki · tanaka.y@torilab.ai', date: 'Apr 11 2026',
               rows: '7 receivers', total: '¥150,725', status: 'pending', isFinalStep: false,
               badge: 'badge-pending', badgeText: 'Pending — Step 1 of 2',
+              description: 'April 2026 payout for 7 receivers — partial batch pending Nakamura account resolution.',
               receivers: [
                 { name:'Tanaka Yuki',    id:'TW-10042', email:'tanaka.y@twomi.com',    paymentAccount:'tanaka.y@payoneer.com',   amount:'¥8,504',  currency:'JPY' },
                 { name:'Suzuki Hana',    id:'TW-10087', email:'suzuki.h@twomi.com',    paymentAccount:'suzuki.h@payoneer.com',   amount:'¥22,680', currency:'JPY' },
@@ -4892,6 +5031,7 @@
             { id: 'PR-0040', receiver: 'Tanaka Yuki · tanaka.y@torilab.ai', date: 'Apr 5 2026',
               rows: '3 receivers', total: '¥375,000', status: 'ready', isFinalStep: false,
               badge: 'badge-approved', badgeText: 'Approved — Ready to Execute',
+              description: 'April 2026 payout — 3 high-earning receivers, priority batch.',
               receivers: [
                 { name:'Tanaka Yuki',  id:'TW-10042', email:'tanaka.y@twomi.com',   paymentAccount:'tanaka.y@payoneer.com',  amount:'¥45,000',  currency:'JPY' },
                 { name:'Suzuki Hana',  id:'TW-10087', email:'suzuki.h@twomi.com',   paymentAccount:'suzuki.h@payoneer.com',  amount:'¥120,000', currency:'JPY' },
@@ -4908,6 +5048,7 @@
               rows: '30 receivers', total: '¥4,100,000', status: 'scheduled', isFinalStep: false,
               badge: 'badge-scheduled', badgeText: 'Scheduled — May 15 2026, 09:00:00',
               scheduledAt: 'May 15 2026, 09:00:00',
+              description: 'March 2026 main payout batch — 30 receivers. Scheduled after Golden Week.',
               receivers: [
                 { name:'Tanaka Yuki',    id:'TW-10042', email:'tanaka.y@twomi.com',   paymentAccount:'tanaka.y@payoneer.com',   amount:'¥8,504',  currency:'JPY' },
                 { name:'Yamamoto Kenji', id:'TW-10134', email:'yamamoto.k@twomi.com', paymentAccount:'yamamoto.k@payoneer.com', amount:'¥14,742', currency:'JPY' },
@@ -4923,8 +5064,9 @@
             { id: 'PR-0038', receiver: 'Suzuki Hana · suzuki.h@torilab.ai', date: 'Feb 15 2026',
               rows: '4 receivers', total: '¥92,374', status: 'failed', isFinalStep: false,
               badge: 'badge-failed', badgeText: 'Payment Failed',
+              description: 'February 2026 payout — 4 receivers. 1 payment failed due to transfer limit.',
               receivers: [
-                { name:'Tanaka Yuki',    id:'TW-10042', email:'tanaka.y@twomi.com',    paymentAccount:'tanaka.y@payoneer.com',   amount:'¥8,504',  currency:'JPY', paymentStatus:'sent',        txId:'PAY-2026-038001' },
+                { name:'Tanaka Yuki',    id:'TW-10042', email:'tanaka.y@twomi.com',    paymentAccount:'tanaka.y@payoneer.com',   amount:'¥8,504',  currency:'JPY', paymentStatus:'paid',        txId:'PAY-2026-038001' },
                 { name:'Suzuki Hana',    id:'TW-10087', email:'suzuki.h@twomi.com',    paymentAccount:'suzuki.h@payoneer.com',   amount:'¥22,680', currency:'JPY', paymentStatus:'in-progress', txId:'PAY-2026-038002' },
                 { name:'Nakamura Daiki', id:'TW-10389', email:'nakamura.d@twomi.com', paymentAccount:'nakamura.d@payoneer.com', paymentMethod:'Payoneer', amount:'¥29,295', currency:'JPY', paymentStatus:'resolved',    txId:'PAY-2026-038003',
                   resolvedBy:'Tanaka Yuki', resolvedByEmail:'tanaka.y@torilab.ai',
@@ -4944,6 +5086,7 @@
               rows: '3 receivers', total: '¥58,872', status: 'scheduled',
               badge: 'badge-scheduled', badgeText: 'Scheduled — May 1 2026, 09:00:00',
               scheduledAt: 'May 1 2026, 09:00:00',
+              description: 'April 2026 remaining batch — 3 receivers previously excluded from PR-0041.',
               receivers: [
                 { name:'Ito Sakura',     id:'TW-10312', email:'ito.s@twomi.com',      paymentAccount:'ito.s@payoneer.com',      amount:'¥12,757', currency:'JPY' },
                 { name:'Nakamura Daiki', id:'TW-10389', email:'nakamura.d@twomi.com', paymentAccount:'nakamura.d@payoneer.com', amount:'¥29,295', currency:'JPY' },
@@ -4953,12 +5096,13 @@
                 { label:'Created',     name:'Suzuki Hana',    email:'suzuki.h@torilab.ai',   date:'Apr 12 2026, 09:00:00', status:'done'     },
                 { label:'Step 1 of 2', name:'Tanaka Yuki',    email:'tanaka.y@torilab.ai',   date:'Apr 12 2026, 14:30:00', status:'approved' },
                 { label:'Step 2 of 2', name:'Yamamoto Kenji', email:'yamamoto.k@torilab.ai', date:'Apr 12 2026, 16:00:00', status:'approved' },
-                { label:'Execute',     name:'Tanaka Yuki',    email:'tanaka.y@torilab.ai',   date:'Apr 12 2026, 17:00:00', status:'scheduled', scheduledAt:'May 1 2026, 09:00:00' },
+                { label:'Execute',     name:'Yamamoto Kenji', email:'yamamoto.k@torilab.ai', date:'Apr 12 2026, 17:00:00', status:'scheduled', scheduledAt:'May 1 2026, 09:00:00' },
               ]
             },
             { id: 'PR-0044', receiver: 'Yamamoto Kenji · yamamoto.k@torilab.ai', date: 'May 6 2026',
               rows: '5 receivers', total: '\u00a554,001', status: 'created',
               badge: 'badge-created', badgeText: 'Created \u2014 awaiting submission',
+              description: 'May 2026 payout \u2014 first batch, 5 receivers with available balance.',
               receivers: [
                 { name:'Tanaka Yuki',    id:'TW-10042', email:'tanaka.y@twomi.com',   paymentAccount:'tanaka.y@payoneer.com',   amount:'\u00a58,504',  currency:'JPY' },
                 { name:'Suzuki Hana',    id:'TW-10087', email:'suzuki.h@twomi.com',   paymentAccount:'suzuki.h@payoneer.com',   amount:'\u00a522,680', currency:'JPY' },
@@ -4976,6 +5120,7 @@
             { id: 'PR-0043', receiver: 'Yamamoto Kenji · yamamoto.k@torilab.ai', date: 'Apr 13 2026',
               rows: '5 receivers', total: '¥76,394', status: 'executed',
               badge: 'badge-executed', badgeText: 'Executed',
+              description: 'April 2026 second batch — 5 receivers. Executed same-day.',
               receivers: [
                 { name:'Tanaka Yuki',    id:'TW-10042', email:'tanaka.y@twomi.com',    paymentAccount:'tanaka.y@payoneer.com',   amount:'¥8,504',  currency:'JPY', paymentStatus:'in-progress', txId:'PAY-2026-043001' },
                 { name:'Suzuki Hana',    id:'TW-10087', email:'suzuki.h@twomi.com',    paymentAccount:'suzuki.h@payoneer.com',   amount:'¥22,680', currency:'JPY', paymentStatus:'in-progress', txId:'PAY-2026-043002' },
@@ -5017,7 +5162,7 @@
                         <select class="filter-input" id="cr-filter-status" onchange="applyCreatorFilters()" style="width:140px;">
                             <option value="">All</option>
                             <option value="in-progress">In Progress</option>
-                            <option value="sent">Sent</option>
+                            <option value="paid">Paid</option>
                             <option value="failed">Failed</option>
                             <option value="resolved">Resolved</option>
                         </select>
@@ -5053,8 +5198,8 @@
                 </div>`;
 
             const headers = showPayoneer
-                ? '<th>Receiver</th><th>Twomi ID</th><th>Receiver Email</th><th>Payment Account</th><th>Amount</th><th>Currency</th><th>Transaction ID</th><th>Payment Status</th><th>Action</th>'
-                : '<th>Receiver</th><th>Twomi ID</th><th>Receiver Email</th><th>Payment Account</th><th>Amount</th><th>Currency</th>';
+                ? '<th>Receiver</th><th>Twomi ID</th><th>Receiver Email</th><th>Payment Account</th><th>Payment Method</th><th>Amount</th><th>Currency</th><th>Transaction ID</th><th>Payment Status</th><th>Action</th>'
+                : '<th>Receiver</th><th>Twomi ID</th><th>Receiver Email</th><th>Payment Account</th><th>Payment Method</th><th>Amount</th><th>Currency</th>';
 
             const rows = d.receivers.map(c => {
                 let statusCell = '';
@@ -5067,8 +5212,8 @@
                     : '';
 
                 if (showPayoneer) {
-                    if (c.paymentStatus === 'sent') {
-                        statusCell = `<td><span class="badge badge-approved" style="font-size:11px;">✓ Sent</span></td>`;
+                    if (c.paymentStatus === 'paid') {
+                        statusCell = `<td><span class="badge badge-approved" style="font-size:11px;">✓ Paid</span></td>`;
                         actionCell = `<td style="color:var(--color-text-muted);font-size:12px;">—</td>`;
 
                     } else if (c.paymentStatus === 'in-progress') {
@@ -5082,12 +5227,14 @@
                             <div style="font-size:11px;color:var(--color-red);margin-top:4px;">${c.payoneerError || ''}</div>
                             <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">Verify with Payoneer before acting</div>
                         </td>`;
-                        actionCell = `<td>
-                            <div style="display:flex;flex-direction:column;gap:5px;">
-                                <button class="btn btn-small btn-secondary" style="font-size:11px;white-space:nowrap;" onclick="returnToPool('${c.id}','${c.name}')">Return to Pool</button>
-                                <button class="btn btn-small" style="font-size:11px;white-space:nowrap;background:rgba(107,114,128,0.1);color:var(--color-text-muted);" onclick="openResolvePRModal('${c.id}','${c.name}')">Mark as Resolved</button>
-                            </div>
-                        </td>`;
+                        actionCell = (prDetailOrigin === 'payout-executer')
+                            ? `<td>
+                                <div style="display:flex;flex-direction:column;gap:5px;">
+                                    <button class="btn btn-small btn-secondary" style="font-size:11px;white-space:nowrap;" onclick="cancelTransaction('${c.id}','${c.name}')">Cancel Transaction</button>
+                                    <button class="btn btn-small" style="font-size:11px;white-space:nowrap;background:rgba(107,114,128,0.1);color:var(--color-text-muted);" onclick="openResolvePRModal('${c.id}','${c.name}')">Mark as Resolved</button>
+                                </div>
+                              </td>`
+                            : `<td style="color:var(--color-text-muted);font-size:12px;">—</td>`;
 
                     } else if (c.paymentStatus === 'resolved') {
                         rowBg      = ' style="background:rgba(0,196,140,0.02);"';
@@ -5110,7 +5257,7 @@
 
                 const emailCell = `<td style="font-size:12px;color:var(--color-text-muted);">${c.email || '—'}</td>`;
                 return `<tr class="receiver-row" data-name="${c.name.toLowerCase()}" data-id="${c.id.toLowerCase()}" data-email="${(c.email||'').toLowerCase()}" data-pstatus="${dataStatus}"${rowBg}>
-                    <td>${c.name}</td><td>${c.id}</td>${emailCell}<td>${c.payoneer}</td><td>${c.amount}</td><td>${c.currency}</td>${txCell}${statusCell}${actionCell}
+                    <td>${c.name}</td><td>${c.id}</td>${emailCell}<td style="font-size:12px;color:var(--color-text-muted);">${c.paymentAccount || '<span style="color:var(--color-amber);font-style:italic;">No account linked</span>'}</td><td style="font-size:12px;">${c.paymentAccount ? `<span class="badge badge-approved" style="font-size:10px;">${c.paymentMethod || 'Payoneer'}</span>` : '<span style="color:var(--color-amber);font-size:12px;">—</span>'}</td><td>${c.amount}</td><td>${c.currency}</td>${txCell}${statusCell}${actionCell}
                 </tr>`;
             }).join('');
 
@@ -5144,9 +5291,9 @@
         let resolvingCreatorId = null;
         let resolveFileSelected = false;
 
-        function returnToPool(creatorId, creatorName) {
-            if (confirm(`Return ${creatorName} (${creatorId}) to the Payout Pool?\n\nMake sure you have confirmed with Payoneer that this transfer was NOT processed.`)) {
-                alert(`${creatorName} has been returned to the Payout Pool. They will appear in the next available batch.`);
+        function cancelTransaction(creatorId, creatorName) {
+            if (confirm(`Cancel transaction for ${creatorName} (${creatorId})?\n\nMake sure you have confirmed with Payoneer that this transfer was NOT processed.`)) {
+                alert(`Transaction for ${creatorName} has been cancelled. They will be available in the next payout batch.`);
             }
         }
 
@@ -5209,6 +5356,7 @@
             document.getElementById('payout-request-date').textContent    = d.date;
             document.getElementById('pr-detail-rows').textContent         = d.rows;
             document.getElementById('pr-detail-total').textContent        = d.total;
+            document.getElementById('pr-detail-description').textContent  = d.description || '—';
             const badge = document.getElementById('payout-request-badge');
             badge.className   = 'badge ' + d.badge;
             badge.textContent = d.badgeText;
@@ -6019,8 +6167,8 @@
                 ],
                 history:[
                     { cycle:'April 2026',    request:'PR-0043', tx:'PAY-2026-043001', amount:'¥8,504',  status:'in-progress', date:'Apr 13 2026' },
-                    { cycle:'April 2026',    request:'PR-0040', tx:'PAY-2026-040001', amount:'¥45,000', status:'sent',        date:'Apr 6 2026'  },
-                    { cycle:'February 2026', request:'PR-0038', tx:'PAY-2026-038001', amount:'¥8,504',  status:'sent',        date:'Feb 16 2026' },
+                    { cycle:'April 2026',    request:'PR-0040', tx:'PAY-2026-040001', amount:'¥45,000', status:'paid',        date:'Apr 6 2026'  },
+                    { cycle:'February 2026', request:'PR-0038', tx:'PAY-2026-038001', amount:'¥8,504',  status:'paid',        date:'Feb 16 2026' },
                 ],
                 cashflow:[
                     { date:'May 6 2026',  cycle:'May 2026',    type:'earnings', desc:'Earnings approved — May 2026 (CM-0005)',          credit:8504,  debit:0,    balance:17008 },
@@ -6112,7 +6260,7 @@
                     { method:'Payoneer', account:'ito.s@payoneer.com', isDefault:true },
                 ],
                 history:[
-                    { cycle:'March 2026', request:'PR-0039', tx:'PAY-2026-039006', amount:'¥12,757', status:'sent', date:'Mar 28 2026' },
+                    { cycle:'March 2026', request:'PR-0039', tx:'PAY-2026-039006', amount:'¥12,757', status:'paid', date:'Mar 28 2026' },
                 ],
                 cashflow:[
                     { date:'May 6 2026',  cycle:'May 2026',   type:'earnings', desc:'Earnings approved — May 2026 (CM-0005)',     credit:12757, debit:0,    balance:25514 },
@@ -6158,8 +6306,8 @@
                 ]
             },
         };
-        const creatorStatusBadgeMap = { sent:'badge-approved', 'in-progress':'badge-scheduled', failed:'badge-failed', resolved:'', skipped:'' };
-        const creatorStatusLabelMap = { sent:'✓ Sent', 'in-progress':'⏳ In Progress', failed:'✕ Failed', resolved:'✓ Resolved', skipped:'⚠ Skipped (no Payoneer)' };
+        const creatorStatusBadgeMap = { paid:'badge-approved', 'in-progress':'badge-scheduled', failed:'badge-failed', resolved:'', skipped:'' };
+        const creatorStatusLabelMap = { paid:'✓ Paid', 'in-progress':'⏳ In Progress', failed:'✕ Failed', resolved:'✓ Resolved', skipped:'⚠ Skipped (no Payoneer)' };
 
         function applyCreatorListFilters() {
             const name     = document.getElementById('cr-list-name').value.toLowerCase();
@@ -6595,8 +6743,12 @@
             document.getElementById('flow-config-inprogress-count').textContent =
                 inProgressCount + ' request' + (inProgressCount !== 1 ? 's' : '');
             banner.style.display = 'flex';
-            // Auto-hide after 6s
             setTimeout(() => { banner.style.display = 'none'; }, 6000);
+            // Re-validate checked rows in New Payout immediately
+            document.querySelectorAll('#np-table-body .np-row-check:checked').forEach(cb => {
+                const input = cb.closest('tr')?.querySelector('.np-amount');
+                if (input) validateNPAmount(input);
+            });
             lucide.createIcons();
         }
 
@@ -6789,6 +6941,9 @@
             // Initialise flow config step renderers
             if (document.getElementById('csv-flow-body'))    renderFlowSteps('csv');
             if (document.getElementById('payout-flow-body')) renderFlowSteps('payout');
+            // Apply role filter for all role-based pages on load
+            ['commission-uploader','commission-checker','payout-pool','payout-requests','payout-executer']
+                .forEach(p => applyRoleFilter(p));
             document.querySelectorAll('input[type="checkbox"].toggle-switch').forEach(toggle => { toggle.checked = toggle.hasAttribute('checked'); if (toggle.checked) toggle.classList.add('on'); });
             document.querySelectorAll('.segment').forEach((segment, index) => { if (index === 0) segment.classList.add('active'); segment.addEventListener('click', function() { this.parentElement.querySelectorAll('.segment').forEach(s => s.classList.remove('active')); this.classList.add('active'); }); });
             const poolCheckboxes = document.querySelectorAll('.pool-row-checkbox');
