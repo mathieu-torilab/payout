@@ -75,6 +75,8 @@
         .badge-completed { background: rgba(0, 196, 140, 0.1); color: var(--color-green); }
         .badge-scheduled { background: rgba(0, 212, 255, 0.1); color: var(--color-cyan); }
         .badge-failed { background: rgba(255, 59, 92, 0.1); color: var(--color-red); }
+        .badge-created   { background: rgba(107,114,128,0.1); color: var(--color-text-muted); }
+        .badge-executed  { background: rgba(0, 212, 255, 0.12); color: var(--color-cyan); }
         .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 14px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
         .btn-primary { background: var(--color-cyan); color: var(--color-navy); }
         .btn-primary:hover { background: #00B8D4; box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3); }
@@ -388,7 +390,7 @@
                         <div style="display:flex;flex-direction:column;gap:10px;">
                             <div style="display:flex;justify-content:space-between;align-items:center;">
                                 <span style="font-size:13px;color:var(--color-text);">PR-0043</span>
-                                <span class="badge badge-scheduled" style="font-size:10px;">In Progress</span>
+                                <span class="badge badge-executed" style="font-size:10px;">Executed</span>
                             </div>
                             <div style="display:flex;justify-content:space-between;align-items:center;">
                                 <span style="font-size:13px;color:var(--color-text);">PR-0042</span>
@@ -448,16 +450,67 @@
                         <i data-lucide="upload" style="width:16px;height:16px;"></i> Upload File
                     </button>
                 </div>
+                <div class="filter-bar" style="margin-bottom:16px;">
+                    <div class="filter-group">
+                        <span class="filter-label">Record ID</span>
+                        <input class="filter-input" type="text" id="maker-cm-filter-id" placeholder="CM-…" style="width:120px;" onkeydown="if(event.key==='Enter') applyMakerCommissionFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Cycle Year</span>
+                        <select class="filter-input" id="maker-cm-filter-year" onchange="applyMakerCommissionFilters()" style="width:100px;">
+                            <option value="">All</option>
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Cycle Month</span>
+                        <select class="filter-input" id="maker-cm-filter-month" onchange="applyMakerCommissionFilters()" style="width:120px;">
+                            <option value="">All</option>
+                            <option value="01">January</option><option value="02">February</option><option value="03">March</option>
+                            <option value="04">April</option><option value="05">May</option><option value="06">June</option>
+                            <option value="07">July</option><option value="08">August</option><option value="09">September</option>
+                            <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Status</span>
+                        <select class="filter-input" id="maker-cm-filter-status" onchange="applyMakerCommissionFilters()" style="width:140px;">
+                            <option value="">All</option>
+                            <option value="created">Created</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">&nbsp;</span>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-primary btn-small" onclick="applyMakerCommissionFilters()"><i data-lucide="search" style="width:14px;height:14px;"></i> Search</button>
+                            <button class="btn btn-secondary btn-small" onclick="resetMakerCommissionFilters()">Reset</button>
+                        </div>
+                    </div>
+                </div>
                 <div class="info-banner" style="margin-bottom:20px;">
                     <i data-lucide="info" style="width:14px;height:14px;display:inline;margin-right:8px;"></i>
                     As Maker, you cannot approve your own submissions. Files pending approval are awaiting review by the Checker.
                 </div>
                 <table>
                     <thead><tr>
-                        <th>Cycle</th><th>Type</th><th>File Name</th><th>Upload Date</th><th>Valid Rows</th><th>Status</th><th>Actions</th>
+                        <th>Record ID</th><th>Cycle</th><th>Type</th><th>File Name</th><th>Upload Date</th><th>Valid Rows</th><th>Status</th><th>Actions</th>
                     </tr></thead>
-                    <tbody>
-                        <tr>
+                    <tbody id="maker-commission-tbody">
+                        <tr data-id="cm-0005" data-year="2026" data-month="05" data-status="created" style="background:rgba(107,114,128,0.03);">
+                            <td><strong>CM-0005</strong></td>
+                            <td><strong>May 2026</strong></td>
+                            <td><span class="badge badge-pending" style="font-size:10px;">Commission</span></td>
+                            <td>commissions_2026_05.csv</td><td>May 6 2026, 09:15:00</td>
+                            <td>148 rows</td>
+                            <td><span class="badge badge-created" style="font-size:10px;">Created</span></td>
+                            <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(4)">View</button></td>
+                        </tr>
+                        <tr data-id="cm-0004" data-year="2026" data-month="04" data-status="pending">
+                            <td><strong>CM-0004</strong></td>
                             <td><strong>April 2026</strong></td>
                             <td><span class="badge badge-pending" style="font-size:10px;">Commission</span></td>
                             <td>commissions_2026_04.csv</td><td>Apr 11 2026, 10:30:15</td>
@@ -465,7 +518,8 @@
                             <td><span class="badge badge-pending">Pending — Step 1 of 2</span></td>
                             <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(0)">View</button></td>
                         </tr>
-                        <tr>
+                        <tr data-id="adj-0001" data-year="2026" data-month="03" data-status="approved">
+                            <td><strong>ADJ-0001</strong></td>
                             <td><strong>March 2026</strong></td>
                             <td><span class="badge" style="font-size:10px;background:rgba(99,91,255,0.1);color:#6366f1;">Adjust</span></td>
                             <td>adjust_2026_03_bonus.csv</td><td>Mar 15 2026, 14:20:00</td>
@@ -485,21 +539,70 @@
                         <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px;">Review and approve or reject commission files at your assigned approval step.</p>
                     </div>
                 </div>
+                <div class="filter-bar" style="margin-bottom:16px;">
+                    <div class="filter-group">
+                        <span class="filter-label">Record ID</span>
+                        <input class="filter-input" type="text" id="cc-filter-id" placeholder="CM-…" style="width:120px;" onkeydown="if(event.key==='Enter') applyCheckerCommissionFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Cycle Year</span>
+                        <select class="filter-input" style="width:100px;">
+                            <option value="">All</option>
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Cycle Month</span>
+                        <select class="filter-input" style="width:120px;">
+                            <option value="">All</option>
+                            <option>January</option><option>February</option><option>March</option>
+                            <option>April</option><option>May</option><option>June</option>
+                            <option>July</option><option>August</option><option>September</option>
+                            <option>October</option><option>November</option><option>December</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Uploaded From</span>
+                        <input class="filter-input" type="date" style="width:140px;">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Uploaded To</span>
+                        <input class="filter-input" type="date" style="width:140px;">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Status</span>
+                        <select class="filter-input" style="width:140px;">
+                            <option value="">All</option>
+                            <option>Pending</option>
+                            <option>Approved</option>
+                            <option>Rejected</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">&nbsp;</span>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-primary btn-small" onclick="applyCheckerCommissionFilters()"><i data-lucide="search" style="width:14px;height:14px;"></i> Search</button>
+                            <button class="btn btn-secondary btn-small" onclick="resetCheckerCommissionFilters()">Reset</button>
+                        </div>
+                    </div>
+                </div>
                 <div class="info-banner" style="margin-bottom:20px;background:rgba(255,184,0,0.06);border-color:rgba(255,184,0,0.3);color:var(--color-amber);">
                     <i data-lucide="alert-triangle" style="width:14px;height:14px;display:inline;margin-right:8px;"></i>
                     <strong>1 file</strong> is waiting for your approval.
                 </div>
                 <table>
                     <thead><tr>
-                        <th>Cycle</th><th>Type</th><th>File Name</th><th>Uploaded By</th><th>Upload Date</th><th>Valid Rows</th><th>Step</th><th>Actions</th>
+                        <th>Record ID</th><th>Cycle</th><th>Type</th><th>File Name</th><th>Submitted By</th><th>Submitted Date</th><th>Valid Rows</th><th>Step</th><th>Actions</th>
                     </tr></thead>
-                    <tbody>
-                        <tr style="background:rgba(255,184,0,0.03);">
+                    <tbody id="checker-commission-tbody">
+                        <tr data-id="cm-0004" style="background:rgba(255,184,0,0.03);">
+                            <td><strong>CM-0004</strong></td>
                             <td><strong>April 2026</strong></td>
                             <td><span class="badge badge-pending" style="font-size:10px;">Commission</span></td>
                             <td>commissions_2026_04.csv</td>
                             <td>yamamoto.k@torilab.ai</td>
-                            <td>Apr 11 2026, 10:30:15</td>
+                            <td>Apr 11 2026, 14:00:00</td>
                             <td>156 rows</td>
                             <td><span class="badge badge-pending" style="font-size:10px;">Step 1 of 2</span></td>
                             <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(0)">Review</button></td>
@@ -524,6 +627,10 @@
 
                     <!-- Filter Bar -->
                     <div class="filter-bar">
+                        <div class="filter-group">
+                            <span class="filter-label">Record ID</span>
+                            <input class="filter-input" type="text" placeholder="CM-…" id="filter-record-id" style="width:120px;" onkeydown="if(event.key==='Enter') applyEarningsFilters()">
+                        </div>
                         <div class="filter-group">
                             <span class="filter-label">Cycle Year</span>
                             <select class="filter-input" id="filter-cycle-year" onchange="applyEarningsFilters()" style="width:100px;">
@@ -594,11 +701,21 @@
                     <table id="earnings-table">
                         <thead>
                             <tr>
-                                <th>Cycle</th><th>Type</th><th>File Name</th><th>Uploaded By</th><th>Upload Date</th><th>Valid Rows</th><th>Status</th><th>Actions</th>
+                                <th>Record ID</th><th>Cycle</th><th>Type</th><th>File Name</th><th>Uploaded By</th><th>Upload Date</th><th>Valid Rows</th><th>Status</th><th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="earnings-table-body">
-                            <tr data-status="pending" data-type="commission" data-uploader="yamamoto.k@torilab.ai" data-date="2026-04-11" data-cycle="2026-04">
+                            <tr data-id="cm-0005" data-status="created" data-type="commission" data-uploader="yamamoto.k@torilab.ai" data-date="2026-05-06" data-cycle="2026-05" style="background:rgba(0,212,255,0.03);">
+                                <td><strong>CM-0005</strong></td>
+                                <td><span style="font-weight:600;">May 2026</span></td>
+                                <td><span class="badge badge-pending" style="font-size:10px;">Commission</span></td>
+                                <td>commissions_2026_05.csv</td><td>yamamoto.k@torilab.ai</td><td>May 6 2026</td>
+                                <td>148 rows</td>
+                                <td><span class="badge badge-created">Created — awaiting submission</span></td>
+                                <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(4)">View</button></td>
+                            </tr>
+                            <tr data-id="cm-0004" data-status="pending" data-type="commission" data-uploader="yamamoto.k@torilab.ai" data-date="2026-04-11" data-cycle="2026-04">
+                                <td><strong>CM-0004</strong></td>
                                 <td><span style="font-weight:600;">April 2026</span></td>
                                 <td><span class="badge badge-pending" style="font-size:10px;">Commission</span></td>
                                 <td>commissions_2026_04.csv</td><td>yamamoto.k@torilab.ai</td><td>Apr 11 2026</td>
@@ -606,7 +723,8 @@
                                 <td><span class="badge badge-pending">Pending — Step 1 of 2</span></td>
                                 <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(0)">View</button></td>
                             </tr>
-                            <tr data-status="approved" data-type="commission" data-uploader="suzuki.h@torilab.ai" data-date="2026-03-28" data-cycle="2026-03">
+                            <tr data-id="cm-0003" data-status="approved" data-type="commission" data-uploader="suzuki.h@torilab.ai" data-date="2026-03-28" data-cycle="2026-03">
+                                <td><strong>CM-0003</strong></td>
                                 <td><span style="font-weight:600;">March 2026</span></td>
                                 <td><span class="badge badge-pending" style="font-size:10px;">Commission</span></td>
                                 <td>commissions_2026_03.csv</td><td>suzuki.h@torilab.ai</td><td>Mar 28 2026</td>
@@ -614,7 +732,8 @@
                                 <td><span class="badge badge-approved">Approved</span></td>
                                 <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(1)">View</button></td>
                             </tr>
-                            <tr data-status="approved" data-type="adjust" data-uploader="yamamoto.k@torilab.ai" data-date="2026-03-15" data-cycle="2026-03">
+                            <tr data-id="adj-0001" data-status="approved" data-type="adjust" data-uploader="yamamoto.k@torilab.ai" data-date="2026-03-15" data-cycle="2026-03">
+                                <td><strong>ADJ-0001</strong></td>
                                 <td><span style="font-weight:600;">March 2026</span></td>
                                 <td><span class="badge" style="font-size:10px;background:rgba(99,91,255,0.1);color:#6366f1;">Adjust</span></td>
                                 <td>adjust_2026_03_bonus.csv</td><td>yamamoto.k@torilab.ai</td><td>Mar 15 2026</td>
@@ -622,7 +741,8 @@
                                 <td><span class="badge badge-approved">Approved</span></td>
                                 <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(1)">View</button></td>
                             </tr>
-                            <tr data-status="approved" data-type="commission" data-uploader="yamamoto.k@torilab.ai" data-date="2026-02-29" data-cycle="2026-02">
+                            <tr data-id="cm-0002" data-status="approved" data-type="commission" data-uploader="yamamoto.k@torilab.ai" data-date="2026-02-29" data-cycle="2026-02">
+                                <td><strong>CM-0002</strong></td>
                                 <td><span style="font-weight:600;">February 2026</span></td>
                                 <td><span class="badge badge-pending" style="font-size:10px;">Commission</span></td>
                                 <td>commissions_2026_02.csv</td><td>yamamoto.k@torilab.ai</td><td>Feb 29 2026</td>
@@ -630,7 +750,8 @@
                                 <td><span class="badge badge-approved">Approved</span></td>
                                 <td><button class="btn btn-small btn-secondary" onclick="viewEarningsDetail(2)">View</button></td>
                             </tr>
-                            <tr data-status="rejected" data-type="commission" data-uploader="suzuki.h@torilab.ai" data-date="2026-01-31" data-cycle="2026-01">
+                            <tr data-id="cm-0001" data-status="rejected" data-type="commission" data-uploader="suzuki.h@torilab.ai" data-date="2026-01-31" data-cycle="2026-01">
+                                <td><strong>CM-0001</strong></td>
                                 <td><span style="font-weight:600;">January 2026</span></td>
                                 <td><span class="badge badge-pending" style="font-size:10px;">Commission</span></td>
                                 <td>commissions_2026_01.csv</td><td>suzuki.h@torilab.ai</td><td>Jan 31 2026</td>
@@ -697,7 +818,7 @@
                         <!-- Action buttons (only when pending) -->
                         <div id="earnings-detail-actions" style="display:none;gap:12px;justify-content:flex-end;margin-top:16px;">
                             <button class="btn btn-danger" onclick="openRejectEarningsModal()"><i data-lucide="x" style="width:16px;height:16px;"></i>Reject</button>
-                            <button class="btn btn-success" id="earnings-approve-btn"><i data-lucide="check" style="width:16px;height:16px;"></i><span id="earnings-approve-label">Approve</span></button>
+                            <button class="btn btn-success" id="earnings-approve-btn" onclick="openApproveEarningsModal()"><i data-lucide="check" style="width:16px;height:16px;"></i><span id="earnings-approve-label">Approve</span></button>
                         </div>
                     </div>
                 </div>
@@ -714,12 +835,12 @@
 
                 <!-- Maker tabs -->
                 <div class="tabs" style="margin-bottom:0;">
-                    <div class="tab active" onclick="switchMakerTab('new', this)">New Payout</div>
-                    <div class="tab" onclick="switchMakerTab('requests', this)">My Requests</div>
+                    <div class="tab active" onclick="switchMakerTab('requests', this)">My Requests</div>
+                    <div class="tab" onclick="switchMakerTab('new', this)">New Payout</div>
                 </div>
 
                 <!-- Tab: New Payout -->
-                <div id="maker-tab-new" class="tab-content active">
+                <div id="maker-tab-new" class="tab-content">
                 <!-- Receivers list -->
                 <div id="new-payout-select-tab">
                     <div class="filter-bar" style="margin-top:16px;">
@@ -836,7 +957,60 @@
                 </div><!-- /maker-tab-new -->
 
                 <!-- Tab: My Requests -->
-                <div id="maker-tab-requests" class="tab-content">
+                <div id="maker-tab-requests" class="tab-content active">
+                <div class="filter-bar" style="margin-bottom:16px;margin-top:16px;">
+                    <div class="filter-group">
+                        <span class="filter-label">Request ID</span>
+                        <input class="filter-input" type="text" id="maker-filter-id" placeholder="PR-…" style="width:120px;" onkeydown="if(event.key==='Enter') applyMakerPRFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Cycle Year</span>
+                        <select class="filter-input" id="maker-filter-year" onchange="applyMakerPRFilters()" style="width:100px;">
+                            <option value="">All</option>
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Cycle Month</span>
+                        <select class="filter-input" id="maker-filter-month" onchange="applyMakerPRFilters()" style="width:120px;">
+                            <option value="">All</option>
+                            <option value="01">January</option><option value="02">February</option><option value="03">March</option>
+                            <option value="04">April</option><option value="05">May</option><option value="06">June</option>
+                            <option value="07">July</option><option value="08">August</option><option value="09">September</option>
+                            <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Status</span>
+                        <select class="filter-input" id="maker-filter-status" onchange="applyMakerPRFilters()" style="width:140px;">
+                            <option value="">All</option>
+                            <option value="created">Created</option>
+                            <option value="pending">Pending</option>
+                            <option value="ready">Ready to Execute</option>
+                            <option value="scheduled">Scheduled</option>
+                            <option value="executed">Executed</option>
+                            <option value="completed">Completed</option>
+                            <option value="failed">Payment Failed</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Created From</span>
+                        <input class="filter-input" type="date" id="maker-filter-date-from" style="width:150px;" onchange="applyMakerPRFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Created To</span>
+                        <input class="filter-input" type="date" id="maker-filter-date-to" style="width:150px;" onchange="applyMakerPRFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">&nbsp;</span>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-primary btn-small" onclick="applyMakerPRFilters()"><i data-lucide="search" style="width:14px;height:14px;"></i> Search</button>
+                            <button class="btn btn-secondary btn-small" onclick="resetMakerPRFilters()">Reset</button>
+                        </div>
+                    </div>
+                </div>
                     <div class="info-banner" style="margin:16px 0 16px;">
                         <i data-lucide="info" style="width:14px;height:14px;display:inline;margin-right:8px;"></i>
                         Payout requests you have created. Pending approval by Checker.
@@ -845,23 +1019,29 @@
                         <thead><tr>
                             <th>Request ID</th><th>Cycle</th><th>Date</th><th>Receivers</th><th>Total Amount</th><th>Status</th><th>Actions</th>
                         </tr></thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>PR-0043</strong></td><td>April 2026</td><td>Apr 13 2026, 09:00:00</td>
-                                <td>5</td><td>¥76,394</td>
-                                <td><span class="badge badge-scheduled">In Progress</span></td>
+                        <tbody id="maker-pr-tbody">
+                            <tr data-id="pr-0044" data-year="2026" data-month="05" data-status="created" data-date="2026-05-06" style="background:rgba(107,114,128,0.03);">
+                                <td><strong>PR-0044</strong></td><td>May 2026</td><td>May 6 2026, 10:00:00</td>
+                                <td>5</td><td>¥54,001</td>
+                                <td><span class="badge badge-created" style="font-size:11px;">Created</span></td>
                                 <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(5)">View</button></td>
                             </tr>
-                            <tr>
+                            <tr data-id="pr-0043" data-year="2026" data-month="04" data-status="executed" data-date="2026-04-13">
+                                <td><strong>PR-0043</strong></td><td>April 2026</td><td>Apr 13 2026, 09:00:00</td>
+                                <td>5</td><td>¥76,394</td>
+                                <td><span class="badge badge-executed">Executed</span></td>
+                                <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(6)">View</button></td>
+                            </tr>
+                            <tr data-id="pr-0041" data-year="2026" data-month="04" data-status="pending" data-date="2026-04-11">
                                 <td><strong>PR-0041</strong></td><td>April 2026</td><td>Apr 11 2026, 10:00:00</td>
                                 <td>7</td><td>¥150,725</td>
                                 <td><span class="badge badge-pending">Pending — Step 1 of 2</span></td>
                                 <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(0)">View</button></td>
                             </tr>
-                            <tr>
+                            <tr data-id="pr-0039" data-year="2026" data-month="03" data-status="scheduled" data-date="2026-03-28">
                                 <td><strong>PR-0039</strong></td><td>March 2026</td><td>Mar 28 2026, 11:00:00</td>
                                 <td>30</td><td>¥4,100,000</td>
-                                <td><span class="badge badge-scheduled">Scheduled Apr 15</span></td>
+                                <td><span class="badge badge-scheduled">Scheduled — May 15 2026, 09:00:00</span></td>
                                 <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(2)">View</button></td>
                             </tr>
                         </tbody>
@@ -875,12 +1055,16 @@
                 <div id="pr-list-section">
                     <div class="section-header" style="margin-bottom:20px;">
                         <div>
-                            <h1 class="section-title">Payout Requests</h1>
-                            <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px;">Track and manage all payout requests across cycles. Each request requires multi-step approval before being executed or scheduled for payment submission.</p>
+                            <h1 class="section-title">Payout — Checker</h1>
+                            <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px;">Review and approve or reject payout requests at your assigned step. You cannot execute or schedule requests.</p>
                         </div>
                     </div>
                     <div id="payout-requests-list">
                         <div class="filter-bar">
+                            <div class="filter-group">
+                                <span class="filter-label">Request ID</span>
+                                <input class="filter-input" type="text" id="pr-filter-id" placeholder="PR-…" style="width:120px;" onkeydown="if(event.key==='Enter') applyPRFilters()">
+                            </div>
                             <div class="filter-group">
                                 <span class="filter-label">Cycle Year</span>
                                 <select class="filter-input" id="pr-filter-year" onchange="applyPRFilters()" style="width:100px;">
@@ -904,16 +1088,25 @@
                                 <select class="filter-input" id="pr-filter-status" onchange="applyPRFilters()" style="width:150px;">
                                     <option value="">All</option>
                                     <option value="pending">Pending</option>
-                                    <option value="in-progress">In Progress</option>
-                                    <option value="completed">Completed</option>
+                                    <option value="ready">Ready to Execute</option>
                                     <option value="scheduled">Scheduled</option>
+                                    <option value="executed">Executed</option>
+                                    <option value="completed">Completed</option>
                                     <option value="failed">Payment Failed</option>
                                     <option value="rejected">Rejected</option>
                                 </select>
                             </div>
                             <div class="filter-group">
-                                <span class="filter-label">Created By</span>
+                                <span class="filter-label">Submitted By</span>
                                 <input class="filter-input" type="text" id="pr-filter-receiver" placeholder="Email…" style="width:150px;" onkeydown="if(event.key==='Enter') applyPRFilters()">
+                            </div>
+                            <div class="filter-group">
+                                <span class="filter-label">Submitted From</span>
+                                <input class="filter-input" type="date" id="pr-filter-from" style="width:140px;" onchange="applyPRFilters()">
+                            </div>
+                            <div class="filter-group">
+                                <span class="filter-label">Submitted To</span>
+                                <input class="filter-input" type="date" id="pr-filter-to" style="width:140px;" onchange="applyPRFilters()">
                             </div>
                             <div class="filter-group">
                                 <span class="filter-label">&nbsp;</span>
@@ -926,19 +1119,19 @@
 
                         <table id="pr-flat-table">
                             <thead><tr>
-                                <th>Request ID</th><th>Cycle</th><th>Created By</th><th>Date</th>
+                                <th>Request ID</th><th>Cycle</th><th>Submitted By</th><th>Submitted Date</th>
                                 <th>Receivers</th><th>Total Amount</th><th>Status</th><th>Next Action</th><th>Actions</th>
                             </tr></thead>
                             <tbody id="pr-flat-body">
-                                <tr data-year="2026" data-month="04" data-status="in-progress" data-receiver="yamamoto.k@torilab.ai">
+                                <tr data-id="pr-0043" data-year="2026" data-month="04" data-status="executed" data-receiver="yamamoto.k@torilab.ai">
                                     <td><strong>PR-0043</strong></td><td>April 2026</td>
                                     <td>Yamamoto Kenji · yamamoto.k@torilab.ai</td><td>Apr 13 2026</td>
                                     <td>5</td><td>¥76,394</td>
-                                    <td><span class="badge badge-scheduled">In Progress</span></td>
+                                    <td><span class="badge badge-executed">Executed</span></td>
                                     <td style="font-size:12px;color:var(--color-text-muted);">Awaiting Payoneer</td>
-                                    <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(5)">View</button></td>
+                                    <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(6)">View</button></td>
                                 </tr>
-                                <tr data-year="2026" data-month="04" data-status="pending" data-receiver="tanaka.y@torilab.ai">
+                                <tr data-id="pr-0041" data-year="2026" data-month="04" data-status="pending" data-receiver="tanaka.y@torilab.ai">
                                     <td><strong>PR-0041</strong></td><td>April 2026</td>
                                     <td>Tanaka Yuki · tanaka.y@torilab.ai</td><td>Apr 11 2026</td>
                                     <td>7</td><td>¥150,725</td>
@@ -946,7 +1139,7 @@
                                     <td><span class="permission-badge" style="font-size:11px;">Finance Team</span></td>
                                     <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(0)">View</button></td>
                                 </tr>
-                                <tr data-year="2026" data-month="04" data-status="scheduled" data-receiver="suzuki.h@torilab.ai">
+                                <tr data-id="pr-0042" data-year="2026" data-month="04" data-status="scheduled" data-receiver="suzuki.h@torilab.ai">
                                     <td><strong>PR-0042</strong></td><td>April 2026</td>
                                     <td>Suzuki Hana · suzuki.h@torilab.ai</td><td>Apr 12 2026</td>
                                     <td>3</td><td>¥58,872</td>
@@ -954,23 +1147,23 @@
                                     <td style="font-size:12px;color:var(--color-text-muted);">Scheduled — May 1 2026, 09:00:00</td>
                                     <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(4)">View</button></td>
                                 </tr>
-                                <tr data-year="2026" data-month="04" data-status="completed" data-receiver="tanaka.y@torilab.ai">
+                                <tr data-id="pr-0040" data-year="2026" data-month="04" data-status="ready" data-receiver="tanaka.y@torilab.ai">
                                     <td><strong>PR-0040</strong></td><td>April 2026</td>
                                     <td>Tanaka Yuki · tanaka.y@torilab.ai</td><td>Apr 5 2026</td>
-                                    <td>18</td><td>¥2,340,000</td>
-                                    <td><span class="badge badge-completed">Completed</span></td>
-                                    <td style="color:var(--color-text-muted);">—</td>
+                                    <td>3</td><td>¥375,000</td>
+                                    <td><span class="badge badge-approved">Ready to Execute</span></td>
+                                    <td style="color:var(--color-text-muted);">Awaiting Executer</td>
                                     <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(1)">View</button></td>
                                 </tr>
-                                <tr data-year="2026" data-month="03" data-status="scheduled" data-receiver="tanaka.y@torilab.ai">
+                                <tr data-id="pr-0039" data-year="2026" data-month="03" data-status="scheduled" data-receiver="tanaka.y@torilab.ai">
                                     <td><strong>PR-0039</strong></td><td>March 2026</td>
                                     <td>Tanaka Yuki · tanaka.y@torilab.ai</td><td>Mar 28 2026</td>
                                     <td>30</td><td>¥4,100,000</td>
-                                    <td><span class="badge badge-scheduled">Scheduled Apr 15</span></td>
+                                    <td><span class="badge badge-scheduled">Scheduled — May 15 2026, 09:00:00</span></td>
                                     <td style="font-size:12px;color:var(--color-text-muted);">Scheduled — May 15 2026, 09:00:00</td>
                                     <td><button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(2)">View</button></td>
                                 </tr>
-                                <tr data-year="2026" data-month="02" data-status="failed" data-receiver="suzuki.h@torilab.ai">
+                                <tr data-id="pr-0038" data-year="2026" data-month="02" data-status="failed" data-receiver="suzuki.h@torilab.ai">
                                     <td><strong>PR-0038</strong></td><td>February 2026</td>
                                     <td>Suzuki Hana · suzuki.h@torilab.ai</td><td>Feb 15 2026</td>
                                     <td>4</td><td>¥92,374</td>
@@ -1066,7 +1259,7 @@
                             </label>
                         </div>
                         <div style="display:flex;justify-content:flex-end;">
-                            <button class="btn btn-primary" onclick="confirmExecutePR()" style="gap:8px;">
+                            <button class="btn btn-primary" onclick="openExecuteConfirmModal()" style="gap:8px;">
                                 <i data-lucide="send" style="width:16px;height:16px;"></i>
                                 <span id="exec-btn-label">Execute Now</span>
                             </button>
@@ -1813,32 +2006,96 @@
                     <strong>⚠ Global payout execution is OFF.</strong> No requests can be executed until it is turned back ON in Flow Config.
                 </div>
 
-                <div class="info-banner" style="margin-bottom:20px;background:rgba(0,196,140,0.06);border-color:rgba(0,196,140,0.3);color:var(--color-green);">
+                <div class="filter-bar" style="margin-bottom:16px;">
+                    <div class="filter-group">
+                        <span class="filter-label">Request ID</span>
+                        <input class="filter-input" type="text" id="exec-filter-id" placeholder="PR-…" style="width:120px;" onkeydown="if(event.key==='Enter') applyExecuterFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Cycle Year</span>
+                        <select class="filter-input" id="exec-filter-year" onchange="applyExecuterFilters()" style="width:100px;">
+                            <option value="">All</option>
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Cycle Month</span>
+                        <select class="filter-input" id="exec-filter-month" onchange="applyExecuterFilters()" style="width:120px;">
+                            <option value="">All</option>
+                            <option value="01">January</option><option value="02">February</option><option value="03">March</option>
+                            <option value="04">April</option><option value="05">May</option><option value="06">June</option>
+                            <option value="07">July</option><option value="08">August</option><option value="09">September</option>
+                            <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Status</span>
+                        <select class="filter-input" id="exec-filter-status" onchange="applyExecuterFilters()" style="width:160px;">
+                            <option value="">All</option>
+                            <option value="ready">Ready to Execute</option>
+                            <option value="scheduled">Scheduled</option>
+                            <option value="executed">Executed</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Submitted By</span>
+                        <input class="filter-input" type="text" id="exec-filter-submitted-by" placeholder="Email…" style="width:160px;" onkeydown="if(event.key==='Enter') applyExecuterFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Submitted Date From</span>
+                        <input class="filter-input" type="date" id="exec-filter-submitted-from" style="width:150px;" onchange="applyExecuterFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Submitted Date To</span>
+                        <input class="filter-input" type="date" id="exec-filter-submitted-to" style="width:150px;" onchange="applyExecuterFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Last Approved From</span>
+                        <input class="filter-input" type="date" id="exec-filter-approved-from" style="width:150px;" onchange="applyExecuterFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Last Approved To</span>
+                        <input class="filter-input" type="date" id="exec-filter-approved-to" style="width:150px;" onchange="applyExecuterFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">&nbsp;</span>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-primary btn-small" onclick="applyExecuterFilters()"><i data-lucide="search" style="width:14px;height:14px;"></i> Search</button>
+                            <button class="btn btn-secondary btn-small" onclick="resetExecuterFilters()">Reset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-banner" style="margin-bottom:16px;background:rgba(0,196,140,0.06);border-color:rgba(0,196,140,0.3);color:var(--color-green);">
                     <i data-lucide="check-circle" style="width:14px;height:14px;display:inline;margin-right:8px;"></i>
                     <strong>2 requests</strong> are ready to execute or schedule.
                 </div>
-
                 <table>
                     <thead><tr>
-                        <th>Request ID</th><th>Cycle</th><th>Created By</th><th>Date Approved</th>
-                        <th>Receivers</th><th>Total Amount</th><th>Status</th><th>Actions</th>
+                        <th>Request ID</th><th>Cycle</th><th>Submitted By</th><th>Submitted Date</th>
+                        <th>Last Approved Date</th><th>Receivers</th><th>Total Amount</th><th>Status</th><th>Actions</th>
                     </tr></thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>PR-0041</strong></td><td>April 2026</td>
+                    <tbody id="executer-pr-tbody">
+                        <tr data-id="pr-0040" data-year="2026" data-month="04" data-status="ready"
+                            data-submitted-by="tanaka.y@torilab.ai" data-submitted-date="2026-04-05" data-approved-date="2026-04-06">
+                            <td><strong>PR-0040</strong></td><td>April 2026</td>
                             <td>Tanaka Yuki · tanaka.y@torilab.ai</td>
-                            <td>Apr 12 2026, 16:00:00</td>
-                            <td>7</td><td>¥150,725</td>
+                            <td>Apr 5 2026, 14:15:00</td>
+                            <td>Apr 6 2026, 16:00:00</td>
+                            <td>3</td><td>¥375,000</td>
                             <td><span class="badge badge-approved" style="font-size:10px;">Ready to Execute</span></td>
                             <td>
-                                <button class="btn btn-small btn-primary" onclick="viewPayoutRequest(0)">
-                                    <i data-lucide="send" style="width:12px;height:12px;"></i> Execute
+                                <button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(1)">
+                                    <i data-lucide="eye" style="width:12px;height:12px;"></i> View
                                 </button>
                             </td>
                         </tr>
-                        <tr>
+                        <tr data-id="pr-0042" data-year="2026" data-month="04" data-status="scheduled"
+                            data-submitted-by="suzuki.h@torilab.ai" data-submitted-date="2026-04-12" data-approved-date="2026-04-12">
                             <td><strong>PR-0042</strong></td><td>April 2026</td>
                             <td>Suzuki Hana · suzuki.h@torilab.ai</td>
+                            <td>Apr 12 2026, 09:00:00</td>
                             <td>Apr 12 2026, 17:00:00</td>
                             <td>3</td><td>¥58,872</td>
                             <td><span class="badge badge-scheduled" style="font-size:10px;">Scheduled — May 1 2026, 09:00:00</span></td>
@@ -1848,10 +2105,219 @@
                                 </button>
                             </td>
                         </tr>
+                        <tr data-id="pr-0043" data-year="2026" data-month="04" data-status="executed" data-submitted-by="yamamoto.k@torilab.ai" data-submitted-date="2026-04-13" data-approved-date="2026-04-13">
+                            <td><strong>PR-0043</strong></td><td>April 2026</td>
+                            <td>Yamamoto Kenji · yamamoto.k@torilab.ai</td>
+                            <td>Apr 13 2026, 09:00:00</td>
+                            <td>Apr 13 2026, 15:00:00</td>
+                            <td>5</td><td>¥76,394</td>
+                            <td><span class="badge badge-executed" style="font-size:10px;">Executed</span></td>
+                            <td>
+                                <button class="btn btn-small btn-secondary" onclick="viewPayoutRequest(6)">
+                                    <i data-lucide="eye" style="width:12px;height:12px;"></i> View
+                                </button>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
-                <div class="pagination" style="margin-top:12px;">
-                    <span class="pagination-info">Showing 1–2 of 2 requests</span>
+            </div>
+
+            <!-- Receivers Page -->
+            <div id="page-receivers" class="page">
+
+                <!-- ── List view ── -->
+                <div id="receivers-list-view">
+                    <div class="section-header" style="margin-bottom:20px;">
+                        <div>
+                            <h1 class="section-title">Receivers</h1>
+                            <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px;">All registered Twomi creators — balance, locked amounts, and payout history.</p>
+                        </div>
+                    </div>
+                    <div class="filter-bar" style="margin-bottom:16px;">
+                        <div class="filter-group">
+                            <span class="filter-label">Name / Twomi ID</span>
+                            <input class="filter-input" type="text" id="recv-filter-name" placeholder="Search…" style="width:180px;" onkeydown="if(event.key==='Enter') applyReceiverFilters()">
+                        </div>
+                        <div class="filter-group">
+                            <span class="filter-label">Email</span>
+                            <input class="filter-input" type="text" id="recv-filter-email" placeholder="@twomi.com" style="width:170px;" onkeydown="if(event.key==='Enter') applyReceiverFilters()">
+                        </div>
+                        <div class="filter-group">
+                            <span class="filter-label">Payment Method</span>
+                            <select class="filter-input" id="recv-filter-method" onchange="applyReceiverFilters()" style="width:140px;">
+                                <option value="">All</option>
+                                <option value="payoneer">Payoneer</option>
+                                <option value="not-linked">Not Linked</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <span class="filter-label">&nbsp;</span>
+                            <div style="display:flex;gap:8px;">
+                                <button class="btn btn-primary btn-small" onclick="applyReceiverFilters()"><i data-lucide="search" style="width:14px;height:14px;"></i> Search</button>
+                                <button class="btn btn-secondary btn-small" onclick="resetReceiverFilters()">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                    <table>
+                        <thead><tr>
+                            <th>Twomi ID</th><th>Name</th><th>Email</th><th>Payment Method</th>
+                            <th style="text-align:right;">Total Balance</th>
+                            <th style="text-align:right;">Locked</th>
+                            <th style="text-align:right;">Available</th>
+                            <th>Last Payout</th><th>Actions</th>
+                        </tr></thead>
+                        <tbody id="receivers-table-body">
+                            <tr data-search="tanaka yuki TW-10042 tanaka.y@twomi.com" data-payment="payoneer">
+                                <td><strong>TW-10042</strong></td><td>Tanaka Yuki</td><td>tanaka.y@twomi.com</td>
+                                <td><span class="badge badge-approved" style="font-size:10px;">Payoneer</span></td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-navy);">¥17,008</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-amber);">¥8,504</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-green);">¥8,504</td>
+                                <td style="font-size:12px;color:var(--color-text-muted);">PR-0043 · Apr 13 2026</td>
+                                <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('tanaka')">View</button></td>
+                            </tr>
+                            <tr data-search="suzuki hana TW-10087 suzuki.h@twomi.com" data-payment="payoneer">
+                                <td><strong>TW-10087</strong></td><td>Suzuki Hana</td><td>suzuki.h@twomi.com</td>
+                                <td><span class="badge badge-approved" style="font-size:10px;">Payoneer</span></td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-navy);">¥45,360</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-amber);">¥22,680</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-green);">¥22,680</td>
+                                <td style="font-size:12px;color:var(--color-text-muted);">PR-0043 · Apr 13 2026</td>
+                                <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('suzuki')">View</button></td>
+                            </tr>
+                            <tr data-search="yamamoto kenji TW-10134 yamamoto.k@twomi.com" data-payment="payoneer">
+                                <td><strong>TW-10134</strong></td><td>Yamamoto Kenji</td><td>yamamoto.k@twomi.com</td>
+                                <td><span class="badge badge-approved" style="font-size:10px;">Payoneer</span></td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-navy);">¥14,742</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-amber);">¥14,742</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-text-muted);">¥0</td>
+                                <td style="font-size:12px;color:var(--color-text-muted);">PR-0043 · Apr 13 2026</td>
+                                <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('yamamoto')">View</button></td>
+                            </tr>
+                            <tr data-search="sato mika TW-10201 sato.m@twomi.com" data-payment="payoneer">
+                                <td><strong>TW-10201</strong></td><td>Sato Mika</td><td>sato.m@twomi.com</td>
+                                <td><span class="badge badge-approved" style="font-size:10px;">Payoneer</span></td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-navy);">¥18,711</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-amber);">¥6,237</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-green);">¥12,474</td>
+                                <td style="font-size:12px;color:var(--color-text-muted);">PR-0039 · Mar 28 2026</td>
+                                <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('sato')">View</button></td>
+                            </tr>
+                            <tr data-search="watanabe ryo TW-10256 watanabe.r@twomi.com" data-payment="payoneer">
+                                <td><strong>TW-10256</strong></td><td>Watanabe Ryo</td><td>watanabe.r@twomi.com</td>
+                                <td><span class="badge badge-approved" style="font-size:10px;">Payoneer</span></td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-navy);">¥39,690</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-amber);">¥39,690</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-text-muted);">¥0</td>
+                                <td style="font-size:12px;color:var(--color-text-muted);">PR-0043 · Apr 13 2026</td>
+                                <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('watanabe')">View</button></td>
+                            </tr>
+                            <tr data-search="ito sakura TW-10312 ito.s@twomi.com" data-payment="payoneer">
+                                <td><strong>TW-10312</strong></td><td>Ito Sakura</td><td>ito.s@twomi.com</td>
+                                <td><span class="badge badge-approved" style="font-size:10px;">Payoneer</span></td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-navy);">¥25,514</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-amber);">¥12,757</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-green);">¥12,757</td>
+                                <td style="font-size:12px;color:var(--color-text-muted);">PR-0039 · Mar 28 2026</td>
+                                <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('ito')">View</button></td>
+                            </tr>
+                            <tr data-search="nakamura daiki TW-10389 nakamura.d@twomi.com" data-payment="not-linked">
+                                <td><strong>TW-10389</strong></td><td>Nakamura Daiki</td><td>nakamura.d@twomi.com</td>
+                                <td><span class="badge" style="font-size:10px;background:rgba(255,184,0,0.1);color:var(--color-amber);">⚠ Not Linked</span></td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-navy);">¥29,295</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-text-muted);">¥0</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-red);">¥29,295</td>
+                                <td style="font-size:12px;color:var(--color-text-muted);">—</td>
+                                <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('nakamura')">View</button></td>
+                            </tr>
+                            <tr data-search="hayashi yuna TW-10421 hayashi.y@twomi.com" data-payment="payoneer">
+                                <td><strong>TW-10421</strong></td><td>Hayashi Yuna</td><td>hayashi.y@twomi.com</td>
+                                <td><span class="badge badge-approved" style="font-size:10px;">Payoneer</span></td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-navy);">¥26,640</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-amber);">¥16,820</td>
+                                <td style="text-align:right;font-weight:600;color:var(--color-green);">¥9,820</td>
+                                <td style="font-size:12px;color:var(--color-text-muted);">PR-0038 · Feb 15 2026</td>
+                                <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('hayashi')">View</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="margin-top:8px;padding:8px 4px;">
+                        <span id="receivers-pagination-info" style="font-size:12px;color:var(--color-text-muted);">Showing 1–8 of 8 receivers</span>
+                    </div>
+                </div>
+
+                <!-- ── Detail view ── -->
+                <div id="receivers-detail-view" style="display:none;">
+                    <a class="back-link" onclick="closeCreatorDetail()">
+                        <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>Back to Receivers
+                    </a>
+                    <div class="detail-header">
+                        <div class="detail-header-info">
+                            <h2 id="cd-name">Tanaka Yuki</h2>
+                            <p id="cd-meta" style="color:var(--color-text-muted);font-size:13px;margin-top:2px;"></p>
+                            <div id="cd-payoneer-badge" style="margin-top:6px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Balance summary cards -->
+                    <div class="stat-cards" style="margin-bottom:24px;">
+                        <div class="stat-card" style="background:var(--color-card);">
+                            <div class="stat-label">Total Balance</div>
+                            <div class="stat-value" id="cd-total-balance" style="font-size:20px;color:var(--color-navy);">¥0</div>
+                            <div class="stat-detail">Accumulated earnings</div>
+                        </div>
+                        <div class="stat-card amber">
+                            <div class="stat-label">Locked Balance</div>
+                            <div class="stat-value" id="cd-locked-balance" style="font-size:20px;">¥0</div>
+                            <div class="stat-detail" id="cd-locked-detail">In active payout request</div>
+                        </div>
+                        <div class="stat-card green">
+                            <div class="stat-label">Available Balance</div>
+                            <div class="stat-value" id="cd-available-balance" style="font-size:20px;">¥0</div>
+                            <div class="stat-detail">Ready to be paid</div>
+                        </div>
+                        <div class="stat-card" style="background:var(--color-card);">
+                            <div class="stat-label">Total Paid Out</div>
+                            <div class="stat-value" id="cd-total-paid" style="font-size:20px;color:var(--color-navy);">¥0</div>
+                            <div class="stat-detail" id="cd-cycles">0 payout cycles</div>
+                        </div>
+                    </div>
+
+                    <!-- Payment methods -->
+                    <div class="config-card" style="margin-bottom:20px;">
+                        <h3>Payment Methods</h3>
+                        <div id="cd-pm-list"></div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="tabs" style="margin-bottom:0;">
+                        <div class="tab active" onclick="switchReceiverTab('history', this)">Payout History</div>
+                        <div class="tab" onclick="switchReceiverTab('cashflow', this)">Cash Flow</div>
+                    </div>
+
+                    <!-- Payout History tab -->
+                    <div id="cd-tab-history" class="tab-content active">
+                        <table style="margin-top:0;">
+                            <thead><tr>
+                                <th>Cycle</th><th>Request</th><th>Transaction ID</th>
+                                <th>Amount</th><th>Status</th><th>Date</th>
+                            </tr></thead>
+                            <tbody id="cd-history"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Cash Flow tab -->
+                    <div id="cd-tab-cashflow" class="tab-content">
+                        <table style="margin-top:0;">
+                            <thead><tr>
+                                <th>Date</th><th>Cycle</th><th>Type</th><th>Description</th>
+                                <th style="text-align:right;">Debit</th>
+                                <th style="text-align:right;">Credit</th>
+                                <th style="text-align:right;">Balance</th>
+                            </tr></thead>
+                            <tbody id="cd-cashflow"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -1860,370 +2326,83 @@
                 <div class="section-header" style="margin-bottom:24px;">
                     <div>
                         <h1 class="section-title">Flow Configuration</h1>
-                        <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px;">Configure the number of approval steps for each workflow and assign a permission group to each step.</p>
+                        <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px;">Configure approval steps and execution settings for commission and payout workflows.</p>
                     </div>
-                    <button class="btn btn-primary" onclick="saveFlowConfig()"><i data-lucide="save" style="width:16px;height:16px;"></i>Save Configuration</button>
+                    <button class="btn btn-primary" onclick="saveFlowConfig()">
+                        <i data-lucide="save" style="width:16px;height:16px;"></i> Save Changes
+                    </button>
                 </div>
 
-                <div class="info-banner" style="margin-bottom:12px;">
-                    <i data-lucide="info" style="width:14px;height:14px;display:inline;margin-right:8px;"></i>
-                    Each step must be assigned a different permission group. The uploader or request receiver cannot be in the approving group for their own submission.
-                </div>
-
-                <div style="padding:12px 16px;background:rgba(255,184,0,0.06);border:1px solid rgba(255,184,0,0.3);border-radius:6px;font-size:13px;color:var(--color-amber);margin-bottom:24px;display:flex;align-items:flex-start;gap:10px;">
-                    <i data-lucide="alert-triangle" style="width:16px;height:16px;flex-shrink:0;margin-top:1px;"></i>
-                    <div>
-                        <strong>Changes apply to new requests only.</strong>
-                        Earnings files and payout requests already in progress will continue under the configuration that was active when they were created.
-                        Changing the approver group for a step takes effect immediately for pending steps not yet acted upon.
-                    </div>
-                </div>
-
-                <!-- Save confirmation (shown after save) -->
-                <div id="flow-config-saved" style="display:none;padding:12px 16px;background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.3);border-radius:6px;font-size:13px;color:var(--color-green);margin-bottom:24px;display:none;align-items:center;gap:10px;">
+                <!-- Saved banner -->
+                <div id="flow-config-saved" style="display:none;align-items:center;gap:10px;padding:12px 16px;background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.3);border-radius:6px;margin-bottom:20px;font-size:13px;color:var(--color-green);">
                     <i data-lucide="check-circle" style="width:16px;height:16px;flex-shrink:0;"></i>
-                    <span>Configuration saved. <strong id="flow-config-inprogress-count">2 requests</strong> currently in progress will continue under their original step configuration.</span>
+                    <span>Configuration saved. Note: <strong id="flow-config-inprogress-count">0 requests</strong> currently in progress will continue with the old settings until completed.</span>
                 </div>
 
-                <!-- Global Payout Flag -->
-                <div class="config-card" style="margin-bottom:20px;border:1px solid rgba(0,212,255,0.25);">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                <!-- Global payout toggle -->
+                <div class="config-card" style="margin-bottom:20px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
                         <div>
                             <h3 style="margin-bottom:4px;">Global Payout Execution</h3>
-                            <p style="font-size:13px;color:var(--color-text-muted);">When OFF, all payout execution and scheduling is blocked system-wide regardless of request status.</p>
+                            <p style="font-size:13px;color:var(--color-text-muted);">When OFF, no payout requests can be executed or scheduled until turned back ON.</p>
                         </div>
                         <div style="display:flex;align-items:center;gap:10px;">
-                            <span id="global-payout-label" style="font-size:13px;font-weight:600;color:var(--color-green);">ON</span>
-                            <button id="global-payout-toggle" class="toggle-switch on" onclick="toggleGlobalPayout(this)" style="cursor:pointer;"></button>
+                            <span id="global-payout-label" style="font-size:13px;font-weight:700;color:var(--color-green);">ON</span>
+                            <button class="btn btn-small btn-secondary toggle-switch on" onclick="toggleGlobalPayout(this)" style="min-width:60px;">ON</button>
                         </div>
                     </div>
-                    <div id="global-payout-warning" style="display:none;margin-top:12px;padding:8px 12px;background:rgba(255,59,92,0.06);border:1px solid rgba(255,59,92,0.25);border-radius:6px;font-size:12px;color:var(--color-red);">
-                        ⚠ Payout execution is currently <strong>OFF</strong>. No requests can be executed or scheduled until this is turned back ON.
+                    <div id="global-payout-warning" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(255,59,92,0.06);border:1px solid rgba(255,59,92,0.25);border-radius:6px;font-size:13px;color:var(--color-red);">
+                        ⚠ Global payout execution is OFF. Executers cannot submit any requests to Payoneer until this is turned back ON.
                     </div>
                 </div>
 
-                <!-- Payout Limits -->
+                <!-- Commission approval flow -->
                 <div class="config-card" style="margin-bottom:20px;">
-                    <h3 style="margin-bottom:6px;">Payout Limits</h3>
-                    <p style="font-size:13px;color:var(--color-text-muted);margin-bottom:16px;">Set the minimum and maximum payout amount per receiver per request. These are used as default filters in New Payout.</p>
-                    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-                        <select class="form-select" style="width:80px;" id="threshold-currency">
-                            <option value="JPY" selected>JPY</option>
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
-                        </select>
+                    <h3 style="margin-bottom:4px;">Commission Approval Flow</h3>
+                    <p style="font-size:13px;color:var(--color-text-muted);margin-bottom:16px;">Number of approval steps required before a commission file is considered approved.</p>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                        <span style="font-size:13px;color:var(--color-text);">Approval steps:</span>
                         <div style="display:flex;align-items:center;gap:8px;">
-                            <span style="font-size:13px;color:var(--color-text-muted);">Min</span>
-                            <input type="number" class="form-input" id="threshold-amount" value="1000" min="0" style="width:130px;" placeholder="e.g. 1000">
+                            <button class="btn btn-small btn-secondary" onclick="decrementSteps('csv','csv-steps')" style="padding:4px 10px;font-size:16px;line-height:1;">−</button>
+                            <input type="number" id="csv-steps" value="2" min="1" max="5" style="width:50px;text-align:center;padding:4px 8px;border:1px solid var(--color-border);border-radius:6px;font-size:14px;font-weight:600;color:var(--color-navy);" onchange="renderFlowSteps('csv')">
+                            <button class="btn btn-small btn-secondary" onclick="incrementSteps('csv','csv-steps')" style="padding:4px 10px;font-size:16px;line-height:1;">+</button>
                         </div>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <span style="font-size:13px;color:var(--color-text-muted);">Max</span>
-                            <input type="number" class="form-input" id="payout-max-amount" value="500000" min="0" style="width:130px;" placeholder="e.g. 500000">
-                        </div>
-                        <span style="font-size:12px;color:var(--color-text-muted);">per receiver per request</span>
                     </div>
+                    <div id="csv-steps-config" style="display:flex;flex-direction:column;gap:10px;"></div>
                 </div>
 
-                <!-- Earnings Approval -->
+                <!-- Payout approval flow -->
                 <div class="config-card" style="margin-bottom:20px;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                        <div>
-                            <h3 style="margin-bottom:4px;">Earnings Approval</h3>
-                            <p style="font-size:13px;color:var(--color-text-muted);">Steps required before an uploaded payout list is applied and the Payout Pool is populated.</p>
-                        </div>
-                        <div class="number-input-group" style="margin:0;">
-                            <button class="number-btn" onclick="decrementSteps('csv', 'csv-steps')">-</button>
-                            <input type="number" class="number-input" id="csv-steps" value="2" readonly>
-                            <button class="number-btn" onclick="incrementSteps('csv', 'csv-steps')">+</button>
-                        </div>
-                    </div>
-                    <div id="csv-steps-config" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <div style="width:80px;font-size:13px;font-weight:600;color:var(--color-text-muted);">Upload</div>
-                            <div class="flow-arrow">→</div>
-                            <div style="font-size:12px;color:var(--color-text-muted);font-style:italic;">Any user with Upload permission</div>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <div style="width:80px;font-size:13px;font-weight:600;color:var(--color-navy);">Step 1</div>
-                            <div class="flow-arrow">→</div>
-                            <select class="form-select" style="width:220px;" id="csv-step-1-group">
-                                <option value="finance-team" selected>Finance Team</option>
-                                <option value="finance-manager">Finance Manager</option>
-                                <option value="super-admin">Super Admin</option>
-                            </select>
-                            <span style="font-size:12px;color:var(--color-text-muted);">approves</span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <div style="width:80px;font-size:13px;font-weight:600;color:var(--color-navy);">Step 2</div>
-                            <div class="flow-arrow">→</div>
-                            <select class="form-select" style="width:220px;" id="csv-step-2-group">
-                                <option value="finance-manager" selected>Finance Manager</option>
-                                <option value="finance-team">Finance Team</option>
-                                <option value="super-admin">Super Admin</option>
-                            </select>
-                            <span style="font-size:12px;color:var(--color-text-muted);">approves</span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <div style="width:80px;font-size:13px;font-weight:600;color:var(--color-green);">Applied</div>
-                            <div class="flow-arrow">→</div>
-                            <div style="font-size:12px;color:var(--color-green);">Payout Pool updated</div>
+                    <h3 style="margin-bottom:4px;">Payout Request Approval Flow</h3>
+                    <p style="font-size:13px;color:var(--color-text-muted);margin-bottom:16px;">Number of approval steps required before a payout request is handed to the Executer.</p>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                        <span style="font-size:13px;color:var(--color-text);">Approval steps:</span>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <button class="btn btn-small btn-secondary" onclick="decrementSteps('payout','payout-steps')" style="padding:4px 10px;font-size:16px;line-height:1;">−</button>
+                            <input type="number" id="payout-steps" value="2" min="1" max="5" style="width:50px;text-align:center;padding:4px 8px;border:1px solid var(--color-border);border-radius:6px;font-size:14px;font-weight:600;color:var(--color-navy);" onchange="renderFlowSteps('payout')">
+                            <button class="btn btn-small btn-secondary" onclick="incrementSteps('payout','payout-steps')" style="padding:4px 10px;font-size:16px;line-height:1;">+</button>
                         </div>
                     </div>
+                    <div id="payout-steps-config" style="display:flex;flex-direction:column;gap:10px;"></div>
                 </div>
 
-                <!-- Payout Request Approval -->
+                <!-- Payoneer API -->
                 <div class="config-card">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                        <div>
-                            <h3 style="margin-bottom:4px;">Payout Request Approval</h3>
-                            <p style="font-size:13px;color:var(--color-text-muted);">Steps required before a payout request is executed or scheduled for Payoneer.</p>
-                        </div>
-                        <div class="number-input-group" style="margin:0;">
-                            <button class="number-btn" onclick="decrementSteps('payout', 'payout-steps')">-</button>
-                            <input type="number" class="number-input" id="payout-steps" value="2" readonly>
-                            <button class="number-btn" onclick="incrementSteps('payout', 'payout-steps')">+</button>
+                    <h3 style="margin-bottom:4px;">Payoneer API Credentials</h3>
+                    <p style="font-size:13px;color:var(--color-text-muted);margin-bottom:16px;">Used when submitting payout requests to Payoneer. Changes take effect immediately on next execution.</p>
+                    <div class="key-value" style="margin-bottom:12px;">
+                        <div class="key" style="width:120px;min-width:120px;">API Key</div>
+                        <div class="value" style="flex:1;display:flex;gap:8px;align-items:center;">
+                            <input type="password" id="api-key-input" value="●●●●●●●●●●●●" class="form-input" style="font-family:monospace;flex:1;max-width:320px;">
+                            <button class="btn btn-small btn-secondary" onclick="toggleApiKeyVisibility()"><i data-lucide="eye" style="width:13px;height:13px;"></i></button>
                         </div>
                     </div>
-                    <div id="payout-steps-config" style="display:flex;flex-direction:column;gap:12px;">
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <div style="width:80px;font-size:13px;font-weight:600;color:var(--color-text-muted);">Create</div>
-                            <div class="flow-arrow">→</div>
-                            <div style="font-size:12px;color:var(--color-text-muted);font-style:italic;">Any user with Create Payout Request permission</div>
+                    <div class="key-value">
+                        <div class="key" style="width:120px;min-width:120px;">API Secret</div>
+                        <div class="value" style="flex:1;display:flex;gap:8px;align-items:center;">
+                            <input type="password" id="api-secret-input" value="●●●●●●●●●●●●" class="form-input" style="font-family:monospace;flex:1;max-width:320px;">
+                            <button class="btn btn-small btn-secondary" onclick="toggleApiSecretVisibility()"><i data-lucide="eye" style="width:13px;height:13px;"></i></button>
                         </div>
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <div style="width:80px;font-size:13px;font-weight:600;color:var(--color-navy);">Step 1</div>
-                            <div class="flow-arrow">→</div>
-                            <select class="form-select" style="width:220px;" id="payout-step-1-group">
-                                <option value="finance-team" selected>Finance Team</option>
-                                <option value="finance-manager">Finance Manager</option>
-                                <option value="super-admin">Super Admin</option>
-                            </select>
-                            <span style="font-size:12px;color:var(--color-text-muted);">approves</span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <div style="width:80px;font-size:13px;font-weight:600;color:var(--color-navy);">Step 2</div>
-                            <div class="flow-arrow">→</div>
-                            <select class="form-select" style="width:220px;" id="payout-step-2-group">
-                                <option value="finance-manager" selected>Finance Manager</option>
-                                <option value="finance-team">Finance Team</option>
-                                <option value="super-admin">Super Admin</option>
-                            </select>
-                            <span style="font-size:12px;color:var(--color-text-muted);">approves</span>
-                        </div>
-                        <!-- Executor Group separator -->
-                        <div style="border-top:1px dashed var(--color-border);margin:4px 0;"></div>
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <div style="width:80px;font-size:13px;font-weight:600;color:var(--color-navy);">
-                                <i data-lucide="send" style="width:13px;height:13px;display:inline;margin-right:4px;vertical-align:middle;"></i>Execute
-                            </div>
-                            <div class="flow-arrow">→</div>
-                            <select class="form-select" style="width:220px;" id="payout-executor-group">
-                                <option value="finance-manager" selected>Finance Manager</option>
-                                <option value="finance-team">Finance Team</option>
-                                <option value="super-admin">Super Admin</option>
-                            </select>
-                            <span style="font-size:12px;color:var(--color-text-muted);">executes or schedules</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Receivers Page -->
-            <div id="page-receivers" class="page">
-                <div id="receivers-list-view">
-                    <div class="section-header" style="margin-bottom:20px;">
-                        <div>
-                            <h1 class="section-title">Receivers</h1>
-                            <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px;">View all receivers, their Payoneer account status, total paid and outstanding amounts across all payout cycles.</p>
-                        </div>
-                        <button class="btn btn-secondary" onclick="alert('Exported')"><i data-lucide="download" style="width:16px;height:16px;"></i>Export</button>
-                    </div>
-                    <div class="filter-bar">
-                        <div class="filter-group">
-                            <span class="filter-label">Name / Twomi ID</span>
-                            <input class="filter-input" type="text" id="cr-list-name" placeholder="Search…" style="width:160px;" onkeydown="if(event.key==='Enter') applyCreatorListFilters()">
-                        </div>
-                        <div class="filter-group">
-                            <span class="filter-label">Receiver Email</span>
-                            <input class="filter-input" type="text" id="cr-list-email" placeholder="@twomi.com" style="width:160px;" onkeydown="if(event.key==='Enter') applyCreatorListFilters()">
-                        </div>
-                        <div class="filter-group">
-                            <span class="filter-label">Payment Method</span>
-                            <select class="filter-input" id="cr-list-payment" onchange="applyCreatorListFilters()" style="width:130px;">
-                                <option value="">All</option>
-                                <option value="linked">Linked</option>
-                                <option value="not-linked">Not Linked</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <span class="filter-label">Last TX Status</span>
-                            <select class="filter-input" id="cr-list-tx-status" onchange="applyCreatorListFilters()" style="width:130px;">
-                                <option value="">All</option>
-                                <option value="in-progress">In Progress</option>
-                                <option value="sent">Sent</option>
-                                <option value="failed">Failed</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <span class="filter-label">&nbsp;</span>
-                            <div style="display:flex;gap:8px;">
-                                <button class="btn btn-primary btn-small" onclick="applyCreatorListFilters()"><i data-lucide="search" style="width:14px;height:14px;"></i> Search</button>
-                                <button class="btn btn-secondary btn-small" onclick="resetCreatorListFilters()">Reset</button>
-                            </div>
-                        </div>
-                    </div>
-                    <table>
-                        <thead><tr>
-                            <th>Receiver</th><th>Twomi ID</th><th>Receiver Email</th>
-                            <th>Payment Method</th><th>Total Paid</th><th>Last Paid</th><th>Unpaid</th><th>Payout</th><th>Actions</th>
-                        </tr></thead>
-                        <tbody id="receivers-table-body">
-                            <tr data-payment="linked" data-search="tanaka yuki TW-10042 tanaka.y@twomi.com">
-                                <td><strong>Tanaka Yuki</strong></td><td>TW-10042</td><td>tanaka.y@twomi.com</td>
-                                <td>
-                                    <div style="font-size:11px;color:var(--color-text-muted);">tanaka.y@payoneer.com</div>
-                                    <span class="badge badge-approved" style="font-size:10px;">Payoneer</span>
-                                </td>
-                                <td style="font-weight:600;">¥516,820</td><td style="font-size:12px;color:var(--color-text-muted);">Apr 13 2026</td>
-                                <td style="color:var(--color-amber);font-weight:600;">¥8,504</td>
-                                <td style="text-align:center;">
-                                    <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
-                                        <button class="toggle-switch on" onclick="toggleReceiverPayout(this, 'tanaka')" style="cursor:pointer;flex-shrink:0;"></button>
-                                        <span style="font-size:11px;color:var(--color-green);font-weight:600;">On</span>
-                                    </div>
-                                </td>
-                                <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('tanaka')">View</button></td>
-                            </tr>
-                            <tr data-payment="linked" data-search="suzuki hana TW-10087 suzuki.h@twomi.com">
-                                <td><strong>Suzuki Hana</strong></td><td>TW-10087</td><td>suzuki.h@twomi.com</td>
-                                <td>
-                                    <div style="font-size:11px;color:var(--color-text-muted);">suzuki.h@stripe.com</div>
-                                    <span class="badge" style="font-size:10px;background:rgba(99,91,255,0.1);color:#6366f1;">Stripe</span>
-                                </td>
-                                <td style="font-weight:600;">¥1,234,560</td><td style="font-size:12px;color:var(--color-text-muted);">Apr 13 2026</td>
-                                <td style="color:var(--color-text-muted);">¥0</td>
-                                <td style="text-align:center;">
-                                    <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
-                                        <button class="toggle-switch on" onclick="toggleReceiverPayout(this, 'suzuki')" style="cursor:pointer;flex-shrink:0;"></button>
-                                        <span style="font-size:11px;color:var(--color-green);font-weight:600;">On</span>
-                                    </div>
-                                </td>
-                                <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('suzuki')">View</button></td>
-                            </tr>
-                            <tr data-payment="linked" data-search="yamamoto kenji TW-10134 yamamoto.k@twomi.com">
-                                <td><strong>Yamamoto Kenji</strong></td><td>TW-10134</td><td>yamamoto.k@twomi.com</td>
-                                <td>
-                                    <div style="font-size:11px;color:var(--color-text-muted);">yamamoto.k@payoneer.com</div>
-                                    <span class="badge badge-approved" style="font-size:10px;">Payoneer</span>
-                                </td>
-                                <td style="font-weight:600;">¥892,450</td><td style="font-size:12px;color:var(--color-text-muted);">Apr 13 2026</td>
-                                <td style="color:var(--color-text-muted);">¥0</td>
-                                <td style="text-align:center;">
-                                    <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
-                                        <button class="toggle-switch on" onclick="toggleReceiverPayout(this, 'yamamoto')" style="cursor:pointer;flex-shrink:0;"></button>
-                                        <span style="font-size:11px;color:var(--color-green);font-weight:600;">On</span>
-                                    </div>
-                                </td>
-                                <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('yamamoto')">View</button></td>
-                            </tr>
-                            <tr data-payment="not-linked" data-search="nakamura daiki TW-10389 nakamura.d@twomi.com">
-                                <td><strong>Nakamura Daiki</strong></td><td>TW-10389</td><td>nakamura.d@twomi.com</td>
-                                <td><span class="badge" style="font-size:10px;background:rgba(255,184,0,0.1);color:var(--color-amber);">⚠ Not Linked</span></td>
-                                <td style="font-weight:600;">¥29,295</td><td style="font-size:12px;color:var(--color-text-muted);">Feb 16 2026</td>
-                                <td style="color:var(--color-red);font-weight:600;">¥29,295</td>
-                                <td style="text-align:center;">
-                                    <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
-                                        <button class="toggle-switch" onclick="toggleReceiverPayout(this, 'nakamura')" style="cursor:pointer;flex-shrink:0;"></button>
-                                        <span style="font-size:11px;color:var(--color-red);font-weight:600;">Off</span>
-                                    </div>
-                                </td>
-                                <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('nakamura')">View</button></td>
-                            </tr>
-                            <tr data-payment="linked" data-search="hayashi yuna TW-10421 hayashi.y@twomi.com">
-                                <td><strong>Hayashi Yuna</strong></td><td>TW-10421</td><td>hayashi.y@twomi.com</td>
-                                <td>
-                                    <div style="font-size:11px;color:var(--color-text-muted);">hayashi.y@payoneer.com</div>
-                                    <span class="badge badge-approved" style="font-size:10px;">Payoneer</span>
-                                </td>
-                                <td style="font-weight:600;">¥456,230</td><td style="font-size:12px;color:var(--color-text-muted);">Mar 30 2026</td>
-                                <td style="color:var(--color-red);font-weight:600;">¥16,820</td>
-                                <td style="text-align:center;">
-                                    <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
-                                        <button class="toggle-switch on" onclick="toggleReceiverPayout(this, 'hayashi')" style="cursor:pointer;flex-shrink:0;"></button>
-                                        <span style="font-size:11px;color:var(--color-green);font-weight:600;">On</span>
-                                    </div>
-                                </td>
-                                <td><button class="btn btn-small btn-secondary" onclick="openCreatorDetail('hayashi')">View</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="pagination" style="margin-top:12px;">
-                        <span class="pagination-info" id="receivers-pagination-info">Showing 1–5 of 5 receivers</span>
-                        <div class="pagination-controls">
-                            <button class="page-btn" disabled>‹</button>
-                            <button class="page-btn active">1</button>
-                            <button class="page-btn" disabled>›</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Receiver Detail -->
-                <div id="receivers-detail-view" style="display:none;">
-                    <a class="back-link" onclick="closeCreatorDetail()">
-                        <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>Back to Receivers
-                    </a>
-                    <div class="detail-header" style="margin-bottom:20px;">
-                        <div class="detail-header-info">
-                            <h2 id="cd-name">Tanaka Yuki</h2>
-                            <p id="cd-meta" style="font-size:13px;color:var(--color-text-muted);"></p>
-                        </div>
-                        <div id="cd-payoneer-badge"></div>
-                    </div>
-                    <!-- Payment Methods -->
-                    <div id="cd-payment-methods" style="margin-bottom:20px;background:var(--color-card);border:1px solid var(--color-border);border-radius:8px;padding:16px 20px;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                            <h3 style="font-size:14px;font-weight:700;color:var(--color-navy);">Payment Methods</h3>
-                            <button class="btn btn-small btn-secondary"><i data-lucide="plus" style="width:13px;height:13px;"></i> Add</button>
-                        </div>
-                        <div id="cd-pm-list" style="display:flex;flex-direction:column;gap:8px;"></div>
-                    </div>
-
-                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
-                        <div class="summary-card"><div class="summary-value" id="cd-total-paid" style="color:var(--color-green);">¥0</div><div class="summary-label">Total Paid</div></div>
-                        <div class="summary-card"><div class="summary-value" id="cd-unpaid" style="color:var(--color-amber);">¥0</div><div class="summary-label">Unpaid</div></div>
-                        <div class="summary-card"><div class="summary-value" id="cd-total-earned" style="color:var(--color-navy);">¥0</div><div class="summary-label">Total Earned</div></div>
-                        <div class="summary-card"><div class="summary-value" id="cd-cycles" style="color:var(--color-navy);">0</div><div class="summary-label">Cycles</div></div>
-                    </div>
-
-                    <!-- Tabs -->
-                    <div class="tabs" style="margin-bottom:0;">
-                        <div class="tab active" onclick="switchReceiverTab('history', this)">Payment History</div>
-                        <div class="tab" onclick="switchReceiverTab('cashflow', this)">Cash Flow</div>
-                    </div>
-
-                    <!-- Payment History tab -->
-                    <div id="cd-tab-history" class="tab-content active">
-                        <table style="margin-top:12px;">
-                            <thead><tr><th>Cycle</th><th>Request ID</th><th>Transaction ID</th><th>Amount</th><th>Payment Status</th><th>Date</th></tr></thead>
-                            <tbody id="cd-history"></tbody>
-                        </table>
-                    </div>
-
-                    <!-- Cash Flow tab -->
-                    <div id="cd-tab-cashflow" class="tab-content">
-                        <div style="margin-top:12px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
-                            <p style="font-size:13px;color:var(--color-text-muted);">Running ledger of all earnings and payouts for this receiver.</p>
-                            <button class="btn btn-secondary btn-small" onclick="alert('Exported')"><i data-lucide="download" style="width:13px;height:13px;"></i> Export</button>
-                        </div>
-                        <table>
-                            <thead><tr>
-                                <th>Date</th><th>Cycle</th><th>Type</th><th>Description</th>
-                                <th style="text-align:right;">Debit (−)</th>
-                                <th style="text-align:right;">Credit (+)</th>
-                                <th style="text-align:right;">Balance</th>
-                            </tr></thead>
-                            <tbody id="cd-cashflow"></tbody>
-                        </table>
                     </div>
                 </div>
             </div>
@@ -2233,38 +2412,41 @@
                 <div class="section-header" style="margin-bottom:24px;">
                     <div>
                         <h1 class="section-title">Domain Config</h1>
-                        <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px;">Configure which email domains are allowed to be invited as staff users. Invitations to addresses outside these domains will be rejected.</p>
+                        <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px;">Only users with an email address matching one of the listed domains can be invited to the system.</p>
                     </div>
-                    <button class="btn btn-primary" onclick="saveDomainConfig()"><i data-lucide="save" style="width:16px;height:16px;"></i>Save</button>
                 </div>
 
                 <div class="config-card" style="max-width:560px;">
-                    <h3 style="margin-bottom:6px;">Allowed Email Domains</h3>
-                    <p style="font-size:12px;color:var(--color-text-muted);margin-bottom:16px;">Only users with an email address ending in one of these domains can be invited.</p>
+                    <h3 style="margin-bottom:16px;">Allowed Domains</h3>
 
-                    <div id="domain-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+                    <!-- Existing domains -->
+                    <div id="domain-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
                         <div class="domain-row" style="display:flex;align-items:center;gap:10px;">
                             <span style="font-size:13px;font-family:monospace;color:var(--color-navy);flex:1;">@torilab.ai</span>
-                            <span class="badge badge-approved" style="font-size:10px;">Default</span>
                             <button class="btn btn-small btn-danger" onclick="removeDomain(this)" style="font-size:11px;">Remove</button>
                         </div>
                         <div class="domain-row" style="display:flex;align-items:center;gap:10px;">
-                            <span style="font-size:13px;font-family:monospace;color:var(--color-navy);flex:1;">@aiavatar.work</span>
-                            <span class="badge badge-approved" style="font-size:10px;">Default</span>
+                            <span style="font-size:13px;font-family:monospace;color:var(--color-navy);flex:1;">@twomi.com</span>
                             <button class="btn btn-small btn-danger" onclick="removeDomain(this)" style="font-size:11px;">Remove</button>
                         </div>
                     </div>
 
-                    <div style="display:flex;gap:8px;align-items:center;">
-                        <input type="text" class="form-input" id="new-domain-input" placeholder="@example.com" style="flex:1;font-family:monospace;" onkeydown="if(event.key==='Enter') addDomain()">
-                        <button class="btn btn-secondary" onclick="addDomain()"><i data-lucide="plus" style="width:14px;height:14px;"></i> Add</button>
+                    <!-- Add new domain -->
+                    <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;">
+                        <div style="flex:1;min-width:200px;">
+                            <input type="text" id="new-domain-input" class="form-input" placeholder="@example.com" style="width:100%;" onkeydown="if(event.key==='Enter') addDomain()">
+                            <div id="domain-error" style="display:none;font-size:12px;color:var(--color-red);margin-top:4px;"></div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="addDomain()">
+                            <i data-lucide="plus" style="width:16px;height:16px;"></i> Add Domain
+                        </button>
                     </div>
-                    <div id="domain-error" style="display:none;font-size:12px;color:var(--color-red);margin-top:6px;"></div>
-                </div>
 
-                <div class="info-banner" style="margin-top:20px;max-width:560px;">
-                    <i data-lucide="info" style="width:14px;height:14px;display:inline;margin-right:8px;"></i>
-                    Removing a domain does not affect existing users — only future invitations. At least one domain must remain.
+                    <div style="margin-top:20px;display:flex;justify-content:flex-end;">
+                        <button class="btn btn-primary" onclick="saveDomainConfig()">
+                            <i data-lucide="save" style="width:16px;height:16px;"></i> Save Changes
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -2710,6 +2892,40 @@
         </div>
     </div>
 
+    <!-- Submit Confirmation modal -->
+    <div class="modal-overlay" id="submit-confirm-modal" onclick="closeSubmitModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width:440px;">
+            <div class="modal-header">
+                <div class="modal-title" id="submit-modal-title">Submit for Approval</div>
+                <button class="modal-close" onclick="closeSubmitModal()"><i data-lucide="x" style="width:20px;height:20px;"></i></button>
+            </div>
+            <p id="submit-modal-body" style="font-size:13px;color:var(--color-text-muted);margin-bottom:20px;">Once submitted, this item will enter the approval workflow and cannot be edited.</p>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeSubmitModal()">Cancel</button>
+                <button class="btn btn-primary" id="submit-modal-confirm" onclick="executeSubmit()">
+                    <i data-lucide="send" style="width:16px;height:16px;"></i> Submit for Approval
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Discard Confirmation modal -->
+    <div class="modal-overlay" id="discard-confirm-modal" onclick="closeDiscardModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width:440px;">
+            <div class="modal-header">
+                <div class="modal-title" id="discard-modal-title">Discard</div>
+                <button class="modal-close" onclick="closeDiscardModal()"><i data-lucide="x" style="width:20px;height:20px;"></i></button>
+            </div>
+            <p id="discard-modal-body" style="font-size:13px;color:var(--color-text-muted);margin-bottom:20px;">This action cannot be undone. The item will be permanently removed.</p>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDiscardModal()">Cancel</button>
+                <button class="btn btn-danger" id="discard-modal-confirm" onclick="executeDiscard()">
+                    <i data-lucide="trash-2" style="width:16px;height:16px;"></i> Discard
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Mark as Resolved modal -->
     <div class="modal-overlay" id="resolve-pr-modal" onclick="closeResolvePRModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()" style="max-width:500px;">
@@ -2751,6 +2967,22 @@
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeResolvePRModal()">Cancel</button>
                 <button class="btn btn-success" onclick="confirmResolvePR()"><i data-lucide="check" style="width:16px;height:16px;"></i>Mark as Resolved</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Execute Confirm modal -->
+    <div class="modal-overlay" id="execute-confirm-modal" onclick="closeExecuteConfirmModal(event)">
+        <div class="modal-content" style="max-width:460px;">
+            <div class="modal-title" id="execute-confirm-title">Confirm Execution</div>
+            <p id="execute-confirm-body" style="font-size:13px;color:var(--color-text-muted);margin:12px 0 8px;"></p>
+            <div id="execute-confirm-detail" style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:6px;padding:12px 14px;margin-bottom:20px;font-size:13px;display:flex;flex-direction:column;gap:6px;"></div>
+            <div style="display:flex;justify-content:flex-end;gap:10px;">
+                <button class="btn btn-secondary" onclick="closeExecuteConfirmModal()">Cancel</button>
+                <button class="btn btn-primary" id="execute-confirm-btn" onclick="doExecutePR()" style="gap:8px;">
+                    <i data-lucide="send" style="width:15px;height:15px;"></i>
+                    <span id="execute-confirm-action-label">Execute Now</span>
+                </button>
             </div>
         </div>
     </div>
@@ -2830,6 +3062,21 @@
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeRejectPRModal()">Cancel</button>
                 <button class="btn btn-danger" onclick="confirmRejectPR()"><i data-lucide="x" style="width:16px;height:16px;"></i>Confirm Rejection</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approve earnings modal -->
+    <div class="modal-overlay" id="approve-earnings-modal" onclick="closeApproveEarningsModal(event)">
+        <div class="modal-content" style="max-width:440px;">
+            <div class="modal-title">Confirm Approval</div>
+            <p id="approve-earnings-body" style="font-size:13px;color:var(--color-text-muted);margin:12px 0 8px;"></p>
+            <div id="approve-earnings-detail" style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:6px;padding:12px 14px;margin-bottom:20px;font-size:13px;display:flex;flex-direction:column;gap:6px;"></div>
+            <div style="display:flex;justify-content:flex-end;gap:10px;">
+                <button class="btn btn-secondary" onclick="closeApproveEarningsModal()">Cancel</button>
+                <button class="btn btn-success" onclick="confirmApproveEarnings()">
+                    <i data-lucide="check" style="width:15px;height:15px;"></i> Confirm Approval
+                </button>
             </div>
         </div>
     </div>
@@ -2996,6 +3243,21 @@
             }
 
             document.getElementById('action-bar').classList.add('hidden');
+
+            // Reset detail views when navigating to list pages
+            if (page === 'payout-requests' || page === 'payout-executer') {
+                const prList = document.getElementById('pr-list-section');
+                const prDetail = document.getElementById('payout-request-detail');
+                if (prList)   prList.style.display   = 'block';
+                if (prDetail) prDetail.style.display = 'none';
+            }
+            if (['earnings-csv','commission-uploader','commission-checker'].includes(page)) {
+                const eList = document.getElementById('earnings-list-view');
+                const eDetail = document.getElementById('earnings-detail-view');
+                if (eList)   eList.style.display   = 'block';
+                if (eDetail) eDetail.style.display = 'none';
+            }
+
             lucide.createIcons();
         }
         // ── Earnings filter & pagination ──────────────────────────
@@ -3003,6 +3265,7 @@
         let earningsCurrentPage = 1;
 
         function applyEarningsFilters() {
+            const recordId   = (document.getElementById('filter-record-id')?.value || '').toLowerCase();
             const cycleYear  = document.getElementById('filter-cycle-year').value;
             const cycleMonth = document.getElementById('filter-cycle-month').value;
             const type       = document.getElementById('filter-type')?.value || '';
@@ -3020,8 +3283,10 @@
                 const rowStatus   = row.dataset.status;
                 const rowDate     = row.dataset.date;
                 const rowType     = row.dataset.type || '';
+                const rowId       = (row.dataset.id || '').toLowerCase();
 
                 const [rYear, rMonth] = rowCycle.split('-');
+                const matchId         = !recordId   || rowId.includes(recordId);
                 const matchCycleYear  = !cycleYear  || rYear  === cycleYear;
                 const matchCycleMonth = !cycleMonth || rMonth === cycleMonth;
                 const matchType       = !type       || rowType   === type;
@@ -3030,7 +3295,7 @@
                 const matchFrom       = !dateFrom   || rowDate >= dateFrom;
                 const matchTo         = !dateTo     || rowDate <= dateTo;
 
-                const show = matchCycleYear && matchCycleMonth && matchType && matchStatus && matchUploader && matchFrom && matchTo;
+                const show = matchId && matchCycleYear && matchCycleMonth && matchType && matchStatus && matchUploader && matchFrom && matchTo;
                 row.style.display = show ? '' : 'none';
                 if (show) visible.push(row);
             });
@@ -3079,6 +3344,8 @@
         }
 
         function resetEarningsFilters() {
+            const rid = document.getElementById('filter-record-id');
+            if (rid) rid.value = '';
             document.getElementById('filter-cycle-year').value  = '';
             document.getElementById('filter-cycle-month').value = '';
             document.getElementById('filter-status').value      = '';
@@ -3214,6 +3481,7 @@
         function closeUploadModal(event) { if (event && event.target !== document.getElementById('upload-modal')) return; document.getElementById('upload-modal').classList.remove('active'); }
         const earningsData = [
             {
+                id: 'CM-0004',
                 name: 'earnings_2026_04.csv', cycle: 'April 2026', uploader: 'Yamamoto Kenji · yamamoto.k@torilab.ai',
                 date: 'Apr 11 2026', status: 'pending', badge: 'badge-pending', badgeText: 'Pending — Step 1 of 2', rows: '156',
                 approvals: [
@@ -3223,6 +3491,7 @@
                 ]
             },
             {
+                id: 'CM-0003',
                 name: 'earnings_2026_03.csv', cycle: 'March 2026', uploader: 'Suzuki Hana · suzuki.h@torilab.ai',
                 date: 'Mar 28 2026', status: 'approved', badge: 'badge-approved', badgeText: 'Approved', rows: '200',
                 approvals: [
@@ -3232,6 +3501,7 @@
                 ]
             },
             {
+                id: 'CM-0002',
                 name: 'earnings_2026_02.csv', cycle: 'February 2026', uploader: 'Yamamoto Kenji · yamamoto.k@torilab.ai',
                 date: 'Feb 29 2026', status: 'approved', badge: 'badge-approved', badgeText: 'Approved', rows: '198',
                 approvals: [
@@ -3241,6 +3511,7 @@
                 ]
             },
             {
+                id: 'CM-0001',
                 name: 'earnings_2026_01.csv', cycle: 'January 2026', uploader: 'Suzuki Hana · suzuki.h@torilab.ai',
                 date: 'Jan 31 2026', status: 'rejected', badge: 'badge-rejected', badgeText: 'Rejected by Approver', rows: '145',
                 approvals: [
@@ -3250,10 +3521,19 @@
                       reason: 'Amount for receiver TW-10042 does not match the agreed earnings for January cycle. Please verify the source data and re-upload.' },
                 ]
             },
+            { id: 'CM-0005',
+              name: 'commissions_2026_05.csv', cycle: 'May 2026', uploader: 'Yamamoto Kenji · yamamoto.k@torilab.ai',
+                date: 'May 6 2026', status: 'created', badge: 'badge-created', badgeText: 'Created — awaiting submission', rows: '148',
+                approvals: [
+                    { label:'Created',     name:'Yamamoto Kenji', email:'yamamoto.k@torilab.ai', date:'May 6 2026, 09:15:00', status:'done'    },
+                    { label:'Step 1 of 2', name:null,             email:null,                    date:null,                   status:'waiting' },
+                    { label:'Step 2 of 2', name:null,             email:null,                    date:null,                   status:'waiting' },
+                ]
+            },
         ];
 
-        const statusIconMap = { done:'✓', approved:'✓', pending:'…', waiting:'–', rejected:'✕', scheduled:'⏰', 'in-progress':'⏳' };
-        const statusLabelMap = { done:'Uploaded', approved:'Approved', pending:'Awaiting approval', waiting:'Not yet reached', rejected:'Rejected', scheduled:'Scheduled', 'in-progress':'Submitting to Payoneer' };
+        const statusIconMap = { done:'✓', approved:'✓', pending:'…', waiting:'–', rejected:'✕', scheduled:'⏰', executed:'⏳', created:'↑' };
+        const statusLabelMap = { done:'Created', approved:'Approved', pending:'Awaiting approval', waiting:'Not yet reached', rejected:'Rejected', scheduled:'Scheduled', executed:'Executing via Payoneer', created:'Created' };
 
         function renderApprovalHistory(approvals) {
             return approvals.map(a => {
@@ -3308,8 +3588,10 @@
         }
 
         let earningsDetailOrigin = 'earnings-csv';
+        let currentEarningsIndex = null;
 
         function viewEarningsDetail(index) {
+            currentEarningsIndex = index;
             const d = earningsData[index];
             // Navigate to earnings-csv page (which houses the detail view)
             const currentPage = document.querySelector('.page.active');
@@ -3332,15 +3614,45 @@
             // Render approval history
             document.getElementById('earnings-approval-history-rows').innerHTML = renderApprovalHistory(d.approvals);
 
-            // Show action buttons only when pending
+            // Role rule: Maker (commission-uploader / payout-pool) cannot approve
+            const isMakerCommission = (earningsDetailOrigin === 'commission-uploader');
             const actions = document.getElementById('earnings-detail-actions');
-            if (d.status === 'pending') {
+
+            // Submit/Discard panel for Uploaded status (only visible to Maker)
+            let uploadedActionsEl = document.getElementById('earnings-created-actions');
+            if (!uploadedActionsEl) {
+                uploadedActionsEl = document.createElement('div');
+                uploadedActionsEl.id = 'earnings-created-actions';
+                uploadedActionsEl.style.cssText = 'display:none;gap:12px;justify-content:flex-end;margin-top:16px;';
+                uploadedActionsEl.innerHTML = `
+                    <a href="#" id="earnings-download-link" style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--color-cyan);margin-right:auto;" onclick="alert('Downloading uploaded file...');return false;"><i data-lucide="download" style="width:15px;height:15px;"></i> Download uploaded file</a>
+                    <button class="btn btn-danger btn-small" onclick="discardCommissionDetail()">Discard</button>
+                    <button class="btn btn-primary" onclick="submitCommissionDetail()">Submit for Approval</button>`;
+                actions.parentNode.insertBefore(uploadedActionsEl, actions);
+            }
+
+            if (d.status === 'created' && isMakerCommission) {
+                uploadedActionsEl.style.display = 'flex';
+                actions.style.display = 'none';
+            } else if (d.status === 'pending' && !isMakerCommission) {
+                uploadedActionsEl.style.display = 'none';
                 actions.style.display = 'flex';
                 const pendingStep = d.approvals.find(a => a.status === 'pending');
                 document.getElementById('earnings-approve-label').textContent = pendingStep ? 'Approve — ' + pendingStep.label : 'Approve';
             } else {
+                uploadedActionsEl.style.display = 'none';
                 actions.style.display = 'none';
             }
+            // Show role notice if Maker
+            let makerNoticeEl = document.getElementById('earnings-maker-notice');
+            if (!makerNoticeEl) {
+                makerNoticeEl = document.createElement('div');
+                makerNoticeEl.id = 'earnings-maker-notice';
+                makerNoticeEl.style.cssText = 'padding:8px 14px;background:rgba(255,184,0,0.06);border:1px solid rgba(255,184,0,0.25);border-radius:6px;font-size:12px;color:var(--color-amber);margin-top:12px;';
+                makerNoticeEl.textContent = 'As Maker, you cannot approve your own submission.';
+                document.getElementById('earnings-detail-actions').parentNode.insertBefore(makerNoticeEl, document.getElementById('earnings-detail-actions'));
+            }
+            makerNoticeEl.style.display = (isMakerCommission && d.status === 'pending') ? 'block' : 'none';
 
             lucide.createIcons();
         }
@@ -3361,7 +3673,73 @@
                 return;
             }
             document.getElementById('reject-earnings-modal').classList.remove('active');
-            console.log('Rejected with reason:', reason);
+            if (currentEarningsIndex === null) return;
+            const d = earningsData[currentEarningsIndex];
+            const pendingStep = d.approvals.find(a => a.status === 'pending');
+            if (pendingStep) {
+                pendingStep.status = 'rejected';
+                pendingStep.name   = 'Suzuki Hana';
+                pendingStep.email  = 'suzuki.h@torilab.ai';
+                pendingStep.date   = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+                pendingStep.reason = reason;
+            }
+            d.status    = 'rejected';
+            d.badge     = 'badge-rejected';
+            d.badgeText = 'Rejected by Approver';
+            const badge = document.getElementById('earnings-detail-badge');
+            if (badge) { badge.className = 'badge badge-rejected'; badge.textContent = 'Rejected by Approver'; }
+            document.getElementById('earnings-detail-actions').style.display = 'none';
+            document.getElementById('earnings-approval-history-rows').innerHTML = renderApprovalHistory(d.approvals);
+            lucide.createIcons();
+        }
+
+        function openApproveEarningsModal() {
+            if (currentEarningsIndex === null) return;
+            const d = earningsData[currentEarningsIndex];
+            const pendingStep = d.approvals.find(a => a.status === 'pending');
+            if (!pendingStep) return;
+            const isFinal = !d.approvals.find(a => a.status === 'waiting');
+            document.getElementById('approve-earnings-body').textContent = isFinal
+                ? 'This is the final approval step. Once confirmed, the commission file will be marked as Approved.'
+                : 'Once confirmed, this step will be marked as approved and the file will advance to the next approval step.';
+            document.getElementById('approve-earnings-detail').innerHTML =
+                `<div><span style="color:var(--color-text-muted);">Record</span>&nbsp;&nbsp;<strong>${d.id}</strong></div>
+                 <div><span style="color:var(--color-text-muted);">Cycle</span>&nbsp;&nbsp;<strong>${d.cycle}</strong></div>
+                 <div><span style="color:var(--color-text-muted);">File</span>&nbsp;&nbsp;<strong>${d.name}</strong></div>
+                 <div><span style="color:var(--color-text-muted);">Step</span>&nbsp;&nbsp;<strong>${pendingStep.label}</strong></div>`;
+            document.getElementById('approve-earnings-modal').classList.add('active');
+            lucide.createIcons();
+        }
+        function closeApproveEarningsModal(event) {
+            if (event && event.target !== document.getElementById('approve-earnings-modal')) return;
+            document.getElementById('approve-earnings-modal').classList.remove('active');
+        }
+        function confirmApproveEarnings() {
+            document.getElementById('approve-earnings-modal').classList.remove('active');
+            if (currentEarningsIndex === null) return;
+            const d = earningsData[currentEarningsIndex];
+            const pendingStep = d.approvals.find(a => a.status === 'pending');
+            if (!pendingStep) return;
+            pendingStep.status = 'approved';
+            pendingStep.name   = 'Suzuki Hana';
+            pendingStep.email  = 'suzuki.h@torilab.ai';
+            pendingStep.date   = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+
+            const nextWaiting = d.approvals.find(a => a.status === 'waiting');
+            if (nextWaiting) {
+                nextWaiting.status = 'pending';
+                document.getElementById('earnings-approve-label').textContent = 'Approve — ' + nextWaiting.label;
+            } else {
+                // All steps approved
+                d.status    = 'approved';
+                d.badge     = 'badge-approved';
+                d.badgeText = 'Approved';
+                const badge = document.getElementById('earnings-detail-badge');
+                if (badge) { badge.className = 'badge badge-approved'; badge.textContent = 'Approved'; }
+                document.getElementById('earnings-detail-actions').style.display = 'none';
+            }
+            document.getElementById('earnings-approval-history-rows').innerHTML = renderApprovalHistory(d.approvals);
+            lucide.createIcons();
         }
 
         function simulateUploadValidation() {
@@ -3798,7 +4176,7 @@
                     <option value="stripe"${c.paymentMethod==='Stripe'?' selected':''}>Stripe</option>
                 </select></div>`;
 
-            if (status === 'in-progress') {
+            if (status === 'executed') {
                 const locked = data.locked.map(c => `
                     <tr style="opacity:0.55;">
                         <td></td>
@@ -3941,14 +4319,14 @@
         const prCycleData = {
             'april2026': {
                 title: 'April 2026', meta: '1 request · ¥3,240,000 total',
-                badge: '<span class="badge badge-pending">In Progress</span>',
+                badge: '<span class="badge badge-pending">Pending</span>',
                 requests: [
                     { id:'PR-0041', receiver:'Tanaka Yuki · tanaka.y@torilab.ai', date:'Apr 11 2026', receivers:7, amount:'¥3,240,000', status:'pending', badgeClass:'badge-pending', badgeText:'Pending — Step 1 of 2', dataIndex:0 }
                 ]
             },
             'march2026': {
                 title: 'March 2026', meta: '2 requests · ¥5,660,000 total',
-                badge: '<span class="badge badge-scheduled">In Progress</span>',
+                badge: '<span class="badge badge-executed">Executed</span>',
                 requests: [
                     { id:'PR-0040', receiver:'Tanaka Yuki · tanaka.y@torilab.ai', date:'Apr 5 2026',  receivers:18, amount:'¥2,340,000', status:'completed', badgeClass:'badge-completed', badgeText:'Completed',         dataIndex:1 },
                     { id:'PR-0039', receiver:'Tanaka Yuki · tanaka.y@torilab.ai', date:'Mar 28 2026', receivers:30, amount:'¥4,100,000', status:'scheduled', badgeClass:'badge-scheduled', badgeText:'Scheduled Apr 15', dataIndex:2 },
@@ -4007,8 +4385,9 @@
             lucide.createIcons();
         }
 
-        // ── Payout Requests flat filters ─────────────────────────
+        // ── Payout Checker filters ────────────────────────────────
         function applyPRFilters() {
+            const id_q    = (document.getElementById('pr-filter-id')?.value || '').toLowerCase();
             const year    = document.getElementById('pr-filter-year').value;
             const month   = document.getElementById('pr-filter-month').value;
             const status  = document.getElementById('pr-filter-status').value;
@@ -4016,18 +4395,138 @@
             const rows    = Array.from(document.querySelectorAll('#pr-flat-body tr'));
             let visible   = 0;
             rows.forEach(row => {
-                const match = (!year    || row.dataset.year   === year)
+                const match = (!id_q    || (row.dataset.id || '').toLowerCase().includes(id_q))
+                           && (!year    || row.dataset.year   === year)
                            && (!month   || row.dataset.month  === month)
                            && (!status  || row.dataset.status === status)
-                           && (!receiver || row.dataset.receiver.includes(receiver));
+                           && (!receiver || (row.dataset.receiver || '').toLowerCase().includes(receiver));
                 row.style.display = match ? '' : 'none';
                 if (match) visible++;
             });
             document.getElementById('pr-pagination-info').textContent = `Showing 1–${visible} of ${visible} requests`;
         }
         function resetPRFilters() {
-            ['pr-filter-year','pr-filter-month','pr-filter-status','pr-filter-receiver'].forEach(id => document.getElementById(id).value = '');
+            ['pr-filter-id','pr-filter-year','pr-filter-month','pr-filter-status','pr-filter-receiver']
+                .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
             applyPRFilters();
+        }
+
+        // ── Payout Maker My Requests filters ─────────────────────
+        function applyMakerPRFilters() {
+            const id_q    = (document.getElementById('maker-filter-id')?.value || '').toLowerCase();
+            const year    = (document.getElementById('maker-filter-year')?.value || '');
+            const month   = (document.getElementById('maker-filter-month')?.value || '');
+            const status  = (document.getElementById('maker-filter-status')?.value || '').toLowerCase();
+            const dateFrom= (document.getElementById('maker-filter-date-from')?.value || '');
+            const dateTo  = (document.getElementById('maker-filter-date-to')?.value || '');
+            const rows    = Array.from(document.querySelectorAll('#maker-pr-tbody tr'));
+            rows.forEach(row => {
+                const match = (!id_q    || (row.dataset.id || '').toLowerCase().includes(id_q))
+                           && (!year    || row.dataset.year   === year)
+                           && (!month   || row.dataset.month  === month)
+                           && (!status  || (row.dataset.status || '').toLowerCase() === status)
+                           && (!dateFrom|| (row.dataset.date  || '') >= dateFrom)
+                           && (!dateTo  || (row.dataset.date  || '') <= dateTo);
+                row.style.display = match ? '' : 'none';
+            });
+        }
+        function resetMakerPRFilters() {
+            ['maker-filter-id','maker-filter-year','maker-filter-month','maker-filter-status',
+             'maker-filter-date-from','maker-filter-date-to']
+                .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            applyMakerPRFilters();
+        }
+
+        // ── Payout Executer filters ───────────────────────────────
+        function applyExecuterFilters() {
+            const id_q         = (document.getElementById('exec-filter-id')?.value || '').toLowerCase();
+            const year         = (document.getElementById('exec-filter-year')?.value || '');
+            const month        = (document.getElementById('exec-filter-month')?.value || '');
+            const status       = (document.getElementById('exec-filter-status')?.value || '').toLowerCase();
+            const submittedBy  = (document.getElementById('exec-filter-submitted-by')?.value || '').toLowerCase();
+            const submittedFrom= (document.getElementById('exec-filter-submitted-from')?.value || '');
+            const submittedTo  = (document.getElementById('exec-filter-submitted-to')?.value || '');
+            const approvedFrom = (document.getElementById('exec-filter-approved-from')?.value || '');
+            const approvedTo   = (document.getElementById('exec-filter-approved-to')?.value || '');
+            const rows  = Array.from(document.querySelectorAll('#executer-pr-tbody tr'));
+            rows.forEach(row => {
+                const match = (!id_q          || (row.dataset.id || '').toLowerCase().includes(id_q))
+                           && (!year          || row.dataset.year  === year)
+                           && (!month         || row.dataset.month === month)
+                           && (!status        || (row.dataset.status || '').toLowerCase().includes(status))
+                           && (!submittedBy   || (row.dataset.submittedBy || '').toLowerCase().includes(submittedBy))
+                           && (!submittedFrom || (row.dataset.submittedDate || '') >= submittedFrom)
+                           && (!submittedTo   || (row.dataset.submittedDate || '') <= submittedTo)
+                           && (!approvedFrom  || (row.dataset.approvedDate  || '') >= approvedFrom)
+                           && (!approvedTo    || (row.dataset.approvedDate  || '') <= approvedTo);
+                row.style.display = match ? '' : 'none';
+            });
+        }
+        function resetExecuterFilters() {
+            ['exec-filter-id','exec-filter-year','exec-filter-month','exec-filter-status',
+             'exec-filter-submitted-by','exec-filter-submitted-from','exec-filter-submitted-to',
+             'exec-filter-approved-from','exec-filter-approved-to']
+                .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            applyExecuterFilters();
+        }
+
+        // ── Commission Maker filters ──────────────────────────────
+        function applyMakerCommissionFilters() {
+            const id_q  = (document.getElementById('maker-cm-filter-id')?.value || '').toLowerCase();
+            const year  = (document.getElementById('maker-cm-filter-year')?.value || '');
+            const month = (document.getElementById('maker-cm-filter-month')?.value || '');
+            const status= (document.getElementById('maker-cm-filter-status')?.value || '');
+            const rows  = Array.from(document.querySelectorAll('#maker-commission-tbody tr'));
+            rows.forEach(row => {
+                const match = (!id_q   || (row.dataset.id || '').toLowerCase().includes(id_q))
+                           && (!year   || row.dataset.year  === year)
+                           && (!month  || row.dataset.month === month)
+                           && (!status || row.dataset.status === status);
+                row.style.display = match ? '' : 'none';
+            });
+        }
+        function resetMakerCommissionFilters() {
+            ['maker-cm-filter-id','maker-cm-filter-year','maker-cm-filter-month','maker-cm-filter-status']
+                .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            applyMakerCommissionFilters();
+        }
+
+        // ── Commission Checker filters ────────────────────────────
+        function applyCheckerCommissionFilters() {
+            const id_q = (document.getElementById('cc-filter-id')?.value || '').toLowerCase();
+            const rows = Array.from(document.querySelectorAll('#checker-commission-tbody tr'));
+            rows.forEach(row => {
+                const match = !id_q || (row.dataset.id || '').toLowerCase().includes(id_q);
+                row.style.display = match ? '' : 'none';
+            });
+        }
+        function resetCheckerCommissionFilters() {
+            ['cc-filter-id'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            applyCheckerCommissionFilters();
+        }
+
+        // ── Receivers filters ─────────────────────────────────────
+        function applyReceiverFilters() {
+            const name_q  = (document.getElementById('recv-filter-name')?.value  || '').toLowerCase();
+            const email_q = (document.getElementById('recv-filter-email')?.value || '').toLowerCase();
+            const method  = (document.getElementById('recv-filter-method')?.value|| '').toLowerCase();
+            let visible = 0;
+            Array.from(document.querySelectorAll('#receivers-table-body tr')).forEach(row => {
+                const rowSearch = (row.dataset.search  || '').toLowerCase();
+                const rowMethod = (row.dataset.payment || '').toLowerCase();
+                const match = (!name_q  || rowSearch.includes(name_q))
+                           && (!email_q || rowSearch.includes(email_q))
+                           && (!method  || rowMethod === method);
+                row.style.display = match ? '' : 'none';
+                if (match) visible++;
+            });
+            const infoEl = document.getElementById('receivers-pagination-info');
+            if (infoEl) infoEl.textContent = `Showing 1–${visible} of ${visible} receivers`;
+        }
+        function resetReceiverFilters() {
+            ['recv-filter-name','recv-filter-email','recv-filter-method']
+                .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            applyReceiverFilters();
         }
 
         // ── Payout Request data & detail ─────────────────────────
@@ -4052,18 +4551,18 @@
               ]
             },
             { id: 'PR-0040', receiver: 'Tanaka Yuki · tanaka.y@torilab.ai', date: 'Apr 5 2026',
-              rows: '18 receivers', total: '¥2,340,000', status: 'completed', isFinalStep: false,
-              badge: 'badge-completed', badgeText: 'Completed',
+              rows: '3 receivers', total: '¥375,000', status: 'ready', isFinalStep: false,
+              badge: 'badge-approved', badgeText: 'Approved — Ready to Execute',
               receivers: [
-                { name:'Tanaka Yuki',  id:'TW-10042', email:'tanaka.y@twomi.com',   paymentAccount:'tanaka.y@payoneer.com',  amount:'¥45,000',  currency:'JPY', paymentStatus:'sent', txId:'PAY-2026-040001' },
-                { name:'Suzuki Hana',  id:'TW-10087', email:'suzuki.h@twomi.com',   paymentAccount:'suzuki.h@payoneer.com',  amount:'¥120,000', currency:'JPY', paymentStatus:'sent', txId:'PAY-2026-040002' },
-                { name:'Watanabe Ryo', id:'TW-10256', email:'watanabe.r@twomi.com', paymentAccount:'watanabe.r@payoneer.com',amount:'¥210,000', currency:'JPY', paymentStatus:'sent', txId:'PAY-2026-040003' },
+                { name:'Tanaka Yuki',  id:'TW-10042', email:'tanaka.y@twomi.com',   paymentAccount:'tanaka.y@payoneer.com',  amount:'¥45,000',  currency:'JPY' },
+                { name:'Suzuki Hana',  id:'TW-10087', email:'suzuki.h@twomi.com',   paymentAccount:'suzuki.h@payoneer.com',  amount:'¥120,000', currency:'JPY' },
+                { name:'Watanabe Ryo', id:'TW-10256', email:'watanabe.r@twomi.com', paymentAccount:'watanabe.r@payoneer.com',amount:'¥210,000', currency:'JPY' },
               ],
               approvals: [
                 { label:'Created',     name:'Tanaka Yuki',    email:'tanaka.y@torilab.ai',   date:'Apr 5 2026, 14:15:00', status:'done'     },
                 { label:'Step 1 of 2', name:'Suzuki Hana',    email:'suzuki.h@torilab.ai',   date:'Apr 6 2026, 09:42:00', status:'approved' },
                 { label:'Step 2 of 2', name:'Yamamoto Kenji', email:'yamamoto.k@torilab.ai', date:'Apr 6 2026, 14:00:00', status:'approved' },
-                { label:'Execute',     name:'Suzuki Hana',    email:'suzuki.h@torilab.ai',   date:'Apr 6 2026, 16:00:00', status:'approved', executeType:'execute-now' },
+                { label:'Execute',     name:null,             email:null,                    date:null,                   status:'pending'  },
               ]
             },
             { id: 'PR-0039', receiver: 'Tanaka Yuki · tanaka.y@torilab.ai', date: 'Mar 28 2026',
@@ -4118,9 +4617,26 @@
                 { label:'Execute',     name:'Tanaka Yuki',    email:'tanaka.y@torilab.ai',   date:'Apr 12 2026, 17:00:00', status:'scheduled', scheduledAt:'May 1 2026, 09:00:00' },
               ]
             },
+            { id: 'PR-0044', receiver: 'Yamamoto Kenji · yamamoto.k@torilab.ai', date: 'May 6 2026',
+              rows: '5 receivers', total: '\u00a554,001', status: 'created',
+              badge: 'badge-created', badgeText: 'Created \u2014 awaiting submission',
+              receivers: [
+                { name:'Tanaka Yuki',    id:'TW-10042', email:'tanaka.y@twomi.com',   paymentAccount:'tanaka.y@payoneer.com',   amount:'\u00a58,504',  currency:'JPY' },
+                { name:'Suzuki Hana',    id:'TW-10087', email:'suzuki.h@twomi.com',   paymentAccount:'suzuki.h@payoneer.com',   amount:'\u00a522,680', currency:'JPY' },
+                { name:'Ito Sakura',     id:'TW-10312', email:'ito.s@twomi.com',      paymentAccount:'ito.s@payoneer.com',      amount:'\u00a512,757', currency:'JPY' },
+                { name:'Hayashi Yuna',   id:'TW-10421', email:'hayashi.y@twomi.com',  paymentAccount:'hayashi.y@payoneer.com',  amount:'\u00a59,820',  currency:'JPY' },
+                { name:'Watanabe Ryo',   id:'TW-10256', email:'watanabe.r@twomi.com', paymentAccount:'watanabe.r@payoneer.com', amount:'\u00a5240',    currency:'JPY' },
+              ],
+              approvals: [
+                { label:'Created',     name:'Yamamoto Kenji', email:'yamamoto.k@torilab.ai', date:'May 6 2026, 10:00:00', status:'done'    },
+                { label:'Step 1 of 2', name:null, email:null, date:null, status:'waiting' },
+                { label:'Step 2 of 2', name:null, email:null, date:null, status:'waiting' },
+                { label:'Execute',     name:null, email:null, date:null, status:'waiting' },
+              ]
+            },
             { id: 'PR-0043', receiver: 'Yamamoto Kenji · yamamoto.k@torilab.ai', date: 'Apr 13 2026',
-              rows: '5 receivers', total: '¥76,394', status: 'in-progress',
-              badge: 'badge-scheduled', badgeText: 'In Progress',
+              rows: '5 receivers', total: '¥76,394', status: 'executed',
+              badge: 'badge-executed', badgeText: 'Executed',
               receivers: [
                 { name:'Tanaka Yuki',    id:'TW-10042', email:'tanaka.y@twomi.com',    paymentAccount:'tanaka.y@payoneer.com',   amount:'¥8,504',  currency:'JPY', paymentStatus:'in-progress', txId:'PAY-2026-043001' },
                 { name:'Suzuki Hana',    id:'TW-10087', email:'suzuki.h@twomi.com',    paymentAccount:'suzuki.h@payoneer.com',   amount:'¥22,680', currency:'JPY', paymentStatus:'in-progress', txId:'PAY-2026-043002' },
@@ -4198,8 +4714,8 @@
                 </div>`;
 
             const headers = showPayoneer
-                ? '<th style="width:36px;"><input type="checkbox" checked onchange="toggleAllPRReceivers(this)" style="accent-color:var(--color-cyan);"></th><th>Receiver</th><th>Twomi ID</th><th>Receiver Email</th><th>Payment Account</th><th>Amount</th><th>Currency</th><th>Transaction ID</th><th>Payment Status</th><th>Action</th>'
-                : '<th style="width:36px;"><input type="checkbox" checked onchange="toggleAllPRReceivers(this)" style="accent-color:var(--color-cyan);"></th><th>Receiver</th><th>Twomi ID</th><th>Receiver Email</th><th>Payment Account</th><th>Amount</th><th>Currency</th>';
+                ? '<th>Receiver</th><th>Twomi ID</th><th>Receiver Email</th><th>Payment Account</th><th>Amount</th><th>Currency</th><th>Transaction ID</th><th>Payment Status</th><th>Action</th>'
+                : '<th>Receiver</th><th>Twomi ID</th><th>Receiver Email</th><th>Payment Account</th><th>Amount</th><th>Currency</th>';
 
             const rows = d.receivers.map(c => {
                 let statusCell = '';
@@ -4255,7 +4771,6 @@
 
                 const emailCell = `<td style="font-size:12px;color:var(--color-text-muted);">${c.email || '—'}</td>`;
                 return `<tr class="receiver-row" data-name="${c.name.toLowerCase()}" data-id="${c.id.toLowerCase()}" data-email="${(c.email||'').toLowerCase()}" data-pstatus="${dataStatus}"${rowBg}>
-                    <td><input type="checkbox" class="pr-receiver-check" checked style="accent-color:var(--color-cyan);"></td>
                     <td>${c.name}</td><td>${c.id}</td>${emailCell}<td>${c.payoneer}</td><td>${c.amount}</td><td>${c.currency}</td>${txCell}${statusCell}${actionCell}
                 </tr>`;
             }).join('');
@@ -4367,27 +4882,78 @@
 
             document.getElementById('pr-approval-history-rows').innerHTML = renderApprovalHistory(d.approvals);
 
-            // Approval action buttons — only when pending
+            // Role detection from origin page
+            const isMaker   = ['payout-pool'].includes(prDetailOrigin);
+            const isChecker = ['payout-requests'].includes(prDetailOrigin);
+            const isExecuter= ['payout-executer'].includes(prDetailOrigin);
+
+            // Submit/Discard panel for Created status (only visible to Maker)
+            let createdActionsEl = document.getElementById('pr-created-actions');
+            if (!createdActionsEl) {
+                createdActionsEl = document.createElement('div');
+                createdActionsEl.id = 'pr-created-actions';
+                createdActionsEl.style.cssText = 'display:none;gap:12px;justify-content:flex-end;margin-top:16px;';
+                createdActionsEl.innerHTML = `<button class="btn btn-danger btn-small" onclick="discardPayoutDetail()">Discard</button><button class="btn btn-primary" onclick="submitPayoutDetail()">Submit for Approval</button>`;
+                document.getElementById('pr-detail-actions').parentNode.insertBefore(createdActionsEl, document.getElementById('pr-detail-actions'));
+            }
+            createdActionsEl.style.display = (d.status === 'created' && isMaker) ? 'flex' : 'none';
+
+            // Approval buttons: only Checker can approve; Maker and Executer cannot
             const actions = document.getElementById('pr-detail-actions');
-            // Show Approve/Reject only when pending on an approval step (not Execute)
             const pendingStep = d.approvals.find(a => a.status === 'pending');
-            if (d.status === 'pending' && pendingStep && pendingStep.label !== 'Execute') {
+            const canApprove = isChecker;
+            if (d.status === 'pending' && pendingStep && pendingStep.label !== 'Execute' && canApprove) {
                 actions.style.display = 'flex';
                 document.getElementById('pr-approve-label').textContent = 'Approve — ' + pendingStep.label;
             } else {
                 actions.style.display = 'none';
             }
 
-            // Execute/Schedule panel — shown when ready to execute (Execute step pending) OR already scheduled
+            // Role notice
+            let prNoticeEl = document.getElementById('pr-role-notice');
+            if (!prNoticeEl) {
+                prNoticeEl = document.createElement('div');
+                prNoticeEl.id = 'pr-role-notice';
+                prNoticeEl.style.cssText = 'padding:8px 14px;background:rgba(255,184,0,0.06);border:1px solid rgba(255,184,0,0.25);border-radius:6px;font-size:12px;color:var(--color-amber);margin-top:12px;';
+                document.getElementById('pr-detail-actions').parentNode.insertBefore(prNoticeEl, document.getElementById('pr-detail-actions'));
+            }
+            if (isMaker && d.status === 'pending') {
+                prNoticeEl.style.display = 'block';
+                prNoticeEl.textContent = 'As Maker, you cannot approve your own request. Awaiting Checker review.';
+            } else {
+                prNoticeEl.style.display = 'none';
+            }
+
+            // Execute/Schedule panel: ONLY Executer can act; Checker and Maker are view-only
             const execPanel      = document.getElementById('pr-execute-panel');
             const scheduledPanel = document.getElementById('pr-scheduled-panel');
-            const hasExecutePermission = true; // simulate: current user has Execute permission
+            const canExecute     = isExecuter; // Only Executer can execute or schedule
             const executeStep    = d.approvals.find(a => a.label === 'Execute');
-            const showExecPanel  = hasExecutePermission && executeStep && executeStep.status === 'pending';
+            const showExecPanel  = canExecute && executeStep && executeStep.status === 'pending';
             execPanel.style.display      = showExecPanel ? 'block' : 'none';
-            scheduledPanel.style.display = (d.status === 'scheduled') ? 'block' : 'none';
+            // Scheduled panel: only shown to Executer (can modify) or others as read-only label
+            scheduledPanel.style.display = (d.status === 'scheduled' && isExecuter) ? 'block' : 'none';
+            // Modify button visible only to Executer
+            const modifyBtn = document.querySelector('#pr-scheduled-panel button');
+            if (modifyBtn) modifyBtn.style.display = isExecuter ? '' : 'none';
             if (d.status === 'scheduled' && d.scheduledAt) {
                 document.getElementById('pr-scheduled-time').textContent = d.scheduledAt;
+            }
+            // Show notice to Checker or Maker when execute step is pending but they cannot act
+            let execNoticeEl = document.getElementById('pr-exec-notice');
+            if (!execNoticeEl) {
+                execNoticeEl = document.createElement('div');
+                execNoticeEl.id = 'pr-exec-notice';
+                execNoticeEl.style.cssText = 'padding:8px 14px;background:rgba(255,184,0,0.06);border:1px solid rgba(255,184,0,0.25);border-radius:6px;font-size:12px;color:var(--color-amber);margin-top:12px;';
+                execPanel.parentNode.insertBefore(execNoticeEl, execPanel);
+            }
+            if (!isExecuter && executeStep && executeStep.status === 'pending') {
+                execNoticeEl.style.display = 'block';
+                execNoticeEl.textContent = isMaker
+                    ? 'This request has been approved and is waiting for Executer to submit to Payoneer.'
+                    : 'You can approve or reject requests but cannot execute or schedule them.';
+            } else {
+                execNoticeEl.style.display = 'none';
             }
 
             // Reset exec timing UI
@@ -4446,6 +5012,60 @@
             if (schLabel)  { schLabel.style.borderColor  = radio.value === 'schedule' ? 'var(--color-cyan)' : 'var(--color-border)'; schLabel.style.borderWidth  = radio.value === 'schedule' ? '2px' : '1px'; }
         }
 
+        // ── Execute Confirm modal ──────────────────────────────────
+        function openExecuteConfirmModal() {
+            if (currentPRIndex === null) return;
+            const d      = payoutRequestData[currentPRIndex];
+            const timing = document.querySelector('input[name="exec-timing"]:checked')?.value;
+
+            // Validate schedule date before opening modal
+            if (timing === 'schedule') {
+                const dt = document.getElementById('exec-schedule-dt').value;
+                if (!dt) {
+                    document.getElementById('exec-schedule-error').style.display = 'block';
+                    return;
+                }
+            }
+
+            const isSchedule = timing === 'schedule';
+            const titleEl    = document.getElementById('execute-confirm-title');
+            const bodyEl     = document.getElementById('execute-confirm-body');
+            const detailEl   = document.getElementById('execute-confirm-detail');
+            const actionLbl  = document.getElementById('execute-confirm-action-label');
+
+            if (isSchedule) {
+                const dt  = document.getElementById('exec-schedule-dt').value;
+                const fmt = new Date(dt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+                titleEl.textContent  = 'Confirm Schedule';
+                bodyEl.textContent   = 'This request will be submitted to Payoneer automatically at the scheduled time. You can modify the schedule before it executes.';
+                actionLbl.textContent = 'Confirm Schedule';
+                detailEl.innerHTML   = `<div><span style="color:var(--color-text-muted);">Request</span>&nbsp;&nbsp;<strong>${d.id}</strong></div>
+                    <div><span style="color:var(--color-text-muted);">Receivers</span>&nbsp;&nbsp;<strong>${d.rows}</strong></div>
+                    <div><span style="color:var(--color-text-muted);">Total Amount</span>&nbsp;&nbsp;<strong style="color:var(--color-cyan);">${d.total}</strong></div>
+                    <div><span style="color:var(--color-text-muted);">Scheduled for</span>&nbsp;&nbsp;<strong style="color:var(--color-cyan);">${fmt}</strong></div>`;
+            } else {
+                titleEl.textContent  = 'Confirm Execution';
+                bodyEl.textContent   = 'This will immediately submit the payout request to Payoneer. This action cannot be undone.';
+                actionLbl.textContent = 'Execute Now';
+                detailEl.innerHTML   = `<div><span style="color:var(--color-text-muted);">Request</span>&nbsp;&nbsp;<strong>${d.id}</strong></div>
+                    <div><span style="color:var(--color-text-muted);">Receivers</span>&nbsp;&nbsp;<strong>${d.rows}</strong></div>
+                    <div><span style="color:var(--color-text-muted);">Total Amount</span>&nbsp;&nbsp;<strong style="color:var(--color-cyan);">${d.total}</strong></div>
+                    <div><span style="color:var(--color-text-muted);">Timing</span>&nbsp;&nbsp;<strong>Execute Immediately</strong></div>`;
+            }
+
+            document.getElementById('execute-confirm-modal').classList.add('active');
+            lucide.createIcons();
+        }
+        function closeExecuteConfirmModal(event) {
+            if (event && event.target !== document.getElementById('execute-confirm-modal')) return;
+            document.getElementById('execute-confirm-modal').classList.remove('active');
+        }
+
+        function doExecutePR() {
+            document.getElementById('execute-confirm-modal').classList.remove('active');
+            confirmExecutePR();
+        }
+
         function confirmExecutePR() {
             if (currentPRIndex === null) return;
             const d = payoutRequestData[currentPRIndex];
@@ -4465,9 +5085,9 @@
                 document.getElementById('pr-scheduled-panel').style.display = 'block';
                 document.getElementById('pr-scheduled-time').textContent    = fmt;
             } else {
-                d.status    = 'completed';
-                d.badge     = 'badge-completed';
-                d.badgeText = 'Submitted to Payoneer';
+                d.status    = 'executed';
+                d.badge     = 'badge-executed';
+                d.badgeText = 'Executed';
                 document.getElementById('pr-execute-panel').style.display = 'none';
             }
             const badge = document.getElementById('payout-request-badge');
@@ -4599,9 +5219,21 @@
                     d.badge     = 'badge-approved';
                     d.badgeText = 'Approved — Awaiting Execution';
                     document.getElementById('pr-detail-actions').style.display = 'none';
-                    // Show Execute panel (only if user has Execute permission — simulated as true)
-                    const hasExecutePermission = true;
-                    document.getElementById('pr-execute-panel').style.display = hasExecutePermission ? 'block' : 'none';
+                    // Checker CANNOT execute — only Executer role can
+                    const isCurrChecker = ['payout-requests'].includes(prDetailOrigin);
+                    document.getElementById('pr-execute-panel').style.display = isCurrChecker ? 'none' : 'block';
+                    if (isCurrChecker) {
+                        // Show notice that it's been handed to Executer
+                        let handedOffEl = document.getElementById('pr-handed-off-notice');
+                        if (!handedOffEl) {
+                            handedOffEl = document.createElement('div');
+                            handedOffEl.id = 'pr-handed-off-notice';
+                            handedOffEl.style.cssText = 'padding:10px 14px;background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.25);border-radius:6px;font-size:13px;color:var(--color-green);margin-top:16px;';
+                            handedOffEl.textContent = '✓ All approvals complete. The request has been handed to the Executor Group for execution.';
+                            document.getElementById('pr-execute-panel').parentNode.insertBefore(handedOffEl, document.getElementById('pr-execute-panel'));
+                        }
+                        handedOffEl.style.display = 'block';
+                    }
                     const nowRadio = document.querySelector('input[name="exec-timing"][value="now"]');
                     if (nowRadio) { nowRadio.checked = true; onExecTimingChange(nowRadio); }
                 } else {
@@ -5040,11 +5672,11 @@
         const creatorHistory = {
             tanaka: {
                 name:'Tanaka Yuki', twomiId:'TW-10042', email:'tanaka.y@twomi.com',
-                paymentAccount:'tanaka.y@payoneer.com', totalPaid:'¥516,820', unpaid:'¥8,504',
-                totalEarned:'¥525,324', cycles:6,
+                paymentAccount:'tanaka.y@payoneer.com',
+                totalBalance:'¥17,008', lockedBalance:'¥8,504', lockedDetail:'Locked in PR-0041 (Pending)',
+                availableBalance:'¥8,504', totalPaid:'¥53,504', cycles:3,
                 paymentMethods:[
-                    { method:'Payoneer', account:'tanaka.y@payoneer.com', isDefault:true,  status:'linked'  },
-                    { method:'Stripe',   account:'tanaka.y@stripe.com',   isDefault:false, status:'linked'  },
+                    { method:'Payoneer', account:'tanaka.y@payoneer.com', isDefault:true  },
                 ],
                 history:[
                     { cycle:'April 2026',    request:'PR-0043', tx:'PAY-2026-043001', amount:'¥8,504',  status:'in-progress', date:'Apr 13 2026' },
@@ -5052,28 +5684,138 @@
                     { cycle:'February 2026', request:'PR-0038', tx:'PAY-2026-038001', amount:'¥8,504',  status:'sent',        date:'Feb 16 2026' },
                 ],
                 cashflow:[
-                    { date:'Apr 11 2026', cycle:'April 2026',    type:'earnings', desc:'Earnings approved — April 2026',           credit:8504,   debit:0,     balance:8504  },
-                    { date:'Apr 13 2026', cycle:'April 2026',    type:'payout',   desc:'Payout submitted — PR-0043 (In Progress)',  credit:0,      debit:8504,  balance:0     },
-                    { date:'Apr 6 2026',  cycle:'April 2026',    type:'payout',   desc:'Payout sent — PR-0040 (PAY-2026-040001)',   credit:0,      debit:45000, balance:-45000 },
-                    { date:'Mar 28 2026', cycle:'April 2026',    type:'earnings', desc:'Earnings approved — April 2026 (batch 2)',  credit:45000,  debit:0,     balance:0     },
-                    { date:'Feb 12 2026', cycle:'February 2026', type:'earnings', desc:'Earnings approved — February 2026',         credit:8504,   debit:0,     balance:8504  },
-                    { date:'Feb 16 2026', cycle:'February 2026', type:'payout',   desc:'Payout sent — PR-0038 (PAY-2026-038001)',   credit:0,      debit:8504,  balance:0     },
+                    { date:'May 6 2026',  cycle:'May 2026',    type:'earnings', desc:'Earnings approved — May 2026 (CM-0005)',          credit:8504,  debit:0,    balance:17008 },
+                    { date:'Apr 11 2026', cycle:'April 2026',  type:'earnings', desc:'Earnings approved — April 2026 (CM-0004)',         credit:8504,  debit:0,    balance:8504  },
+                    { date:'Apr 13 2026', cycle:'April 2026',  type:'locked',   desc:'Locked in PR-0041 — awaiting approval',           credit:0,     debit:0,    balance:8504  },
+                    { date:'Apr 13 2026', cycle:'April 2026',  type:'payout',   desc:'Payout executed — PR-0043 (PAY-2026-043001)',      credit:0,     debit:8504, balance:0     },
+                    { date:'Apr 6 2026',  cycle:'April 2026',  type:'payout',   desc:'Payout sent — PR-0040 (PAY-2026-040001)',          credit:0,     debit:45000,balance:0     },
+                    { date:'Mar 28 2026', cycle:'March 2026',  type:'earnings', desc:'Earnings approved — March 2026 (CM-0003)',         credit:45000, debit:0,    balance:45000 },
+                    { date:'Feb 12 2026', cycle:'Feb 2026',    type:'earnings', desc:'Earnings approved — February 2026 (CM-0002)',      credit:8504,  debit:0,    balance:8504  },
+                    { date:'Feb 16 2026', cycle:'Feb 2026',    type:'payout',   desc:'Payout sent — PR-0038 (PAY-2026-038001)',          credit:0,     debit:8504, balance:0     },
+                ]
+            },
+            suzuki: {
+                name:'Suzuki Hana', twomiId:'TW-10087', email:'suzuki.h@twomi.com',
+                paymentAccount:'suzuki.h@payoneer.com',
+                totalBalance:'¥45,360', lockedBalance:'¥22,680', lockedDetail:'Locked in PR-0041 (Pending)',
+                availableBalance:'¥22,680', totalPaid:'¥22,680', cycles:2,
+                paymentMethods:[
+                    { method:'Payoneer', account:'suzuki.h@payoneer.com', isDefault:true },
+                ],
+                history:[
+                    { cycle:'April 2026', request:'PR-0043', tx:'PAY-2026-043002', amount:'¥22,680', status:'in-progress', date:'Apr 13 2026' },
+                ],
+                cashflow:[
+                    { date:'May 6 2026',  cycle:'May 2026',   type:'earnings', desc:'Earnings approved — May 2026 (CM-0005)',     credit:22680, debit:0,    balance:45360 },
+                    { date:'Apr 11 2026', cycle:'April 2026', type:'earnings', desc:'Earnings approved — April 2026 (CM-0004)',   credit:22680, debit:0,    balance:22680 },
+                    { date:'Apr 13 2026', cycle:'April 2026', type:'locked',   desc:'Locked in PR-0041 — awaiting approval',      credit:0,     debit:0,    balance:22680 },
+                    { date:'Apr 13 2026', cycle:'April 2026', type:'payout',   desc:'Payout executed — PR-0043 (PAY-2026-043002)',credit:0,     debit:22680,balance:0     },
+                ]
+            },
+            yamamoto: {
+                name:'Yamamoto Kenji', twomiId:'TW-10134', email:'yamamoto.k@twomi.com',
+                paymentAccount:'yamamoto.k@payoneer.com',
+                totalBalance:'¥14,742', lockedBalance:'¥14,742', lockedDetail:'Locked in PR-0041 (Pending)',
+                availableBalance:'¥0', totalPaid:'¥14,742', cycles:1,
+                paymentMethods:[
+                    { method:'Payoneer', account:'yamamoto.k@payoneer.com', isDefault:true },
+                ],
+                history:[
+                    { cycle:'April 2026', request:'PR-0043', tx:'PAY-2026-043003', amount:'¥14,742', status:'in-progress', date:'Apr 13 2026' },
+                ],
+                cashflow:[
+                    { date:'Apr 11 2026', cycle:'April 2026', type:'earnings', desc:'Earnings approved — April 2026 (CM-0004)',   credit:14742, debit:0,    balance:14742 },
+                    { date:'Apr 13 2026', cycle:'April 2026', type:'locked',   desc:'Locked in PR-0041 — awaiting approval',      credit:0,     debit:0,    balance:14742 },
+                    { date:'Apr 13 2026', cycle:'April 2026', type:'payout',   desc:'Payout executed — PR-0043 (PAY-2026-043003)',credit:0,     debit:14742,balance:0     },
+                ]
+            },
+            sato: {
+                name:'Sato Mika', twomiId:'TW-10201', email:'sato.m@twomi.com',
+                paymentAccount:'sato.m@payoneer.com',
+                totalBalance:'¥18,711', lockedBalance:'¥6,237', lockedDetail:'Locked in PR-0041 (Pending)',
+                availableBalance:'¥12,474', totalPaid:'¥6,237', cycles:2,
+                paymentMethods:[
+                    { method:'Payoneer', account:'sato.m@payoneer.com', isDefault:true },
+                ],
+                history:[
+                    { cycle:'April 2026', request:'PR-0043', tx:'PAY-2026-043004', amount:'¥6,237', status:'in-progress', date:'Apr 13 2026' },
+                ],
+                cashflow:[
+                    { date:'May 6 2026',  cycle:'May 2026',   type:'earnings', desc:'Earnings approved — May 2026 (CM-0005)',     credit:12474, debit:0,   balance:18711 },
+                    { date:'Apr 11 2026', cycle:'April 2026', type:'earnings', desc:'Earnings approved — April 2026 (CM-0004)',   credit:6237,  debit:0,   balance:6237  },
+                    { date:'Apr 13 2026', cycle:'April 2026', type:'locked',   desc:'Locked in PR-0041 — awaiting approval',      credit:0,     debit:0,   balance:6237  },
+                    { date:'Apr 13 2026', cycle:'April 2026', type:'payout',   desc:'Payout executed — PR-0043 (PAY-2026-043004)',credit:0,     debit:6237,balance:0     },
+                ]
+            },
+            watanabe: {
+                name:'Watanabe Ryo', twomiId:'TW-10256', email:'watanabe.r@twomi.com',
+                paymentAccount:'watanabe.r@payoneer.com',
+                totalBalance:'¥39,690', lockedBalance:'¥39,690', lockedDetail:'Locked in PR-0041 (Pending)',
+                availableBalance:'¥0', totalPaid:'¥24,231', cycles:2,
+                paymentMethods:[
+                    { method:'Payoneer', account:'watanabe.r@payoneer.com', isDefault:true },
+                ],
+                history:[
+                    { cycle:'April 2026', request:'PR-0043', tx:'PAY-2026-043005', amount:'¥24,231', status:'in-progress', date:'Apr 13 2026' },
+                ],
+                cashflow:[
+                    { date:'Apr 11 2026', cycle:'April 2026', type:'earnings', desc:'Earnings approved — April 2026 (CM-0004)',    credit:39690, debit:0,    balance:39690 },
+                    { date:'Apr 13 2026', cycle:'April 2026', type:'locked',   desc:'Locked in PR-0041 — awaiting approval',       credit:0,     debit:0,    balance:39690 },
+                    { date:'Apr 13 2026', cycle:'April 2026', type:'payout',   desc:'Payout executed — PR-0043 (PAY-2026-043005)', credit:0,     debit:24231,balance:15459 },
+                ]
+            },
+            ito: {
+                name:'Ito Sakura', twomiId:'TW-10312', email:'ito.s@twomi.com',
+                paymentAccount:'ito.s@payoneer.com',
+                totalBalance:'¥25,514', lockedBalance:'¥12,757', lockedDetail:'Locked in PR-0041 (Pending)',
+                availableBalance:'¥12,757', totalPaid:'¥12,757', cycles:2,
+                paymentMethods:[
+                    { method:'Payoneer', account:'ito.s@payoneer.com', isDefault:true },
+                ],
+                history:[
+                    { cycle:'March 2026', request:'PR-0039', tx:'PAY-2026-039006', amount:'¥12,757', status:'sent', date:'Mar 28 2026' },
+                ],
+                cashflow:[
+                    { date:'May 6 2026',  cycle:'May 2026',   type:'earnings', desc:'Earnings approved — May 2026 (CM-0005)',     credit:12757, debit:0,    balance:25514 },
+                    { date:'Mar 11 2026', cycle:'March 2026', type:'earnings', desc:'Earnings approved — March 2026 (CM-0003)',   credit:12757, debit:0,    balance:12757 },
+                    { date:'Mar 28 2026', cycle:'March 2026', type:'locked',   desc:'Locked in PR-0039 — awaiting approval',      credit:0,     debit:0,    balance:12757 },
+                    { date:'Mar 28 2026', cycle:'March 2026', type:'payout',   desc:'Payout sent — PR-0039 (PAY-2026-039006)',    credit:0,     debit:12757,balance:0     },
                 ]
             },
             nakamura: {
                 name:'Nakamura Daiki', twomiId:'TW-10389', email:'nakamura.d@twomi.com',
-                paymentAccount:null, totalPaid:'¥29,295', unpaid:'¥29,295',
-                totalEarned:'¥58,590', cycles:2,
+                paymentAccount:null,
+                totalBalance:'¥29,295', lockedBalance:'¥0', lockedDetail:'No active payout request',
+                availableBalance:'¥29,295', totalPaid:'¥0', cycles:0,
                 paymentMethods:[],
                 history:[
-                    { cycle:'January 2026',  request:'PR-0039', tx:'—',              amount:'¥29,295', status:'skipped',  date:'—'           },
-                    { cycle:'February 2026', request:'PR-0038', tx:'PAY-2026-038003',amount:'¥29,295', status:'resolved', date:'Feb 16 2026' },
+                    { cycle:'January 2026',  request:'PR-0039', tx:'—',               amount:'¥29,295', status:'skipped',  date:'—'           },
+                    { cycle:'February 2026', request:'PR-0038', tx:'PAY-2026-038003',  amount:'¥29,295', status:'resolved', date:'Feb 16 2026' },
                 ],
                 cashflow:[
-                    { date:'Jan 31 2026', cycle:'January 2026',  type:'earnings', desc:'Earnings approved — January 2026',   credit:29295, debit:0,     balance:29295 },
-                    { date:'—',          cycle:'January 2026',  type:'skipped',  desc:'Skipped in PR-0039 — no payment method linked', credit:0, debit:0, balance:29295 },
-                    { date:'Feb 12 2026', cycle:'February 2026', type:'earnings', desc:'Earnings approved — February 2026',  credit:29295, debit:0,     balance:58590 },
-                    { date:'Feb 16 2026', cycle:'February 2026', type:'payout',   desc:'Payout resolved — PR-0038 (PAY-2026-038003)', credit:0, debit:29295, balance:29295 },
+                    { date:'Jan 31 2026', cycle:'January 2026',  type:'earnings', desc:'Earnings approved — January 2026 (CM-0001)',              credit:29295, debit:0,    balance:29295 },
+                    { date:'—',          cycle:'January 2026',  type:'skipped',  desc:'Skipped in PR-0039 — no payment method linked',           credit:0,     debit:0,    balance:29295 },
+                    { date:'Feb 12 2026', cycle:'Feb 2026',      type:'earnings', desc:'Earnings approved — February 2026 (CM-0002)',             credit:29295, debit:0,    balance:58590 },
+                    { date:'Feb 16 2026', cycle:'Feb 2026',      type:'payout',   desc:'Payout resolved — PR-0038 (PAY-2026-038003)',             credit:0,     debit:29295,balance:29295 },
+                ]
+            },
+            hayashi: {
+                name:'Hayashi Yuna', twomiId:'TW-10421', email:'hayashi.y@twomi.com',
+                paymentAccount:'hayashi.y@payoneer.com',
+                totalBalance:'¥26,640', lockedBalance:'¥16,820', lockedDetail:'Locked in PR-0041 (Pending)',
+                availableBalance:'¥9,820', totalPaid:'¥16,820', cycles:2,
+                paymentMethods:[
+                    { method:'Payoneer', account:'hayashi.y@payoneer.com', isDefault:true },
+                ],
+                history:[
+                    { cycle:'February 2026', request:'PR-0038', tx:'PAY-2026-038004', amount:'¥16,820', status:'failed',  date:'Feb 16 2026' },
+                ],
+                cashflow:[
+                    { date:'May 6 2026',  cycle:'May 2026',   type:'earnings', desc:'Earnings approved — May 2026 (CM-0005)',      credit:9820,  debit:0,    balance:26640 },
+                    { date:'Apr 11 2026', cycle:'April 2026', type:'earnings', desc:'Earnings approved — April 2026 (CM-0004)',    credit:16820, debit:0,    balance:16820 },
+                    { date:'Apr 13 2026', cycle:'April 2026', type:'locked',   desc:'Locked in PR-0041 — awaiting approval',       credit:0,     debit:0,    balance:16820 },
+                    { date:'Feb 12 2026', cycle:'Feb 2026',   type:'earnings', desc:'Earnings approved — February 2026 (CM-0002)', credit:16820, debit:0,    balance:16820 },
+                    { date:'Feb 16 2026', cycle:'Feb 2026',   type:'payout',   desc:'Payment failed — PR-0038 (PAY-2026-038004)',  credit:0,     debit:0,    balance:16820 },
                 ]
             },
         };
@@ -5101,16 +5843,17 @@
         }
         function openCreatorDetail(key) {
             const d = creatorHistory[key] || creatorHistory['tanaka'];
-            document.getElementById('cd-name').textContent      = d.name;
-            document.getElementById('cd-meta').textContent      = `${d.twomiId} · ${d.email}`;
-            document.getElementById('cd-total-paid').textContent = d.totalPaid;
-            document.getElementById('cd-unpaid').textContent    = d.unpaid;
-            document.getElementById('cd-cycles').textContent    = d.cycles;
-            document.getElementById('cd-payoneer-badge').innerHTML = d.payoneer
-                ? `<span class="badge badge-approved" style="font-size:11px;">✓ Linked — ${d.payoneer}</span>`
-                : `<span class="badge" style="font-size:11px;background:rgba(255,184,0,0.1);color:var(--color-amber);">⚠ Not Linked</span>`;
-            // Total Earned
-            document.getElementById('cd-total-earned').textContent = d.totalEarned || '—';
+            document.getElementById('cd-name').textContent          = d.name;
+            document.getElementById('cd-meta').textContent          = `${d.twomiId} · ${d.email}`;
+            document.getElementById('cd-total-balance').textContent = d.totalBalance    || '¥0';
+            document.getElementById('cd-locked-balance').textContent= d.lockedBalance   || '¥0';
+            document.getElementById('cd-locked-detail').textContent = d.lockedDetail    || 'In active payout request';
+            document.getElementById('cd-available-balance').textContent = d.availableBalance || '¥0';
+            document.getElementById('cd-total-paid').textContent    = d.totalPaid       || '¥0';
+            document.getElementById('cd-cycles').textContent        = (d.cycles || 0) + ' payout cycle' + (d.cycles !== 1 ? 's' : '');
+            document.getElementById('cd-payoneer-badge').innerHTML  = d.paymentAccount
+                ? `<span class="badge badge-approved" style="font-size:11px;">✓ Payoneer linked — ${d.paymentAccount}</span>`
+                : `<span class="badge" style="font-size:11px;background:rgba(255,184,0,0.1);color:var(--color-amber);">⚠ No payment method linked</span>`;
 
             // Payment Methods
             const pmList = document.getElementById('cd-pm-list');
@@ -5157,7 +5900,9 @@
                     ? `<span class="badge badge-approved" style="font-size:10px;">Earnings</span>`
                     : cf.type === 'payout'
                         ? `<span class="badge badge-pending" style="font-size:10px;">Payout</span>`
-                        : `<span class="badge" style="font-size:10px;background:rgba(255,184,0,0.1);color:var(--color-amber);">Skipped</span>`;
+                        : cf.type === 'locked'
+                            ? `<span class="badge badge-created" style="font-size:10px;">Locked</span>`
+                            : `<span class="badge" style="font-size:10px;background:rgba(255,184,0,0.1);color:var(--color-amber);">Skipped</span>`;
                 const debit  = cf.debit  ? `<td style="text-align:right;color:var(--color-red);font-weight:600;">−¥${cf.debit.toLocaleString()}</td>`  : `<td style="text-align:right;color:var(--color-text-muted);">—</td>`;
                 const credit = cf.credit ? `<td style="text-align:right;color:var(--color-green);font-weight:600;">+¥${cf.credit.toLocaleString()}</td>` : `<td style="text-align:right;color:var(--color-text-muted);">—</td>`;
                 const balColor = cf.balance > 0 ? 'var(--color-amber)' : 'var(--color-green)';
@@ -5407,6 +6152,103 @@
             alert('Saved. Allowed domains: ' + domains.join(', '));
         }
 
+
+        // ── Submit / Discard modal system ─────────────────────────
+        let _submitCallback = null;
+        let _discardCallback = null;
+
+        function openSubmitModal(title, body, onConfirm) {
+            _submitCallback = onConfirm;
+            document.getElementById('submit-modal-title').textContent = title;
+            document.getElementById('submit-modal-body').textContent  = body;
+            document.getElementById('submit-confirm-modal').classList.add('active');
+            lucide.createIcons();
+        }
+        function closeSubmitModal(event) {
+            if (event && event.target !== document.getElementById('submit-confirm-modal')) return;
+            document.getElementById('submit-confirm-modal').classList.remove('active');
+        }
+        function executeSubmit() {
+            document.getElementById('submit-confirm-modal').classList.remove('active');
+            if (_submitCallback) _submitCallback();
+            _submitCallback = null;
+        }
+
+        function openDiscardModal(title, body, onConfirm) {
+            _discardCallback = onConfirm;
+            document.getElementById('discard-modal-title').textContent = title;
+            document.getElementById('discard-modal-body').textContent  = body;
+            document.getElementById('discard-confirm-modal').classList.add('active');
+            lucide.createIcons();
+        }
+        function closeDiscardModal(event) {
+            if (event && event.target !== document.getElementById('discard-confirm-modal')) return;
+            document.getElementById('discard-confirm-modal').classList.remove('active');
+        }
+        function executeDiscard() {
+            document.getElementById('discard-confirm-modal').classList.remove('active');
+            if (_discardCallback) _discardCallback();
+            _discardCallback = null;
+        }
+
+        // ── Commission Maker Submit / Discard ─────────────────────
+        function submitCommissionDetail() {
+            openSubmitModal(
+                'Submit Commission File',
+                'Once submitted, this file will enter the approval workflow. You will not be able to edit or withdraw it.',
+                () => {
+                    // Update earnings detail badge
+                    const badge = document.getElementById('earnings-detail-badge');
+                    if (badge) { badge.className = 'badge badge-pending'; badge.textContent = 'Pending — Step 1 of 2'; }
+                    document.getElementById('earnings-created-actions').style.display = 'none';
+                    // Update the data
+                    if (typeof earningsDetailOrigin !== 'undefined') {
+                        const d = earningsData[earningsData.findIndex(e => e.status === 'created')];
+                        if (d) { d.status = 'pending'; d.badge = 'badge-pending'; d.badgeText = 'Pending — Step 1 of 2'; d.approvals[1].status = 'pending'; d.approvals[2].status = 'waiting'; }
+                    }
+                    document.getElementById('earnings-approval-history-rows').innerHTML = renderApprovalHistory(earningsData.find(e => e.badge === 'badge-pending' && e.cycle === 'May 2026')?.approvals || []);
+                }
+            );
+        }
+        function discardCommissionDetail() {
+            openDiscardModal(
+                'Discard Commission File',
+                'This will permanently remove the uploaded file. This action cannot be undone.',
+                () => {
+                    backToEarningsList();
+                    alert('File discarded.');
+                }
+            );
+        }
+
+        // ── Payout Maker Submit / Discard (from detail) ───────────
+        function submitPayoutDetail() {
+            openSubmitModal(
+                'Submit Payout Request',
+                'Once submitted, this request will enter the approval workflow and cannot be edited or withdrawn.',
+                () => {
+                    if (currentPRIndex === null) return;
+                    const d = payoutRequestData[currentPRIndex];
+                    d.status    = 'pending';
+                    d.badge     = 'badge-pending';
+                    d.badgeText = 'Pending — Step 1 of 2';
+                    d.approvals[1].status = 'pending';
+                    const badge = document.getElementById('payout-request-badge');
+                    if (badge) { badge.className = 'badge badge-pending'; badge.textContent = 'Pending — Step 1 of 2'; }
+                    document.getElementById('pr-created-actions').style.display = 'none';
+                    document.getElementById('pr-approval-history-rows').innerHTML = renderApprovalHistory(d.approvals);
+                    lucide.createIcons();
+                }
+            );
+        }
+        function discardPayoutDetail() {
+            openDiscardModal(
+                'Discard Payout Request',
+                'This will permanently remove the payout request. Receivers will be returned to the available pool.',
+                () => { backToPayoutRequests(); alert('Request discarded.'); }
+            );
+        }
+
         function saveFlowConfig() {
             // Count in-progress requests (prototype: simulated)
             const inProgressCount = document.querySelectorAll('#pr-flat-body tr[data-status="pending"], #pr-flat-body tr[data-status="in-progress"]').length || 2;
@@ -5502,6 +6344,9 @@
         function toggleApiSecretVisibility() { const input = document.getElementById('api-secret-input'); if (input.type === 'password') { input.type = 'text'; input.value = 'secret-abc123def456ghi789jkl012'; } else { input.type = 'password'; input.value = '●●●●●●●●●●●●'; } }
         window.addEventListener('load', function() {
             lucide.createIcons();
+            // Initialise flow config step renderers
+            if (document.getElementById('csv-steps-config'))   renderFlowSteps('csv');
+            if (document.getElementById('payout-steps-config')) renderFlowSteps('payout');
             document.querySelectorAll('input[type="checkbox"].toggle-switch').forEach(toggle => { toggle.checked = toggle.hasAttribute('checked'); if (toggle.checked) toggle.classList.add('on'); });
             document.querySelectorAll('.segment').forEach((segment, index) => { if (index === 0) segment.classList.add('active'); segment.addEventListener('click', function() { this.parentElement.querySelectorAll('.segment').forEach(s => s.classList.remove('active')); this.classList.add('active'); }); });
             const poolCheckboxes = document.querySelectorAll('.pool-row-checkbox');
