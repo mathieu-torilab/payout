@@ -30,6 +30,11 @@
         .sidebar-nav li { padding: 12px 24px; cursor: pointer; transition: background 0.2s; color: rgba(255, 255, 255, 0.7); font-size: 14px; font-weight: 500; }
         .sidebar-nav li:hover { background: rgba(0, 212, 255, 0.1); color: white; }
         .sidebar-nav li.active { background: rgba(0, 212, 255, 0.2); color: var(--color-cyan); border-left: 3px solid var(--color-cyan); padding-left: 21px; }
+        .nav-accent { color: var(--color-cyan) !important; }
+        .nav-accent:hover { color: var(--color-cyan) !important; background: rgba(0, 212, 255, 0.12) !important; }
+        .nav-accent.active { color: var(--color-cyan) !important; }
+        #nav-dashboard, #nav-dashboard.active { color: rgba(255, 255, 255, 0.9) !important; }
+        #nav-dashboard:hover { color: white !important; }
         .nav-parent { display:flex; justify-content:space-between; align-items:center; }
         .nav-arrow { font-size:10px; transition:transform 0.2s; display:inline-block; }
         .nav-parent.open .nav-arrow { transform:rotate(180deg); }
@@ -216,6 +221,17 @@
         button:disabled { opacity: 0.5; cursor: not-allowed; }
         @media (max-width: 1400px) { .stat-cards { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 768px) { .sidebar { width: 0; padding: 0; } .header, .main-content, .action-bar { margin-left: 0; left: 0; } .stat-cards { grid-template-columns: 1fr; } .modal-content { width: 90%; } }
+        /* ── Multi-select dropdown ── */
+        .multi-select-wrap { position: relative; display: inline-block; }
+        .multi-select-btn { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 6px; background: white; cursor: pointer; font-size: 13px; color: var(--color-text); min-width: 220px; justify-content: space-between; transition: border-color 0.2s; }
+        .multi-select-btn:hover { border-color: var(--color-cyan); }
+        .multi-select-btn.open { border-color: var(--color-cyan); box-shadow: 0 0 0 2px rgba(0,212,255,0.15); }
+        .multi-select-label-text { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .multi-select-panel { position: absolute; top: calc(100% + 4px); left: 0; background: white; border: 1px solid var(--color-border); border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); z-index: 200; min-width: 220px; padding: 6px 0; }
+        .multi-select-option { display: flex; align-items: center; gap: 10px; padding: 9px 14px; cursor: pointer; font-size: 13px; transition: background 0.15s; }
+        .multi-select-option:hover { background: var(--color-bg); }
+        .multi-select-option input[type="checkbox"] { accent-color: var(--color-cyan); cursor: pointer; flex-shrink: 0; }
+        .multi-select-none { font-size: 12px; color: var(--color-text-muted); font-style: italic; }
     </style>
 </head>
 <body>
@@ -235,29 +251,29 @@
         <div class="sidebar">
             <div class="sidebar-brand">TWOMI</div>
             <ul class="sidebar-nav">
-                <li class="nav-item active" onclick="navigateTo('dashboard', this)">Dashboard</li>
-                <li class="nav-item nav-parent" id="commission-parent" onclick="toggleCommissionMenu(this)">
+                <li class="nav-item active" id="nav-dashboard" onclick="navigateTo('dashboard', this)">Dashboard</li>
+                <li class="nav-item nav-parent nav-accent" id="commission-parent" onclick="toggleCommissionMenu(this)">
                     Commissions <span class="nav-arrow">▾</span>
                 </li>
                 <ul class="nav-submenu" id="commission-submenu">
-                    <li class="nav-subitem" id="nav-commission-uploader" onclick="navigateTo('commission-uploader', this)">
+                    <li class="nav-subitem nav-accent" id="nav-commission-uploader" onclick="navigateTo('commission-uploader', this)">
                         <i data-lucide="upload" style="width:14px;height:14px;"></i> Maker
                     </li>
-                    <li class="nav-subitem" id="nav-commission-checker" onclick="navigateTo('commission-checker', this)">
+                    <li class="nav-subitem nav-accent" id="nav-commission-checker" onclick="navigateTo('commission-checker', this)">
                         <i data-lucide="check-square" style="width:14px;height:14px;"></i> Checker
                     </li>
                 </ul>
-                <li class="nav-item nav-parent" id="payout-parent" onclick="togglePayoutMenu(this)">
+                <li class="nav-item nav-parent nav-accent" id="payout-parent" onclick="togglePayoutMenu(this)">
                     Payout <span class="nav-arrow">▾</span>
                 </li>
                 <ul class="nav-submenu" id="payout-submenu">
-                    <li class="nav-subitem" id="nav-payout-pool" onclick="navigateTo('payout-pool', this)">
+                    <li class="nav-subitem nav-accent" id="nav-payout-pool" onclick="navigateTo('payout-pool', this)">
                         <i data-lucide="file-plus" style="width:14px;height:14px;"></i> Maker
                     </li>
-                    <li class="nav-subitem" id="nav-payout-requests" onclick="navigateTo('payout-requests', this)">
+                    <li class="nav-subitem nav-accent" id="nav-payout-requests" onclick="navigateTo('payout-requests', this)">
                         <i data-lucide="check-square" style="width:14px;height:14px;"></i> Checker
                     </li>
-                    <li class="nav-subitem" id="nav-payout-executer" onclick="navigateTo('payout-executer', this)">
+                    <li class="nav-subitem nav-accent" id="nav-payout-executer" onclick="navigateTo('payout-executer', this)">
                         <i data-lucide="zap" style="width:14px;height:14px;"></i> Executer
                     </li>
                 </ul>
@@ -265,9 +281,9 @@
                 <li class="nav-item" onclick="navigateTo('reconciliation', this)">Reconciliation</li>
                 <li class="nav-item" onclick="navigateTo('receivers', this)">Receivers</li>
                 <div class="sidebar-divider"></div>
-                <li class="nav-item" id="nav-permission-groups" onclick="navigateTo('permission-groups', this)">Permission Groups</li>
-                <li class="nav-item" id="nav-users" onclick="navigateTo('users', this)">Users</li>
-                <li class="nav-item" onclick="navigateTo('flow-config', this)">Flow Config</li>
+                <li class="nav-item nav-accent" id="nav-permission-groups" onclick="navigateTo('permission-groups', this)">Permission Groups</li>
+                <li class="nav-item nav-accent" id="nav-users" onclick="navigateTo('users', this)">Users</li>
+                <li class="nav-item nav-accent" onclick="navigateTo('flow-config', this)">Flow Config</li>
                 <li class="nav-item" onclick="navigateTo('domain-config', this)">Domain Config</li>
                 <li class="nav-item" onclick="navigateTo('audit-log', this)">Audit Log</li>
             </ul>
@@ -446,9 +462,14 @@
                         <h1 class="section-title">Commissions — Maker</h1>
                         <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px;">Upload commission files. Files you upload will enter the approval workflow — you cannot approve your own submissions.</p>
                     </div>
-                    <button class="btn btn-primary" onclick="openUploadModal()">
-                        <i data-lucide="upload" style="width:16px;height:16px;"></i> Upload File
-                    </button>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-secondary" onclick="exportCommissionTemplate()">
+                            <i data-lucide="download" style="width:16px;height:16px;"></i> Export Template
+                        </button>
+                        <button class="btn btn-primary" onclick="openUploadModal()">
+                            <i data-lucide="upload" style="width:16px;height:16px;"></i> Upload File
+                        </button>
+                    </div>
                 </div>
                 <div class="filter-bar" style="margin-bottom:16px;">
                     <div class="filter-group">
@@ -853,11 +874,11 @@
                             <input class="filter-input" type="text" id="np-filter-email" placeholder="@twomi.com" style="width:160px;" onkeydown="if(event.key==='Enter') applyNewPayoutFilters()">
                         </div>
                         <div class="filter-group">
-                            <span class="filter-label">Balance From (¥)</span>
+                            <span class="filter-label">Available From (¥)</span>
                             <input class="filter-input" type="number" id="np-filter-bal-from" placeholder="0" min="0" style="width:110px;" onkeydown="if(event.key==='Enter') applyNewPayoutFilters()">
                         </div>
                         <div class="filter-group">
-                            <span class="filter-label">Balance To (¥)</span>
+                            <span class="filter-label">Available To (¥)</span>
                             <input class="filter-input" type="number" id="np-filter-bal-to" placeholder="∞" min="0" style="width:110px;" onkeydown="if(event.key==='Enter') applyNewPayoutFilters()">
                         </div>
                         <div class="filter-group">
@@ -873,44 +894,71 @@
                         <thead><tr>
                             <th style="width:40px;"><input type="checkbox" id="np-check-all" onchange="toggleAllNewPayout(this)" style="accent-color:var(--color-cyan);"></th>
                             <th>Receiver</th><th>Twomi ID</th><th>Receiver Email</th><th>Payment Method</th>
-                            <th style="text-align:right;">Balance</th>
-                            <th style="width:160px;">Amount to Pay</th>
+                            <th style="text-align:right;">Total Balance</th>
+                            <th style="text-align:right;">Locked</th>
+                            <th style="text-align:right;">Available</th>
+                            <th style="min-width:190px;">Amount to Pay</th>
                         </tr></thead>
                         <tbody id="np-table-body">
-                            <tr data-balance="positive" data-search="tanaka yuki TW-10042 tanaka.y@twomi.com">
+                            <tr data-available="8504" data-search="tanaka yuki TW-10042 tanaka.y@twomi.com">
                                 <td><input type="checkbox" class="np-row-check" onchange="onNPRowCheck(this)" style="accent-color:var(--color-cyan);"></td>
                                 <td><strong>Tanaka Yuki</strong></td><td>TW-10042</td><td>tanaka.y@twomi.com</td>
                                 <td><span class="badge badge-approved" style="font-size:10px;">Payoneer</span></td>
+                                <td style="text-align:right;color:var(--color-text-muted);">¥38,504</td>
+                                <td style="text-align:right;color:var(--color-text-muted);">¥30,000</td>
                                 <td style="text-align:right;font-weight:600;color:var(--color-amber);">¥8,504</td>
-                                <td><input type="number" class="form-input np-amount" data-balance="8504" value="8504" min="1" max="8504" style="font-size:12px;padding:4px 8px;text-align:right;" disabled></td>
+                                <td>
+                                    <input type="number" class="form-input np-amount" data-available="8504" value="8504" min="1" max="8504" style="font-size:12px;padding:4px 8px;text-align:right;width:100%;" disabled oninput="validateNPAmount(this)">
+                                    <div class="np-amount-warn" style="display:none;font-size:11px;color:var(--color-red);margin-top:3px;line-height:1.4;"></div>
+                                </td>
                             </tr>
-                            <tr data-balance="positive" data-search="suzuki hana TW-10087 suzuki.h@twomi.com">
+                            <tr data-available="0" data-search="suzuki hana TW-10087 suzuki.h@twomi.com">
                                 <td><input type="checkbox" class="np-row-check" onchange="onNPRowCheck(this)" style="accent-color:var(--color-cyan);"></td>
                                 <td><strong>Suzuki Hana</strong></td><td>TW-10087</td><td>suzuki.h@twomi.com</td>
                                 <td><span class="badge" style="font-size:10px;background:rgba(99,91,255,0.1);color:#6366f1;">Stripe</span></td>
+                                <td style="text-align:right;color:var(--color-text-muted);">¥22,680</td>
+                                <td style="text-align:right;color:var(--color-text-muted);">¥22,680</td>
                                 <td style="text-align:right;font-weight:600;color:var(--color-text-muted);">¥0</td>
-                                <td><input type="number" class="form-input np-amount" data-balance="0" value="0" min="1" max="0" style="font-size:12px;padding:4px 8px;text-align:right;" disabled></td>
+                                <td>
+                                    <input type="number" class="form-input np-amount" data-available="0" value="0" min="1" max="0" style="font-size:12px;padding:4px 8px;text-align:right;width:100%;opacity:0.4;" disabled oninput="validateNPAmount(this)">
+                                    <div class="np-amount-warn" style="display:none;font-size:11px;color:var(--color-red);margin-top:3px;line-height:1.4;"></div>
+                                </td>
                             </tr>
-                            <tr data-balance="positive" data-search="yamamoto kenji TW-10134 yamamoto.k@twomi.com">
+                            <tr data-available="0" data-search="yamamoto kenji TW-10134 yamamoto.k@twomi.com">
                                 <td><input type="checkbox" class="np-row-check" onchange="onNPRowCheck(this)" style="accent-color:var(--color-cyan);"></td>
                                 <td><strong>Yamamoto Kenji</strong></td><td>TW-10134</td><td>yamamoto.k@twomi.com</td>
                                 <td><span class="badge badge-approved" style="font-size:10px;">Payoneer</span></td>
+                                <td style="text-align:right;color:var(--color-text-muted);">¥14,742</td>
+                                <td style="text-align:right;color:var(--color-text-muted);">¥14,742</td>
                                 <td style="text-align:right;font-weight:600;color:var(--color-text-muted);">¥0</td>
-                                <td><input type="number" class="form-input np-amount" data-balance="0" value="0" min="1" max="0" style="font-size:12px;padding:4px 8px;text-align:right;" disabled></td>
+                                <td>
+                                    <input type="number" class="form-input np-amount" data-available="0" value="0" min="1" max="0" style="font-size:12px;padding:4px 8px;text-align:right;width:100%;opacity:0.4;" disabled oninput="validateNPAmount(this)">
+                                    <div class="np-amount-warn" style="display:none;font-size:11px;color:var(--color-red);margin-top:3px;line-height:1.4;"></div>
+                                </td>
                             </tr>
-                            <tr data-balance="positive" data-search="nakamura daiki TW-10389 nakamura.d@twomi.com">
+                            <tr data-available="29295" data-search="nakamura daiki TW-10389 nakamura.d@twomi.com">
                                 <td><input type="checkbox" class="np-row-check" onchange="onNPRowCheck(this)" style="accent-color:var(--color-cyan);"></td>
                                 <td><strong>Nakamura Daiki</strong></td><td>TW-10389</td><td>nakamura.d@twomi.com</td>
                                 <td><span class="badge" style="font-size:10px;background:rgba(255,184,0,0.1);color:var(--color-amber);">⚠ Not Linked</span></td>
+                                <td style="text-align:right;color:var(--color-text-muted);">¥39,295</td>
+                                <td style="text-align:right;color:var(--color-text-muted);">¥10,000</td>
                                 <td style="text-align:right;font-weight:600;color:var(--color-red);">¥29,295</td>
-                                <td><input type="number" class="form-input np-amount" data-balance="29295" value="29295" min="1" max="29295" style="font-size:12px;padding:4px 8px;text-align:right;" disabled></td>
+                                <td>
+                                    <input type="number" class="form-input np-amount" data-available="29295" value="29295" min="1" max="29295" style="font-size:12px;padding:4px 8px;text-align:right;width:100%;" disabled oninput="validateNPAmount(this)">
+                                    <div class="np-amount-warn" style="display:none;font-size:11px;color:var(--color-red);margin-top:3px;line-height:1.4;"></div>
+                                </td>
                             </tr>
-                            <tr data-balance="positive" data-search="hayashi yuna TW-10421 hayashi.y@twomi.com">
+                            <tr data-available="16820" data-search="hayashi yuna TW-10421 hayashi.y@twomi.com">
                                 <td><input type="checkbox" class="np-row-check" onchange="onNPRowCheck(this)" style="accent-color:var(--color-cyan);"></td>
                                 <td><strong>Hayashi Yuna</strong></td><td>TW-10421</td><td>hayashi.y@twomi.com</td>
                                 <td><span class="badge badge-approved" style="font-size:10px;">Payoneer</span></td>
+                                <td style="text-align:right;color:var(--color-text-muted);">¥26,820</td>
+                                <td style="text-align:right;color:var(--color-text-muted);">¥10,000</td>
                                 <td style="text-align:right;font-weight:600;color:var(--color-red);">¥16,820</td>
-                                <td><input type="number" class="form-input np-amount" data-balance="16820" value="16820" min="1" max="16820" style="font-size:12px;padding:4px 8px;text-align:right;" disabled></td>
+                                <td>
+                                    <input type="number" class="form-input np-amount" data-available="16820" value="16820" min="1" max="16820" style="font-size:12px;padding:4px 8px;text-align:right;width:100%;" disabled oninput="validateNPAmount(this)">
+                                    <div class="np-amount-warn" style="display:none;font-size:11px;color:var(--color-red);margin-top:3px;line-height:1.4;"></div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -922,35 +970,15 @@
                             <div><div style="font-size:11px;color:var(--color-text-muted);text-transform:uppercase;font-weight:600;margin-bottom:4px;">Total Amount</div><div style="font-size:18px;font-weight:700;color:var(--color-cyan);" id="np-total-amount">¥0</div></div>
                         </div>
                         <div style="display:flex;gap:8px;">
-                            <button class="btn btn-secondary" id="np-upload-btn" onclick="toggleNPUploadZone()">
+                            <button class="btn btn-secondary" onclick="exportPayoutTemplate()">
+                                <i data-lucide="download" style="width:16px;height:16px;"></i> Export Template
+                            </button>
+                            <button class="btn btn-secondary" id="np-upload-btn" onclick="openPayoutUploadModal()">
                                 <i data-lucide="upload" style="width:16px;height:16px;"></i> Upload File
                             </button>
                             <button class="btn btn-primary" id="np-create-btn" onclick="createPayoutFromSelection()" disabled>
                                 <i data-lucide="send" style="width:16px;height:16px;"></i> Create Payout Request
                             </button>
-                        </div>
-                    </div>
-
-                    <!-- Upload zone (collapsed by default) -->
-                    <div id="np-upload-zone" style="display:none;border:1px solid var(--color-border);border-radius:8px;padding:20px;margin-top:12px;background:var(--color-bg);">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                            <div style="font-size:13px;font-weight:600;color:var(--color-navy);">Upload Payout File</div>
-                            <button onclick="toggleNPUploadZone()" style="background:none;border:none;cursor:pointer;color:var(--color-text-muted);font-size:18px;">×</button>
-                        </div>
-                        <div class="drag-drop-zone" style="margin-bottom:12px;">
-                            <div class="drag-drop-icon"><i data-lucide="upload-cloud" style="width:28px;height:28px;color:var(--color-cyan);"></i></div>
-                            <div class="drag-drop-text">Drop payout CSV here or click to browse</div>
-                            <div class="drag-drop-hint">.csv · Max 50MB</div>
-                        </div>
-                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">
-                            <span style="background:white;border:1px solid var(--color-border);border-radius:4px;padding:2px 7px;font-size:11px;font-family:monospace;">Twomi User ID</span>
-                            <span style="background:white;border:1px solid var(--color-border);border-radius:4px;padding:2px 7px;font-size:11px;font-family:monospace;">Receiver Email</span>
-                            <span style="background:white;border:1px solid var(--color-border);border-radius:4px;padding:2px 7px;font-size:11px;font-family:monospace;">Amount</span>
-                            <span style="background:white;border:1px solid var(--color-border);border-radius:4px;padding:2px 7px;font-size:11px;font-family:monospace;">Currency</span>
-                        </div>
-                        <div style="font-size:11px;color:var(--color-text-muted);margin-bottom:12px;">Amount must be ≤ each receiver's current balance.</div>
-                        <div style="display:flex;justify-content:flex-end;">
-                            <button class="btn btn-primary btn-small" onclick="toggleNPUploadZone()"><i data-lucide="upload" style="width:14px;height:14px;"></i> Upload &amp; Create Request</button>
                         </div>
                     </div>
                 </div>
@@ -2359,49 +2387,37 @@
                 <!-- Commission approval flow -->
                 <div class="config-card" style="margin-bottom:20px;">
                     <h3 style="margin-bottom:4px;">Commission Approval Flow</h3>
-                    <p style="font-size:13px;color:var(--color-text-muted);margin-bottom:16px;">Number of approval steps required before a commission file is considered approved.</p>
-                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-                        <span style="font-size:13px;color:var(--color-text);">Approval steps:</span>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <button class="btn btn-small btn-secondary" onclick="decrementSteps('csv','csv-steps')" style="padding:4px 10px;font-size:16px;line-height:1;">−</button>
-                            <input type="number" id="csv-steps" value="2" min="1" max="5" style="width:50px;text-align:center;padding:4px 8px;border:1px solid var(--color-border);border-radius:6px;font-size:14px;font-weight:600;color:var(--color-navy);" onchange="renderFlowSteps('csv')">
-                            <button class="btn btn-small btn-secondary" onclick="incrementSteps('csv','csv-steps')" style="padding:4px 10px;font-size:16px;line-height:1;">+</button>
-                        </div>
-                    </div>
-                    <div id="csv-steps-config" style="display:flex;flex-direction:column;gap:10px;"></div>
+                    <p style="font-size:13px;color:var(--color-text-muted);margin-bottom:20px;">Configure who can upload commission files, who approves them at each step, and the outcome when all steps pass.</p>
+                    <div id="csv-flow-body"></div>
                 </div>
 
                 <!-- Payout approval flow -->
                 <div class="config-card" style="margin-bottom:20px;">
                     <h3 style="margin-bottom:4px;">Payout Request Approval Flow</h3>
-                    <p style="font-size:13px;color:var(--color-text-muted);margin-bottom:16px;">Number of approval steps required before a payout request is handed to the Executer.</p>
-                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-                        <span style="font-size:13px;color:var(--color-text);">Approval steps:</span>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <button class="btn btn-small btn-secondary" onclick="decrementSteps('payout','payout-steps')" style="padding:4px 10px;font-size:16px;line-height:1;">−</button>
-                            <input type="number" id="payout-steps" value="2" min="1" max="5" style="width:50px;text-align:center;padding:4px 8px;border:1px solid var(--color-border);border-radius:6px;font-size:14px;font-weight:600;color:var(--color-navy);" onchange="renderFlowSteps('payout')">
-                            <button class="btn btn-small btn-secondary" onclick="incrementSteps('payout','payout-steps')" style="padding:4px 10px;font-size:16px;line-height:1;">+</button>
-                        </div>
-                    </div>
-                    <div id="payout-steps-config" style="display:flex;flex-direction:column;gap:10px;"></div>
+                    <p style="font-size:13px;color:var(--color-text-muted);margin-bottom:20px;">Configure who can create requests, who approves them, who executes them, and the final outcome.</p>
+                    <div id="payout-flow-body"></div>
                 </div>
 
-                <!-- Payoneer API -->
+                <!-- Payout Amount Limits -->
                 <div class="config-card">
-                    <h3 style="margin-bottom:4px;">Payoneer API Credentials</h3>
-                    <p style="font-size:13px;color:var(--color-text-muted);margin-bottom:16px;">Used when submitting payout requests to Payoneer. Changes take effect immediately on next execution.</p>
-                    <div class="key-value" style="margin-bottom:12px;">
-                        <div class="key" style="width:120px;min-width:120px;">API Key</div>
-                        <div class="value" style="flex:1;display:flex;gap:8px;align-items:center;">
-                            <input type="password" id="api-key-input" value="●●●●●●●●●●●●" class="form-input" style="font-family:monospace;flex:1;max-width:320px;">
-                            <button class="btn btn-small btn-secondary" onclick="toggleApiKeyVisibility()"><i data-lucide="eye" style="width:13px;height:13px;"></i></button>
+                    <h3 style="margin-bottom:4px;">Payout Amount Limits</h3>
+                    <p style="font-size:13px;color:var(--color-text-muted);margin-bottom:20px;">Set minimum and maximum payout amounts per receiver. Receivers below the minimum are flagged in the Payout Pool; requests exceeding the maximum require additional review before execution.</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:560px;">
+                        <div>
+                            <label class="form-label" style="margin-bottom:8px;">Minimum payout per receiver (¥)</label>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:15px;font-weight:700;color:var(--color-text-muted);">¥</span>
+                                <input type="number" id="min-payout-amount" class="form-input" value="1000" min="0" step="100" style="max-width:160px;">
+                            </div>
+                            <div style="font-size:12px;color:var(--color-text-muted);margin-top:8px;line-height:1.5;">Receivers below this amount will be flagged as "Below threshold" in the Payout Pool. They can still be included with confirmation.</div>
                         </div>
-                    </div>
-                    <div class="key-value">
-                        <div class="key" style="width:120px;min-width:120px;">API Secret</div>
-                        <div class="value" style="flex:1;display:flex;gap:8px;align-items:center;">
-                            <input type="password" id="api-secret-input" value="●●●●●●●●●●●●" class="form-input" style="font-family:monospace;flex:1;max-width:320px;">
-                            <button class="btn btn-small btn-secondary" onclick="toggleApiSecretVisibility()"><i data-lucide="eye" style="width:13px;height:13px;"></i></button>
+                        <div>
+                            <label class="form-label" style="margin-bottom:8px;">Maximum payout per receiver (¥)</label>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:15px;font-weight:700;color:var(--color-text-muted);">¥</span>
+                                <input type="number" id="max-payout-amount" class="form-input" value="500000" min="0" step="10000" style="max-width:160px;">
+                            </div>
+                            <div style="font-size:12px;color:var(--color-text-muted);margin-top:8px;line-height:1.5;">Payout requests including a receiver above this amount will be blocked and require Super Admin approval before execution.</div>
                         </div>
                     </div>
                 </div>
@@ -2580,7 +2596,7 @@
                             <input type="radio" name="upload-type" value="adjust" onchange="onUploadTypeChange(this)" style="accent-color:var(--color-cyan);">
                             <div>
                                 <div style="font-size:13px;font-weight:600;color:var(--color-navy);">Adjust</div>
-                                <div style="font-size:11px;color:var(--color-text-muted);">Additive adjustment — multiple allowed per cycle</div>
+                                <div style="font-size:11px;color:var(--color-text-muted);">Positive or negative adjustment — multiple allowed per cycle</div>
                             </div>
                         </label>
                     </div>
@@ -2635,6 +2651,10 @@
 
                 <!-- File upload zone (shown before upload attempt) -->
                 <div id="upload-file-zone">
+                    <!-- Negative amount notice — Adjust type only -->
+                    <div id="adjust-balance-note" style="display:none;padding:10px 14px;background:rgba(255,184,0,0.06);border:1px solid rgba(255,184,0,0.3);border-radius:6px;font-size:13px;color:var(--color-amber);margin-bottom:14px;">
+                        <strong>⚠ Negative amounts allowed for Adjust type.</strong> However, the resulting balance for each receiver cannot go below ¥0. Any row where the adjustment would cause a negative balance will fail validation.
+                    </div>
                     <div class="drag-drop-zone">
                         <div class="drag-drop-icon"><i data-lucide="upload-cloud" style="width:32px;height:32px;color:var(--color-cyan);"></i></div>
                         <div class="drag-drop-text">Drop file here or click to browse</div>
@@ -2662,13 +2682,13 @@
                     <div style="background:rgba(255,59,92,0.06);border:1px solid rgba(255,59,92,0.25);border-radius:8px;padding:16px 20px;margin-bottom:20px;display:flex;gap:12px;align-items:flex-start;">
                         <i data-lucide="alert-circle" style="width:20px;height:20px;color:var(--color-red);flex-shrink:0;margin-top:1px;"></i>
                         <div>
-                            <div style="font-weight:700;color:var(--color-red);margin-bottom:4px;">Validation Failed — 4 errors found</div>
+                            <div style="font-weight:700;color:var(--color-red);margin-bottom:4px;" id="upload-error-title">Validation Failed — 4 errors found</div>
                             <div style="font-size:13px;color:var(--color-text-muted);">No data was imported. The annotated file has been downloaded — fix the highlighted rows and upload again.</div>
                         </div>
                     </div>
                     <table style="margin-bottom:20px;">
                         <thead><tr><th>Row #</th><th>Field</th><th>Error</th></tr></thead>
-                        <tbody>
+                        <tbody id="upload-error-tbody">
                             <tr><td>12</td><td>Payout (¥)</td><td>Invalid amount — value is not a number</td></tr>
                             <tr><td>47</td><td>Currency</td><td>Unsupported currency code "XYZ"</td></tr>
                             <tr><td>89</td><td>Twomi User ID</td><td>User ID does not exist in the system</td></tr>
@@ -2677,6 +2697,135 @@
                     </table>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" onclick="resetUploadModal()">Upload a different file</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payout Upload modal -->
+    <div class="modal-overlay" id="payout-upload-modal" onclick="closePayoutUploadModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width:520px;">
+            <div class="modal-header">
+                <div class="modal-title">Upload Payout File</div>
+                <button class="modal-close" onclick="closePayoutUploadModal()"><i data-lucide="x" style="width:20px;height:20px;"></i></button>
+            </div>
+
+            <!-- Step indicators -->
+            <div style="display:flex;align-items:center;gap:0;margin-bottom:28px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div id="pu-step-dot-1" style="width:28px;height:28px;border-radius:50%;background:var(--color-navy);color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">1</div>
+                    <span id="pu-step-label-1" style="font-size:13px;font-weight:600;color:var(--color-navy);">Select Cycle</span>
+                </div>
+                <div style="flex:1;height:2px;background:var(--color-border);margin:0 12px;"></div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div id="pu-step-dot-2" style="width:28px;height:28px;border-radius:50%;background:var(--color-border);color:var(--color-text-muted);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">2</div>
+                    <span id="pu-step-label-2" style="font-size:13px;font-weight:600;color:var(--color-text-muted);">Upload File</span>
+                </div>
+            </div>
+
+            <!-- Step 1: Cycle -->
+            <div id="pu-step-1">
+                <div class="form-group" style="margin-bottom:16px;">
+                    <label class="form-label">Cycle <span style="color:var(--color-red)">*</span></label>
+                    <div style="display:flex;gap:8px;">
+                        <select class="form-select" id="pu-cycle-year" onchange="puCheckCycle()" style="flex:1;">
+                            <option value="">Year</option>
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                        </select>
+                        <select class="form-select" id="pu-cycle-month" onchange="puCheckCycle()" style="flex:1;">
+                            <option value="">Month</option>
+                            <option value="01">January</option><option value="02">February</option>
+                            <option value="03">March</option><option value="04">April</option>
+                            <option value="05">May</option><option value="06">June</option>
+                            <option value="07">July</option><option value="08">August</option>
+                            <option value="09">September</option><option value="10">October</option>
+                            <option value="11">November</option><option value="12">December</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="pu-cycle-warning" style="display:none;padding:10px 14px;border-radius:6px;font-size:13px;"></div>
+                <div id="pu-cycle-ok" style="display:none;padding:10px 14px;border-radius:6px;font-size:13px;background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.3);color:var(--color-green);">
+                    ✓ <strong id="pu-cycle-ok-label"></strong> — No existing payout request. Ready to proceed.
+                </div>
+                <div class="modal-footer" style="margin-top:24px;">
+                    <button class="btn btn-secondary" onclick="closePayoutUploadModal()">Cancel</button>
+                    <button class="btn btn-primary" id="pu-next-btn" onclick="puGoToStep2()" disabled>Next →</button>
+                </div>
+            </div>
+
+            <!-- Step 2: File upload -->
+            <div id="pu-step-2" style="display:none;">
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--color-bg);border-radius:6px;margin-bottom:20px;border:1px solid var(--color-border);">
+                    <i data-lucide="calendar" style="width:16px;height:16px;color:var(--color-cyan);"></i>
+                    <span style="font-size:13px;color:var(--color-text-muted);">Cycle:</span>
+                    <span style="font-size:13px;font-weight:700;color:var(--color-navy);" id="pu-cycle-recap"></span>
+                    <a onclick="puBackToStep1()" style="margin-left:auto;font-size:12px;color:var(--color-cyan);cursor:pointer;">Change</a>
+                </div>
+
+                <div id="pu-file-zone">
+                    <div class="drag-drop-zone">
+                        <div class="drag-drop-icon"><i data-lucide="upload-cloud" style="width:32px;height:32px;color:var(--color-cyan);"></i></div>
+                        <div class="drag-drop-text">Drop file here or click to browse</div>
+                        <div class="drag-drop-hint">.xlsx or .csv · Maximum 50MB</div>
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <label class="form-label">Required columns</label>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+                            <span style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:4px;padding:3px 8px;font-size:11px;color:var(--color-text-muted);font-family:monospace;">Twomi User ID</span>
+                            <span style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:4px;padding:3px 8px;font-size:11px;color:var(--color-text-muted);font-family:monospace;">Receiver Name</span>
+                            <span style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:4px;padding:3px 8px;font-size:11px;color:var(--color-text-muted);font-family:monospace;">User Email</span>
+                            <span style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:4px;padding:3px 8px;font-size:11px;color:var(--color-text-muted);font-family:monospace;">Payment Account</span>
+                            <span style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:4px;padding:3px 8px;font-size:11px;color:var(--color-text-muted);font-family:monospace;">Currency</span>
+                            <span style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:4px;padding:3px 8px;font-size:11px;color:var(--color-text-muted);font-family:monospace;">Amount (¥)</span>
+                        </div>
+                        <div style="font-size:11px;color:var(--color-text-muted);margin-top:8px;">Amount must not exceed each receiver's available balance. Locked amounts are excluded.</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="puBackToStep1()">← Back</button>
+                        <button class="btn btn-primary" onclick="puSimulateValidation()">
+                            <i data-lucide="upload" style="width:15px;height:15px;"></i> Upload
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Validation failure -->
+                <div id="pu-validation-error" style="display:none;">
+                    <div style="background:rgba(255,59,92,0.06);border:1px solid rgba(255,59,92,0.25);border-radius:8px;padding:16px 20px;margin-bottom:20px;display:flex;gap:12px;align-items:flex-start;">
+                        <i data-lucide="alert-circle" style="width:20px;height:20px;color:var(--color-red);flex-shrink:0;margin-top:1px;"></i>
+                        <div>
+                            <div style="font-weight:700;color:var(--color-red);margin-bottom:4px;">Validation Failed — 3 errors found</div>
+                            <div style="font-size:13px;color:var(--color-text-muted);">No data was imported. Fix the highlighted rows and upload again.</div>
+                        </div>
+                    </div>
+                    <table style="margin-bottom:20px;">
+                        <thead><tr><th>Row #</th><th>Field</th><th>Error</th></tr></thead>
+                        <tbody>
+                            <tr><td>3</td><td>Amount (¥)</td><td>Exceeds available balance — receiver has ¥0 available</td></tr>
+                            <tr><td>7</td><td>Twomi User ID</td><td>User ID does not exist in the system</td></tr>
+                            <tr><td>12</td><td>Payment Account</td><td>No Payoneer account linked for this receiver</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="puResetFileZone()">Upload a different file</button>
+                    </div>
+                </div>
+
+                <!-- Validation success -->
+                <div id="pu-validation-success" style="display:none;">
+                    <div style="background:rgba(0,196,140,0.06);border:1px solid rgba(0,196,140,0.3);border-radius:8px;padding:16px 20px;margin-bottom:20px;display:flex;gap:12px;align-items:flex-start;">
+                        <i data-lucide="check-circle" style="width:20px;height:20px;color:var(--color-green);flex-shrink:0;margin-top:1px;"></i>
+                        <div>
+                            <div style="font-weight:700;color:var(--color-green);margin-bottom:4px;">Validation Passed — <span id="pu-success-rows">5 receivers</span></div>
+                            <div style="font-size:13px;color:var(--color-text-muted);">All rows are valid. Total amount: <strong id="pu-success-total">¥54,001</strong></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="puResetFileZone()">Upload different file</button>
+                        <button class="btn btn-primary" onclick="puConfirmUpload()">
+                            <i data-lucide="check" style="width:15px;height:15px;"></i> Confirm &amp; Create Draft
+                        </button>
                     </div>
                 </div>
             </div>
@@ -3373,6 +3522,11 @@
             document.getElementById('type-commission-label').style.borderWidth = !isAdjust ? '2px' : '1px';
             document.getElementById('type-adjust-label').style.borderColor    = isAdjust  ? 'var(--color-cyan)' : 'var(--color-border)';
             document.getElementById('type-adjust-label').style.borderWidth    = isAdjust  ? '2px' : '1px';
+            // Show/hide adjust balance note if step 2 is already visible
+            const note = document.getElementById('adjust-balance-note');
+            if (note && document.getElementById('upload-step-2').style.display !== 'none') {
+                note.style.display = isAdjust ? 'block' : 'none';
+            }
             // Re-run cycle check since Adjust has different rules
             checkCycleDuplicate();
         }
@@ -3455,6 +3609,11 @@
             document.getElementById('upload-step-1').style.display = 'none';
             document.getElementById('upload-step-2').style.display = 'block';
             document.getElementById('cycle-recap-label').textContent = label;
+
+            // Show adjust balance note if Adjust type selected
+            const isAdjust = getUploadType() === 'adjust';
+            const note = document.getElementById('adjust-balance-note');
+            if (note) note.style.display = isAdjust ? 'block' : 'none';
 
             // Update step dots
             document.getElementById('step-dot-1').style.background = 'var(--color-green)';
@@ -3743,9 +3902,25 @@
         }
 
         function simulateUploadValidation() {
+            const isAdjust = getUploadType() === 'adjust';
+            const titleEl  = document.getElementById('upload-error-title');
+            const tbody    = document.getElementById('upload-error-tbody');
+            if (isAdjust) {
+                if (titleEl) titleEl.textContent = 'Validation Failed — 3 errors found';
+                if (tbody) tbody.innerHTML = `
+                    <tr><td>8</td><td>Amount (¥)</td><td>Would result in negative balance — TW-10087 current balance ¥0, adjustment −¥5,000 → result −¥5,000</td></tr>
+                    <tr><td>23</td><td>Amount (¥)</td><td>Would result in negative balance — TW-10312 current balance ¥12,757, adjustment −¥15,000 → result −¥2,243</td></tr>
+                    <tr><td>47</td><td>Twomi User ID</td><td>User ID 99999 does not exist in the system</td></tr>`;
+            } else {
+                if (titleEl) titleEl.textContent = 'Validation Failed — 4 errors found';
+                if (tbody) tbody.innerHTML = `
+                    <tr><td>12</td><td>Payout (¥)</td><td>Invalid amount — value is not a number</td></tr>
+                    <tr><td>47</td><td>Currency</td><td>Unsupported currency code "XYZ"</td></tr>
+                    <tr><td>89</td><td>Twomi User ID</td><td>User ID does not exist in the system</td></tr>
+                    <tr><td>156</td><td>User Email</td><td>Invalid email format</td></tr>`;
+            }
             document.getElementById('upload-file-zone').style.display        = 'none';
             document.getElementById('upload-validation-error').style.display = 'block';
-            console.log('Auto-downloading annotated Excel with error notes...');
             lucide.createIcons();
         }
 
@@ -3825,10 +4000,129 @@
 
                 function switchNewPayoutTab(tab, el) { /* no-op */ }
 
-        function toggleNPUploadZone() {
-            const zone = document.getElementById('np-upload-zone');
-            zone.style.display = zone.style.display === 'none' ? 'block' : 'none';
-            if (zone.style.display === 'block') lucide.createIcons();
+        function toggleNPUploadZone() { /* legacy — replaced by modal */ }
+
+        // ── Payout Upload modal ───────────────────────────────────
+        // monthNames already declared above as object — helper to lookup by numeric index
+        function monthNameByIndex(i) { const k = String(i).padStart(2,'0'); return monthNames[k] || ''; }
+
+        function openPayoutUploadModal() {
+            // Reset to step 1
+            document.getElementById('pu-step-1').style.display = 'block';
+            document.getElementById('pu-step-2').style.display = 'none';
+            document.getElementById('pu-cycle-year').value  = '';
+            document.getElementById('pu-cycle-month').value = '';
+            document.getElementById('pu-cycle-warning').style.display = 'none';
+            document.getElementById('pu-cycle-ok').style.display      = 'none';
+            document.getElementById('pu-next-btn').disabled = true;
+            puSetStepDot(1);
+            document.getElementById('payout-upload-modal').classList.add('active');
+            lucide.createIcons();
+        }
+        function closePayoutUploadModal(event) {
+            if (event && event.target !== document.getElementById('payout-upload-modal')) return;
+            document.getElementById('payout-upload-modal').classList.remove('active');
+        }
+        function puSetStepDot(active) {
+            const d1 = document.getElementById('pu-step-dot-1');
+            const d2 = document.getElementById('pu-step-dot-2');
+            const l1 = document.getElementById('pu-step-label-1');
+            const l2 = document.getElementById('pu-step-label-2');
+            if (active === 1) {
+                d1.style.background = 'var(--color-navy)'; d1.style.color = 'white';
+                d2.style.background = 'var(--color-border)'; d2.style.color = 'var(--color-text-muted)';
+                l1.style.color = 'var(--color-navy)'; l2.style.color = 'var(--color-text-muted)';
+            } else {
+                d1.style.background = 'var(--color-green)'; d1.style.color = 'white';
+                d2.style.background = 'var(--color-navy)'; d2.style.color = 'white';
+                l1.style.color = 'var(--color-green)'; l2.style.color = 'var(--color-navy)';
+            }
+        }
+        function puCheckCycle() {
+            const y = document.getElementById('pu-cycle-year').value;
+            const m = document.getElementById('pu-cycle-month').value;
+            const warn = document.getElementById('pu-cycle-warning');
+            const ok   = document.getElementById('pu-cycle-ok');
+            warn.style.display = 'none'; ok.style.display = 'none';
+            document.getElementById('pu-next-btn').disabled = true;
+            if (!y || !m) return;
+            const label = monthNameByIndex(parseInt(m)) + ' ' + y;
+            // Check if a payout request already exists for this cycle in Maker's list
+            const existingRows = Array.from(document.querySelectorAll('#maker-pr-tbody tr'));
+            const exists = existingRows.some(r => r.dataset.year === y && r.dataset.month === m && ['created','pending','ready','scheduled','executed'].includes(r.dataset.status));
+            if (exists) {
+                warn.style.cssText = 'display:block;padding:10px 14px;border-radius:6px;font-size:13px;background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.3);color:var(--color-amber);';
+                warn.innerHTML = `⚠ A payout request for <strong>${label}</strong> already exists and is active. You may still upload a new one if the cycle allows multiple requests.`;
+                document.getElementById('pu-next-btn').disabled = false;
+            } else {
+                document.getElementById('pu-cycle-ok-label').textContent = label;
+                ok.style.display = 'block';
+                document.getElementById('pu-next-btn').disabled = false;
+            }
+        }
+        function puGoToStep2() {
+            const y = document.getElementById('pu-cycle-year').value;
+            const m = document.getElementById('pu-cycle-month').value;
+            if (!y || !m) return;
+            document.getElementById('pu-cycle-recap').textContent = monthNameByIndex(parseInt(m)) + ' ' + y;
+            document.getElementById('pu-step-1').style.display = 'none';
+            document.getElementById('pu-step-2').style.display = 'block';
+            puResetFileZone();
+            puSetStepDot(2);
+            lucide.createIcons();
+        }
+        function puBackToStep1() {
+            document.getElementById('pu-step-1').style.display = 'block';
+            document.getElementById('pu-step-2').style.display = 'none';
+            puSetStepDot(1);
+        }
+        function puResetFileZone() {
+            document.getElementById('pu-file-zone').style.display          = 'block';
+            document.getElementById('pu-validation-error').style.display   = 'none';
+            document.getElementById('pu-validation-success').style.display = 'none';
+            lucide.createIcons();
+        }
+        function puSimulateValidation() {
+            // Prototype: randomly show success (70%) or error (30%)
+            const success = Math.random() > 0.3;
+            document.getElementById('pu-file-zone').style.display = 'none';
+            if (success) {
+                document.getElementById('pu-validation-success').style.display = 'block';
+            } else {
+                document.getElementById('pu-validation-error').style.display = 'block';
+            }
+            lucide.createIcons();
+        }
+        function puConfirmUpload() {
+            document.getElementById('payout-upload-modal').classList.remove('active');
+            // Prototype: navigate to My Requests tab showing the new draft
+            switchMakerTab('requests', document.querySelector('#page-payout-pool .tabs .tab:first-child'));
+        }
+
+        // ── Template exports ──────────────────────────────────────
+        function exportPayoutTemplate() {
+            const csv = [
+                'Twomi User ID,Receiver Name,User Email,Payment Account,Currency,Amount (¥)',
+                'TW-10042,Tanaka Yuki,tanaka.y@twomi.com,tanaka.y@payoneer.com,JPY,',
+                'TW-10087,Suzuki Hana,suzuki.h@twomi.com,suzuki.h@payoneer.com,JPY,',
+            ].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'payout_template.csv';
+            a.click();
+        }
+        function exportCommissionTemplate() {
+            const csv = [
+                'No.,Twomi User ID,Receiver Name,User Email,Currency,Payout (¥)',
+                '1,TW-10042,Tanaka Yuki,tanaka.y@twomi.com,JPY,',
+                '2,TW-10087,Suzuki Hana,suzuki.h@twomi.com,JPY,',
+            ].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'commission_template.csv';
+            a.click();
         }
 
         // ── Global Payout Flag ────────────────────────────────────
@@ -3882,11 +4176,11 @@
             const balTo   = document.getElementById('np-filter-bal-to').value;
             const rows    = Array.from(document.querySelectorAll('#np-table-body tr'));
             rows.forEach(row => {
-                const bal = parseInt(row.querySelector('.np-amount')?.dataset.balance || '0');
+                const avail = parseInt(row.dataset.available || '0');
                 const match = (!name    || row.dataset.search.includes(name))
                            && (!email   || row.dataset.search.includes(email))
-                           && (!balFrom || bal >= parseInt(balFrom))
-                           && (!balTo   || bal <= parseInt(balTo));
+                           && (!balFrom || avail >= parseInt(balFrom))
+                           && (!balTo   || avail <= parseInt(balTo));
                 row.style.display = match ? '' : 'none';
             });
         }
@@ -3896,23 +4190,68 @@
         }
         function toggleAllNewPayout(masterCb) {
             document.querySelectorAll('.np-row-check').forEach(cb => {
-                const bal = parseInt(cb.closest('tr').querySelector('.np-amount')?.dataset.balance || '0');
-                if (bal > 0) { cb.checked = masterCb.checked; onNPRowCheck(cb); }
+                const avail = parseInt(cb.closest('tr').dataset.available || '0');
+                if (avail > 0) { cb.checked = masterCb.checked; onNPRowCheck(cb); }
             });
         }
         function onNPRowCheck(cb) {
             const row   = cb.closest('tr');
             const input = row.querySelector('.np-amount');
-            const bal   = parseInt(input?.dataset.balance || '0');
-            if (input) input.disabled = !cb.checked || bal === 0;
+            const avail = parseInt(row.dataset.available || '0');
+            if (input) {
+                const isChecked = cb.checked && avail > 0;
+                input.disabled = !isChecked;
+                // Reset value to available when first checking
+                if (isChecked) { input.value = avail; input.style.borderColor = ''; }
+                // Clear warning when unchecking
+                const warn = row.querySelector('.np-amount-warn');
+                if (!isChecked && warn) { warn.style.display = 'none'; warn.textContent = ''; input.style.borderColor = ''; }
+                if (isChecked) validateNPAmount(input);
+            }
+            updateNPSummary();
+        }
+        function validateNPAmount(input) {
+            const val    = parseFloat(input.value);
+            const avail  = parseInt(input.dataset.available || '0');
+            const minAmt = parseInt(document.getElementById('min-payout-amount')?.value || '1000');
+            const maxAmt = parseInt(document.getElementById('max-payout-amount')?.value || '500000');
+            const warn   = input.closest('td')?.querySelector('.np-amount-warn');
+            let msg = '';
+            if (isNaN(val) || val < 1) {
+                msg = 'Amount must be at least \u00a51.';
+            } else if (val > avail) {
+                msg = `Cannot exceed available balance (\u00a5${avail.toLocaleString()}).`;
+            } else if (val > maxAmt) {
+                msg = `\u26a0 Exceeds max payout per receiver (\u00a5${maxAmt.toLocaleString()}). Reduce the amount or contact Super Admin.`;
+            } else if (val < minAmt) {
+                msg = `\u26a0 Below min payout amount (\u00a5${minAmt.toLocaleString()}). Increase the amount or skip this receiver.`;
+            }
+            if (warn) { warn.textContent = msg; warn.style.display = msg ? 'block' : 'none'; }
+            input.style.borderColor = msg ? 'var(--color-red)' : '';
             updateNPSummary();
         }
         function updateNPSummary() {
-            const checks = Array.from(document.querySelectorAll('.np-row-check:checked'));
-            const total  = checks.reduce((s, cb) => s + parseInt(cb.closest('tr').querySelector('.np-amount')?.value || '0'), 0);
+            const checks    = Array.from(document.querySelectorAll('.np-row-check:checked'));
+            const total     = checks.reduce((s, cb) => s + (parseFloat(cb.closest('tr').querySelector('.np-amount')?.value) || 0), 0);
+            const hasErrors = Array.from(document.querySelectorAll('#np-table-body .np-amount-warn'))
+                                   .some(w => w.style.display !== 'none' && w.textContent);
             document.getElementById('np-selected-count').textContent = checks.length + ' receiver' + (checks.length !== 1 ? 's' : '');
-            document.getElementById('np-total-amount').textContent   = '\u00a5' + total.toLocaleString();
-            document.getElementById('np-create-btn').disabled        = checks.length === 0 || total === 0;
+            document.getElementById('np-total-amount').textContent   = '\u00a5' + Math.round(total).toLocaleString();
+            document.getElementById('np-create-btn').disabled        = checks.length === 0 || total === 0 || hasErrors;
+            // Show/hide warning banner
+            let warnBanner = document.getElementById('np-limit-banner');
+            if (!warnBanner) {
+                warnBanner = document.createElement('div');
+                warnBanner.id = 'np-limit-banner';
+                warnBanner.style.cssText = 'display:none;padding:8px 14px;background:rgba(255,59,92,0.06);border:1px solid rgba(255,59,92,0.25);border-radius:6px;font-size:12px;color:var(--color-red);margin-top:10px;';
+                document.getElementById('np-create-btn')?.closest('div[style]')?.parentNode?.insertBefore(warnBanner, document.getElementById('np-create-btn')?.closest('div[style]'));
+            }
+            if (hasErrors) {
+                warnBanner.style.display = 'block';
+                warnBanner.textContent = 'Fix the highlighted amount errors before creating a payout request.';
+            } else {
+                warnBanner.style.display = 'none';
+            }
         }
         function createPayoutFromSelection() {
             const checks = Array.from(document.querySelectorAll('.np-row-check:checked'));
@@ -6275,78 +6614,181 @@
             { value:'uploader',        label:'Uploader' },
         ];
 
-        function multiGroupCheckboxes(type, step, defaultChecked) {
-            return allGroups.map(g => `
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;white-space:nowrap;">
-                    <input type="checkbox" id="${type}-step-${step}-${g.value}"
+        // ── Multi-select dropdown for permission groups ───────────
+        function multiSelectDropdown(type, step, defaultChecked) {
+            const id = `${type}-step-${step}`;
+            const labelText = defaultChecked.length
+                ? defaultChecked.map(v => allGroups.find(g => g.value === v)?.label || v).join(', ')
+                : '<span class="multi-select-none">None selected</span>';
+            const optionsHtml = allGroups.map(g => `
+                <label class="multi-select-option">
+                    <input type="checkbox" id="${id}-${g.value}"
                         ${defaultChecked.includes(g.value) ? 'checked' : ''}
-                        style="accent-color:var(--color-cyan);">
+                        onchange="updateMultiSelectLabel('${id}')">
                     ${g.label}
                 </label>`).join('');
+            return `
+                <div class="multi-select-wrap">
+                    <button type="button" class="multi-select-btn" id="${id}-btn" onclick="toggleMultiSelectPanel('${id}', event)">
+                        <span class="multi-select-label-text" id="${id}-label">${labelText}</span>
+                        <i data-lucide="chevron-down" style="width:14px;height:14px;flex-shrink:0;"></i>
+                    </button>
+                    <div class="multi-select-panel" id="${id}-panel" style="display:none;">
+                        ${optionsHtml}
+                    </div>
+                </div>`;
+        }
+
+        function toggleMultiSelectPanel(id, event) {
+            if (event) event.stopPropagation();
+            const panel = document.getElementById(id + '-panel');
+            const btn   = document.getElementById(id + '-btn');
+            const isOpen = panel.style.display !== 'none';
+            // Close all open panels first
+            document.querySelectorAll('.multi-select-panel').forEach(p => { p.style.display = 'none'; });
+            document.querySelectorAll('.multi-select-btn').forEach(b => b.classList.remove('open'));
+            if (!isOpen) {
+                panel.style.display = 'block';
+                btn.classList.add('open');
+                lucide.createIcons();
+            }
+        }
+
+        function updateMultiSelectLabel(id) {
+            const checked = allGroups.filter(g => document.getElementById(id + '-' + g.value)?.checked);
+            const labelEl = document.getElementById(id + '-label');
+            if (labelEl) {
+                labelEl.innerHTML = checked.length
+                    ? checked.map(g => g.label).join(', ')
+                    : '<span class="multi-select-none">None selected</span>';
+            }
+        }
+
+        // ── Flow Config step counts (state) ──────────────────────
+        let csvStepCount    = 2;
+        let payoutStepCount = 2;
+
+        // ── Flow section helpers ──────────────────────────────────
+        const flowArrowHTML = `<div style="text-align:center;font-size:18px;color:var(--color-cyan);margin:6px 16px;line-height:1;user-select:none;">↓</div>`;
+
+        function flowRoleBadge(letter, bg, color) {
+            return `<span style="width:26px;height:26px;border-radius:50%;background:${bg};color:${color};display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;">${letter}</span>`;
+        }
+
+        function flowSectionCard(badgeHtml, titleHtml, contentHtml, headerRight = '') {
+            return `<div style="background:white;border:1px solid var(--color-border);border-radius:8px;padding:16px 18px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;${contentHtml ? 'margin-bottom:14px;' : ''}">
+                    <div style="display:flex;align-items:center;gap:9px;">
+                        ${badgeHtml}
+                        ${titleHtml}
+                    </div>
+                    ${headerRight}
+                </div>
+                ${contentHtml}
+            </div>`;
         }
 
         function renderFlowSteps(type) {
-            const inputId   = type === 'csv' ? 'csv-steps' : 'payout-steps';
-            const configId  = type === 'csv' ? 'csv-steps-config' : 'payout-steps-config';
-            const n         = parseInt(document.getElementById(inputId).value);
-            const startLabel = type === 'csv' ? 'Upload' : 'Create';
-            const startNote  = type === 'csv'
-                ? 'Any user with Upload permission'
-                : 'Any user with Create Payout Request permission';
-            const endLabel  = type === 'csv' ? 'Applied' : 'Approved';
-            const endNote   = type === 'csv' ? 'Payout Pool updated' : 'Handed to Executor Group';
+            const isCSV    = type === 'csv';
+            const configId = isCSV ? 'csv-flow-body' : 'payout-flow-body';
+            const n        = isCSV ? csvStepCount : payoutStepCount;
 
-            const stepDefaults = { 1:['finance-team'], 2:['finance-manager'], 3:['super-admin'] };
+            const stepDefaults = { 1:['finance-team'], 2:['finance-manager'], 3:['super-admin'], 4:['super-admin'], 5:['super-admin'] };
 
-            let html = `<div style="display:flex;align-items:flex-start;gap:12px;">
-                <div style="width:80px;font-size:13px;font-weight:600;color:var(--color-text-muted);padding-top:2px;">${startLabel}</div>
-                <div class="flow-arrow" style="margin-top:2px;">→</div>
-                <div style="font-size:12px;color:var(--color-text-muted);font-style:italic;padding-top:3px;">${startNote}</div>
+            // ── Maker ──
+            const makerDefaults = isCSV ? ['uploader'] : ['finance-team'];
+            const makerBadge    = flowRoleBadge('M', 'var(--color-navy)', 'white');
+            const makerTitle    = `<span style="font-size:14px;font-weight:700;color:var(--color-navy);">Maker</span>`;
+            const makerContent  = `<div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:12px;color:var(--color-text-muted);white-space:nowrap;">Permission groups</span>
+                ${multiSelectDropdown(type + '-maker', 'grp', makerDefaults)}
             </div>`;
 
+            // ── Checker ──
+            const checkerBadge  = flowRoleBadge('C', 'var(--color-amber)', 'white');
+            const checkerTitle  = `<span style="font-size:14px;font-weight:700;color:var(--color-navy);">Checker</span>`;
+            const checkerRight  = `<div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:12px;color:var(--color-text-muted);">Approval steps:</span>
+                <button class="btn btn-small btn-secondary" onclick="decrementSteps('${type}')" style="padding:3px 9px;font-size:15px;line-height:1;min-width:28px;">−</button>
+                <span style="font-size:14px;font-weight:700;color:var(--color-navy);min-width:16px;text-align:center;">${n}</span>
+                <button class="btn btn-small btn-secondary" onclick="incrementSteps('${type}')" style="padding:3px 9px;font-size:15px;line-height:1;min-width:28px;">+</button>
+            </div>`;
+            let stepsHtml = '';
             for (let i = 1; i <= n; i++) {
                 const defaults = stepDefaults[i] || ['finance-team'];
-                html += `<div style="display:flex;align-items:flex-start;gap:12px;">
-                    <div style="width:80px;font-size:13px;font-weight:600;color:var(--color-navy);padding-top:4px;">Step ${i}</div>
-                    <div class="flow-arrow" style="margin-top:4px;">→</div>
-                    <div style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:6px;padding:8px 12px;display:flex;flex-wrap:wrap;gap:10px;">
-                        ${multiGroupCheckboxes(type, i, defaults)}
-                    </div>
-                    <span style="font-size:12px;color:var(--color-text-muted);padding-top:6px;">can approve</span>
+                stepsHtml += `<div style="display:flex;align-items:center;gap:10px;${i < n ? 'margin-bottom:8px;' : ''}">
+                    <span style="font-size:12px;font-weight:600;color:var(--color-text);min-width:52px;">Step ${i}</span>
+                    <span style="color:var(--color-cyan);font-weight:700;">→</span>
+                    ${multiSelectDropdown(type, i, defaults)}
+                    <span style="font-size:12px;color:var(--color-text-muted);white-space:nowrap;">can approve</span>
                 </div>`;
             }
 
-            html += `<div style="display:flex;align-items:flex-start;gap:12px;">
-                <div style="width:80px;font-size:13px;font-weight:600;color:var(--color-green);padding-top:2px;">${endLabel}</div>
-                <div class="flow-arrow" style="margin-top:2px;">→</div>
-                <div style="font-size:12px;color:var(--color-green);padding-top:3px;">${endNote}</div>
+            // ── Executer (payout only) ──
+            const execBadge   = flowRoleBadge('E', 'var(--color-cyan)', 'var(--color-navy)');
+            const execTitle   = `<span style="font-size:14px;font-weight:700;color:var(--color-navy);">Executer</span>`;
+            const execDefaults = ['finance-manager'];
+            const execContent  = `<div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:12px;color:var(--color-text-muted);white-space:nowrap;">Permission groups</span>
+                ${multiSelectDropdown(type + '-exec', 'grp', execDefaults)}
             </div>`;
 
+            // ── End state ──
+            const endLabel = isCSV ? 'Update receivers\' balance' : 'Approved';
+            const endNote  = isCSV ? 'Earnings applied — Payout Pool updated' : 'Handed to Executer group';
+            const endHtml  = `<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;background:rgba(0,196,140,0.06);border:1px solid rgba(0,196,140,0.25);border-radius:8px;">
+                <i data-lucide="check-circle" style="width:18px;height:18px;color:var(--color-green);flex-shrink:0;"></i>
+                <div>
+                    <div style="font-size:13px;font-weight:700;color:var(--color-green);">${endLabel}</div>
+                    <div style="font-size:12px;color:var(--color-text-muted);margin-top:2px;">${endNote}</div>
+                </div>
+            </div>`;
+
+            // ── Assemble ──
+            let html = '';
+            html += flowSectionCard(makerBadge,   makerTitle,   makerContent);
+            html += flowArrowHTML;
+            html += flowSectionCard(checkerBadge, checkerTitle, stepsHtml,    checkerRight);
+            html += flowArrowHTML;
+            if (!isCSV) {
+                html += flowSectionCard(execBadge, execTitle, execContent);
+                html += flowArrowHTML;
+            }
+            html += endHtml;
+
             document.getElementById(configId).innerHTML = html;
+            lucide.createIcons();
         }
 
-        function incrementSteps(type, inputId) {
-            const input = document.getElementById(inputId);
-            const n = parseInt(input.value);
-            if (n >= 5) return;
-            input.value = n + 1;
-            renderFlowSteps(type);
+        function incrementSteps(type) {
+            if (type === 'csv') {
+                if (csvStepCount < 5) { csvStepCount++;    renderFlowSteps('csv'); }
+            } else {
+                if (payoutStepCount < 5) { payoutStepCount++; renderFlowSteps('payout'); }
+            }
         }
-        function decrementSteps(type, inputId) {
-            const input = document.getElementById(inputId);
-            const n = parseInt(input.value);
-            if (n <= 1) return;
-            input.value = n - 1;
-            renderFlowSteps(type);
+        function decrementSteps(type) {
+            if (type === 'csv') {
+                if (csvStepCount > 1) { csvStepCount--;    renderFlowSteps('csv'); }
+            } else {
+                if (payoutStepCount > 1) { payoutStepCount--; renderFlowSteps('payout'); }
+            }
         }
         function toggleCheck(checkbox) { if (checkbox.classList && checkbox.classList.contains('toggle-switch')) checkbox.classList.toggle('on'); }
-        function toggleApiKeyVisibility() { const input = document.getElementById('api-key-input'); if (input.type === 'password') { input.type = 'text'; input.value = 'sk-live-abc123def456ghi789jkl012'; } else { input.type = 'password'; input.value = '●●●●●●●●●●●●'; } }
-        function toggleApiSecretVisibility() { const input = document.getElementById('api-secret-input'); if (input.type === 'password') { input.type = 'text'; input.value = 'secret-abc123def456ghi789jkl012'; } else { input.type = 'password'; input.value = '●●●●●●●●●●●●'; } }
+
+        // Close any open multi-select dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.multi-select-wrap')) {
+                document.querySelectorAll('.multi-select-panel').forEach(p => { p.style.display = 'none'; });
+                document.querySelectorAll('.multi-select-btn').forEach(b => b.classList.remove('open'));
+            }
+        });
+
         window.addEventListener('load', function() {
             lucide.createIcons();
             // Initialise flow config step renderers
-            if (document.getElementById('csv-steps-config'))   renderFlowSteps('csv');
-            if (document.getElementById('payout-steps-config')) renderFlowSteps('payout');
+            if (document.getElementById('csv-flow-body'))    renderFlowSteps('csv');
+            if (document.getElementById('payout-flow-body')) renderFlowSteps('payout');
             document.querySelectorAll('input[type="checkbox"].toggle-switch').forEach(toggle => { toggle.checked = toggle.hasAttribute('checked'); if (toggle.checked) toggle.classList.add('on'); });
             document.querySelectorAll('.segment').forEach((segment, index) => { if (index === 0) segment.classList.add('active'); segment.addEventListener('click', function() { this.parentElement.querySelectorAll('.segment').forEach(s => s.classList.remove('active')); this.classList.add('active'); }); });
             const poolCheckboxes = document.querySelectorAll('.pool-row-checkbox');
